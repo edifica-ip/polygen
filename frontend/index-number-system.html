@@ -388,6 +388,13 @@ SELECT DROPDOWN FIX
   Binary Visualizer
 </button>
 
+
+          <button class="ns-tab"
+        data-tab="digitalcodes">
+  Digital Codes
+</button>
+
+          
           
         </div>
 
@@ -937,7 +944,80 @@ SELECT DROPDOWN FIX
 
 
 
+<!-- ================================ -->
+<!-- DIGITAL CODES -->
+<!-- ================================ -->
 
+<div class="ns-card tab-content hidden"
+     id="digitalcodes">
+
+  <div class="ns-grid">
+
+    <div>
+
+      <div class="ns-input-group">
+
+        <label>Input</label>
+
+        <input type="text"
+               id="digitalInput"
+               placeholder="Example: 1011 or 59">
+
+      </div>
+
+      <div class="ns-input-group">
+
+        <label>Code Type</label>
+
+        <select id="digitalType">
+
+          <option value="binaryToGray">
+            Binary → Gray
+          </option>
+
+          <option value="grayToBinary">
+            Gray → Binary
+          </option>
+
+          <option value="decimalToBCD">
+            Decimal → BCD
+          </option>
+
+          <option value="decimalToExcess3">
+            Decimal → Excess-3
+          </option>
+
+        </select>
+
+      </div>
+
+      <button class="ns-btn"
+              onclick="convertDigitalCodes()">
+
+        Convert Code
+
+      </button>
+
+    </div>
+
+    <div class="ns-output">
+
+      <div class="ns-result"
+           id="digitalResult">
+
+        Result will appear here
+
+      </div>
+
+      <div class="ns-steps"
+           id="digitalSteps">
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
 
 
