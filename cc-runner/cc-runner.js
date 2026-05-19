@@ -27,11 +27,9 @@ const app = express();
 
 // ---- CORS allowlist ----
 const ALLOW_ORIGINS = [
-  "https://www.polycode.in",
-  "https://polycode.in",
+  "https://www.polygen.in",
+  "https://polygen.in",
   "https://polycode.pages.dev",
-  "https://edifica-polycode.pages.dev",
-  "https://polycode.cc",
   "http://localhost:3000", // dev
 ];
 
