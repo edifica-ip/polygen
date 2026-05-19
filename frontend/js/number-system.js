@@ -317,7 +317,7 @@ const dec2 =
         break;
 
       case '/':
-        answer = Math.floor(dec1 / dec2);
+        answer = dec1 / dec2;
         break;
 
     }
