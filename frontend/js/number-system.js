@@ -335,23 +335,34 @@ function generateSignedBinary(){
     document.getElementById('signedSteps');
 
   if(isNaN(num)){
+
     result.innerHTML = "❌ Invalid";
+
     return;
   }
 
-  let magnitude =
-  Math.abs(num)
-  .toString(2)
-  .padStart(bits - 1, '0');
+  // Positive magnitude binary
+  let positiveBinary =
+    Math.abs(num)
+    .toString(2)
+    .padStart(bits,'0');
 
-let binary =
-  (num < 0 ? '1' : '0') + magnitude;
+  // Signed magnitude
+  let signedMagnitude =
+    (num < 0 ? '1' : '0') +
+    positiveBinary.substring(1);
 
-  let ones =
-    binary.replace(/0/g,'x')
-          .replace(/1/g,'0')
-          .replace(/x/g,'1');
+  // 1's complement
+  let ones = '';
 
+  for(let bit of positiveBinary){
+
+    ones += bit === '0'
+      ? '1'
+      : '0';
+  }
+
+  // 2's complement
   let twos =
     (parseInt(ones,2)+1)
     .toString(2)
@@ -362,7 +373,7 @@ let binary =
 
   steps.innerHTML = `
 Signed Magnitude:
-${binary}
+${signedMagnitude}
 
 1's Complement:
 ${ones}
