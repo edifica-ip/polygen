@@ -25,62 +25,13 @@ const CC_TOKEN_TTL_MS = Number(process.env.CC_TOKEN_TTL_MS || 5 * 60 * 1000); //
 // ----------------------------------------------------------------------------
 const app = express();
 
-// ---- CORS allowlist ----
-const ALLOW_ORIGINS = [
-  "https://www.polygen.in",
-  "https://polygen.in",
-  "http://www.polygen.in",
-  "http://polygen.in",
-  "https://polycode.pages.dev",
-  "http://localhost:3000", // dev
-];
 
-const corsOptions = {
-
-  origin: (origin, cb) => {
-
-    // Allow curl/server-server/no-origin requests
-    if (!origin)
-      return cb(null, true);
-
-    // Normalize trailing slash
-    const cleanOrigin =
-      origin.replace(/\/$/, '');
-
-    const allowed =
-      ALLOW_ORIGINS.map(o =>
-        o.replace(/\/$/, '')
-      );
-
-    if (allowed.includes(cleanOrigin)) {
-      return cb(null, true);
-    }
-
-    console.log(
-      "Blocked Origin:",
-      origin
-    );
-
-    // IMPORTANT:
-    // Don't throw hard error
-    return cb(null, false);
-  },
-
-  methods: ["GET", "POST", "OPTIONS"],
-
-  allowedHeaders: [
-    "Content-Type",
-    "X-Requested-With"
-  ],
-
-  credentials: true,
-
-  maxAge: 86400
-};
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 
 
-
-app.use(cors(corsOptions));
 app.use((req,res,next)=>{
 
   console.log(
@@ -118,35 +69,7 @@ app.use((req,res,next)=>{
 });
 
 
-app.options("*", (req,res)=>{
-
-  if(req.headers.origin){
-
-    res.header(
-      "Access-Control-Allow-Origin",
-      req.headers.origin
-    );
-
-  }
-
-  res.header(
-    "Access-Control-Allow-Credentials",
-    "true"
-  );
-
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET,POST,OPTIONS"
-  );
-
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Content-Type,X-Requested-With"
-  );
-
-  return res.sendStatus(204);
-
-});
+app.options("*", cors());
 
 app.use(express.json({ limit: "1mb" }));
 
@@ -157,7 +80,7 @@ app.use(
   "/artifacts",
   (req, res, next) => {
     const o = req.headers.origin;
-    if (!o || ALLOW_ORIGINS.includes(o)) {
+    if ((o)) {
       res.setHeader("Access-Control-Allow-Origin", o || "*");
     }
     next();
