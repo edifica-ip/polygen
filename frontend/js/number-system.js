@@ -788,7 +788,7 @@ ${overflow ? 'YES' : 'NO'}
 BINARY ADDITION VISUALIZER
 ========================================= */
 
-function visualizeBinaryAddition(){
+function visualizeBinaryOperation(){
 
   let a =
     document.getElementById('visualNum1')
@@ -797,6 +797,13 @@ function visualizeBinaryAddition(){
   let b =
     document.getElementById('visualNum2')
     .value.trim();
+
+  const operation =
+  document.getElementById(
+    'visualOperation'
+  ).value;
+
+  
 
   const result =
     document.getElementById('visualResult');
@@ -815,6 +822,13 @@ function visualizeBinaryAddition(){
     return;
   }
 
+  if(operation === 'multiply'){
+
+  return visualizeBinaryMultiplication(a,b);
+
+}
+
+  
   const maxLen =
     Math.max(a.length, b.length);
 
@@ -884,7 +898,88 @@ ${parseInt(answer,2)}
 }
 
 
+/* =========================================
+BINARY MULTIPLICATION VISUALIZER
+========================================= */
 
+function visualizeBinaryMultiplication(a,b){
+
+  const result =
+    document.getElementById('visualResult');
+
+  const steps =
+    document.getElementById('visualSteps');
+
+  const decA =
+    parseInt(a,2);
+
+  const decB =
+    parseInt(b,2);
+
+  const final =
+    decA * decB;
+
+  const binaryFinal =
+    final.toString(2);
+
+  let work = '';
+
+  let shift = 0;
+
+  for(let i=b.length-1; i>=0; i--){
+
+    const bit = b[i];
+
+    if(bit === '1'){
+
+      const partial =
+        a + '0'.repeat(shift);
+
+      work +=
+        partial + '\n';
+
+    }
+    else{
+
+      work +=
+        '0'.repeat(a.length + shift)
+        + '\n';
+
+    }
+
+    shift++;
+
+  }
+
+  result.innerHTML =
+    `✅ Binary Multiplication Complete`;
+
+  steps.innerHTML = `
+       ${a}
+×      ${b}
+----------------
+
+${work}
+
+----------------
+
+Result:
+${binaryFinal}
+
+--------------------------------
+
+Decimal Verification:
+
+${decA}
+×
+${decB}
+
+=
+
+${final}
+`;
+
+}
 
 
 
