@@ -1598,7 +1598,18 @@ function resolveValue(value, REG){
 
   }
 
-  return parseInt(value);
+  const parsed =
+    parseInt(value);
+
+  if(isNaN(parsed)){
+
+    throw new Error(
+      `Invalid Operand: ${value}`
+    );
+
+  }
+
+  return parsed;
 
 }
 
@@ -1712,7 +1723,7 @@ FLAGS.OF = 0;
     if(instruction === 'MOV'){
 
       // MEMORY WRITE
-      if(op1.startsWith('[')){
+      if(op1 && op1.startsWith('[')){
 
         const addr =
           op1.replace('[','')
@@ -1724,7 +1735,11 @@ FLAGS.OF = 0;
       }
 
 // MEMORY READ
-else if(op2 && op2.startsWith('[')){
+else if(
+  op2 &&
+  typeof op2 === 'string' &&
+  op2.startsWith('[')
+){
 
   const addr =
     op2.replace('[','')
