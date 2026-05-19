@@ -339,9 +339,13 @@ function generateSignedBinary(){
     return;
   }
 
-  let binary =
-    (Math.abs(num)).toString(2)
-    .padStart(bits,'0');
+  let magnitude =
+  Math.abs(num)
+  .toString(2)
+  .padStart(bits - 1, '0');
+
+let binary =
+  (num < 0 ? '1' : '0') + magnitude;
 
   let ones =
     binary.replace(/0/g,'x')
