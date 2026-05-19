@@ -32,41 +32,7 @@ app.use(cors({
 }));
 
 
-app.use((req,res,next)=>{
 
-  console.log(
-    "Origin:",
-    req.headers.origin
-  );
-
-  
-  if(req.headers.origin){
-
-  res.header(
-    "Access-Control-Allow-Origin",
-    req.headers.origin
-  );
-
-}
-
-  res.header(
-  "Access-Control-Allow-Credentials",
-  "true"
-);
-
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET,POST,OPTIONS"
-  );
-
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Content-Type,X-Requested-With"
-  );
-
-  next();
-
-});
 
 
 app.options("*", cors());
@@ -80,9 +46,17 @@ app.use(
   "/artifacts",
   (req, res, next) => {
     const o = req.headers.origin;
-    if ((o)) {
-      res.setHeader("Access-Control-Allow-Origin", o || "*");
-    }
+   if (o) {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    o
+  );
+
+      res.setHeader(
+    "Access-Control-Allow-Credentials",
+    "true"
+  );
+}
     next();
   },
   express.static(PUBLIC_ROOT, { maxAge: "5m", fallthrough: true })
