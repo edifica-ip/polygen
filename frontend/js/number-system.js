@@ -1584,22 +1584,15 @@ ${excess3}
 
 
 /* =========================================
-CPU REGISTER SIMULATOR
+MINI CPU EMULATOR
 ========================================= */
 
-function executeCPUOperation(){
+function runCPUProgram(){
 
-  let acc =
-    document.getElementById('cpuAcc')
-    .value.trim();
-
-  let operand =
-    document.getElementById('cpuOperand')
-    .value.trim();
-
-  const operation =
-    document.getElementById('cpuOperation')
-    .value;
+  const code =
+    document.getElementById('cpuProgram')
+    .value
+    .trim();
 
   const resultDiv =
     document.getElementById('cpuResult');
@@ -1607,154 +1600,345 @@ function executeCPUOperation(){
   const stepsDiv =
     document.getElementById('cpuSteps');
 
-  if(
-    !/^[01]{8}$/.test(acc) ||
-    !/^[01]{8}$/.test(operand)
-  ){
-
-    resultDiv.innerHTML =
-      "❌ Enter valid 8-bit binary";
-
-    return;
-  }
-
-  let A = parseInt(acc,2);
-  let B = parseInt(operand,2);
-
-  let result = 0;
-
-  let carryFlag = 0;
-  let overflowFlag = 0;
-  let zeroFlag = 0;
-
   /* =====================================
-  OPERATIONS
+  CPU STATE
   ===================================== */
 
-  switch(operation){
+  let REG = {
 
-    case 'add':
+    AX: 0,
+    BX: 0,
+    CX: 0,
+    DX: 0
 
-      result = A + B;
+  };
 
-      if(result > 255){
+  let MEMORY = {};
 
-        carryFlag = 1;
+  let FLAGS = {
 
-      }
+    CF: 0,
+    ZF: 0,
+    OF: 0
 
-      result &= 255;
+  };
 
-      break;
+  let clockCycles = 0;
 
-    case 'sub':
+  let instructionQueue = [];
 
-      result = A - B;
+  let output = '';
 
-      if(result < 0){
+  const lines =
+    code
+    .split('\n')
+    .map(x => x.trim())
+    .filter(Boolean);
 
-        overflowFlag = 1;
+  /* =====================================
+  EXECUTION LOOP
+  ===================================== */
 
-        result = 256 + result;
+  for(let line of lines){
 
-      }
-
-      break;
-
-    case 'and':
-
-      result = A & B;
-
-      break;
-
-    case 'or':
-
-      result = A | B;
-
-      break;
-
-    case 'xor':
-
-      result = A ^ B;
-
-      break;
-
-    case 'lshift':
-
-      carryFlag =
-        (A & 128) ? 1 : 0;
-
-      result =
-        (A << 1) & 255;
-
-      break;
-
-    case 'rshift':
-
-      carryFlag =
-        (A & 1) ? 1 : 0;
-
-      result =
-        A >> 1;
-
-      break;
+    instructionQueue.push(line);
 
   }
 
-  if(result === 0){
-
-    zeroFlag = 1;
-
-  }
-
-  const binaryResult =
-    result
-    .toString(2)
-    .padStart(8,'0');
-
-  resultDiv.innerHTML =
-    `✅ Instruction Executed`;
-
-  stepsDiv.innerHTML = `
+  output += `
 ================================
-CPU REGISTER STATE
+PROGRAM LOADED
 ================================
 
-ACC:
-${acc}
+Instruction Queue:
+${instructionQueue.join('\n')}
 
-OPERAND:
-${operand}
+================================
 
+`;
+
+  for(let pc=0; pc<instructionQueue.length; pc++){
+
+    const line =
+      instructionQueue[pc];
+
+    output += `
 --------------------------------
-
-INSTRUCTION:
-${operation.toUpperCase()}
-
+EXECUTING:
+${line}
 --------------------------------
+`;
 
-RESULT (Binary):
-${binaryResult}
+    const parts =
+      line
+      .replace(',', ' ')
+      .split(/\s+/);
 
-RESULT (Decimal):
-${result}
+    const instruction =
+      parts[0]?.toUpperCase();
+
+    const op1 =
+      parts[1]?.toUpperCase();
+
+    const op2 =
+      parts[2]?.toUpperCase();
+
+    /* =================================
+    MOV
+    ================================= */
+
+    if(instruction === 'MOV'){
+
+      // MEMORY WRITE
+      if(op1.startsWith('[')){
+
+        const addr =
+          op1.replace('[','')
+             .replace(']','');
+
+        MEMORY[addr] =
+          REG[op2] ?? parseInt(op2);
+
+      }
+
+      // REGISTER WRITE
+      else{
+
+        REG[op1] =
+          REG[op2] ?? parseInt(op2);
+
+      }
+
+      clockCycles += 2;
+
+    }
+
+    /* =================================
+    ADD
+    ================================= */
+
+    else if(instruction === 'ADD'){
+
+      REG[op1] +=
+        REG[op2] ?? parseInt(op2);
+
+      if(REG[op1] > 255){
+
+        FLAGS.CF = 1;
+
+        REG[op1] &= 255;
+
+      }
+
+      clockCycles += 1;
+
+    }
+
+    /* =================================
+    SUB
+    ================================= */
+
+    else if(instruction === 'SUB'){
+
+      REG[op1] -=
+        REG[op2] ?? parseInt(op2);
+
+      if(REG[op1] < 0){
+
+        FLAGS.OF = 1;
+
+        REG[op1] =
+          256 + REG[op1];
+
+      }
+
+      clockCycles += 1;
+
+    }
+
+    /* =================================
+    INC
+    ================================= */
+
+    else if(instruction === 'INC'){
+
+      REG[op1]++;
+
+      REG[op1] &= 255;
+
+      clockCycles += 1;
+
+    }
+
+    /* =================================
+    DEC
+    ================================= */
+
+    else if(instruction === 'DEC'){
+
+      REG[op1]--;
+
+      if(REG[op1] < 0){
+
+        REG[op1] = 255;
+
+      }
+
+      clockCycles += 1;
+
+    }
+
+    /* =================================
+    AND
+    ================================= */
+
+    else if(instruction === 'AND'){
+
+      REG[op1] &=
+        REG[op2] ?? parseInt(op2);
+
+      clockCycles += 1;
+
+    }
+
+    /* =================================
+    OR
+    ================================= */
+
+    else if(instruction === 'OR'){
+
+      REG[op1] |=
+        REG[op2] ?? parseInt(op2);
+
+      clockCycles += 1;
+
+    }
+
+    /* =================================
+    XOR
+    ================================= */
+
+    else if(instruction === 'XOR'){
+
+      REG[op1] ^=
+        REG[op2] ?? parseInt(op2);
+
+      clockCycles += 1;
+
+    }
+
+    /* =================================
+    SHL
+    ================================= */
+
+    else if(instruction === 'SHL'){
+
+      FLAGS.CF =
+        (REG[op1] & 128)
+        ? 1
+        : 0;
+
+      REG[op1] =
+        (REG[op1] << 1) & 255;
+
+      clockCycles += 1;
+
+    }
+
+    /* =================================
+    SHR
+    ================================= */
+
+    else if(instruction === 'SHR'){
+
+      FLAGS.CF =
+        (REG[op1] & 1)
+        ? 1
+        : 0;
+
+      REG[op1] >>= 1;
+
+      clockCycles += 1;
+
+    }
+
+    /* =================================
+    ZERO FLAG
+    ================================= */
+
+    if(REG[op1] === 0){
+
+      FLAGS.ZF = 1;
+
+    }
+
+    /* =================================
+    REGISTER DUMP
+    ================================= */
+
+    output += `
+REGISTERS
+
+AX:
+${REG.AX}
+(${REG.AX.toString(2).padStart(8,'0')})
+
+BX:
+${REG.BX}
+(${REG.BX.toString(2).padStart(8,'0')})
+
+CX:
+${REG.CX}
+(${REG.CX.toString(2).padStart(8,'0')})
+
+DX:
+${REG.DX}
+(${REG.DX.toString(2).padStart(8,'0')})
 
 --------------------------------
 
 FLAGS
 
-Carry Flag (CF):
-${carryFlag}
+CF:
+${FLAGS.CF}
 
-Overflow Flag (OF):
-${overflowFlag}
+ZF:
+${FLAGS.ZF}
 
-Zero Flag (ZF):
-${zeroFlag}
+OF:
+${FLAGS.OF}
 
+--------------------------------
+
+CLOCK CYCLES:
+${clockCycles}
+
+`;
+
+  }
+
+  /* =====================================
+  MEMORY DUMP
+  ===================================== */
+
+  output += `
+================================
+MEMORY DUMP
 ================================
 `;
 
+  for(let addr in MEMORY){
+
+    output += `
+[${addr}] = ${MEMORY[addr]}
+`;
+
+  }
+
+  resultDiv.innerHTML =
+    `✅ Program Executed`;
+
+  stepsDiv.innerHTML =
+    output;
+
 }
-
-
