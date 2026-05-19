@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 8090;
 const ALLOW_ORIGINS = [
   "https://www.polygen.in",
   "https://polygen.in",
-  "https://polygen.pages.dev",
+  "https://polycode.pages.dev",
   "http://localhost:3000",
 ];
 const corsOptions = {
