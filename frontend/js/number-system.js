@@ -828,6 +828,18 @@ function visualizeBinaryOperation(){
 
 }
 
+if(operation === 'sub1'){
+
+  return visualizeOnesComplementSubtraction(a,b);
+
+}
+
+if(operation === 'sub2'){
+
+  return visualizeTwosComplementSubtraction(a,b);
+
+}
+
   
   const maxLen =
     Math.max(a.length, b.length);
@@ -984,7 +996,195 @@ ${final}
 
 
 
+/* =========================================
+1's COMPLEMENT SUBTRACTION
+========================================= */
 
+function visualizeOnesComplementSubtraction(a,b){
+
+  const result =
+    document.getElementById('visualResult');
+
+  const steps =
+    document.getElementById('visualSteps');
+
+  const bits =
+    Math.max(a.length,b.length);
+
+  a = a.padStart(bits,'0');
+  b = b.padStart(bits,'0');
+
+  // 1's complement
+  let ones = '';
+
+  for(let bit of b){
+
+    ones += bit === '0'
+      ? '1'
+      : '0';
+  }
+
+  const sum =
+    parseInt(a,2)
+    +
+    parseInt(ones,2);
+
+  let binary =
+    sum.toString(2);
+
+  let carry = '';
+
+  // End-around carry
+  if(binary.length > bits){
+
+    carry = binary[0];
+
+    binary =
+      binary.slice(1);
+
+    binary =
+      (
+        parseInt(binary,2)
+        + 1
+      )
+      .toString(2)
+      .padStart(bits,'0');
+  }
+
+  result.innerHTML =
+    `✅ 1's Complement Subtraction`;
+
+  steps.innerHTML = `
+Minuend:
+${a}
+
+Subtrahend:
+${b}
+
+--------------------------------
+
+1's Complement of Subtrahend:
+${ones}
+
+--------------------------------
+
+Addition:
+
+${a}
++
+${ones}
+
+=
+${sum.toString(2)}
+
+--------------------------------
+
+End Around Carry:
+${carry || 'None'}
+
+Final Result:
+${binary}
+`;
+
+}
+
+
+
+
+
+/* =========================================
+2's COMPLEMENT SUBTRACTION
+========================================= */
+
+function visualizeTwosComplementSubtraction(a,b){
+
+  const result =
+    document.getElementById('visualResult');
+
+  const steps =
+    document.getElementById('visualSteps');
+
+  const bits =
+    Math.max(a.length,b.length);
+
+  a = a.padStart(bits,'0');
+  b = b.padStart(bits,'0');
+
+  // 1's complement
+  let ones = '';
+
+  for(let bit of b){
+
+    ones += bit === '0'
+      ? '1'
+      : '0';
+  }
+
+  // 2's complement
+  let twos =
+    (
+      parseInt(ones,2) + 1
+    )
+    .toString(2)
+    .padStart(bits,'0');
+
+  const sum =
+    parseInt(a,2)
+    +
+    parseInt(twos,2);
+
+  let binary =
+    sum.toString(2);
+
+  let carry = '';
+
+  if(binary.length > bits){
+
+    carry = binary[0];
+
+    binary =
+      binary.slice(1);
+  }
+
+  result.innerHTML =
+    `✅ 2's Complement Subtraction`;
+
+  steps.innerHTML = `
+Minuend:
+${a}
+
+Subtrahend:
+${b}
+
+--------------------------------
+
+1's Complement:
+${ones}
+
+2's Complement:
+${twos}
+
+--------------------------------
+
+Addition:
+
+${a}
++
+${twos}
+
+=
+${sum.toString(2)}
+
+--------------------------------
+
+Carry:
+${carry || 'None'}
+
+Final Result:
+${binary}
+`;
+
+}
 
 
 
