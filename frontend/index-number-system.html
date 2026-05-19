@@ -383,7 +383,10 @@ SELECT DROPDOWN FIX
   Overflow Detector
 </button>
 
-
+<button class="ns-tab"
+        data-tab="visual">
+  Binary Visualizer
+</button>
 
           
         </div>
@@ -781,7 +784,7 @@ SELECT DROPDOWN FIX
 
       <button class="ns-btn"
               onclick="convertAsciiHex()">
-        Convert ASCII / HEX
+        Generate
       </button>
 
     </div>
@@ -858,6 +861,71 @@ SELECT DROPDOWN FIX
   </div>
 
 </div>
+
+
+
+
+
+
+
+
+
+
+        <div class="ns-card tab-content hidden"
+     id="visual">
+
+  <div class="ns-grid">
+
+    <div>
+
+      <div class="ns-input-group">
+        <label>First Binary Number</label>
+
+        <input type="text"
+               id="visualNum1"
+               placeholder="Example: 1010">
+      </div>
+
+      <div class="ns-input-group">
+        <label>Second Binary Number</label>
+
+        <input type="text"
+               id="visualNum2"
+               placeholder="Example: 0111">
+      </div>
+
+      <button class="ns-btn"
+              onclick="visualizeBinaryAddition()">
+        Visualize Addition
+      </button>
+
+    </div>
+
+    <div class="ns-output">
+
+      <div class="ns-result"
+           id="visualResult">
+      </div>
+
+      <div class="ns-steps"
+           id="visualSteps"
+           style="font-family:monospace;
+                  font-size:18px;">
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
 
         
       </div>
