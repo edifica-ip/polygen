@@ -228,6 +228,9 @@ function convertFromDecimal(decimal, base){
   let fractionPart =
     decimal - integerPart;
 
+  fractionPart =
+  Number(fractionPart.toFixed(12));
+
   let intResult =
     integerPart.toString(base)
     .toUpperCase();
