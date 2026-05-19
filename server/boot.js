@@ -10,6 +10,6 @@ app.use(express.json({ limit: '2mb' }));
 
 (async () => {
   await loadPlugins(app);
-  const server = app.listen(PORT, () => console.log('[polycode] listening on :' + PORT));
+  const server = app.listen(PORT, () => console.log('[polygen] listening on :' + PORT));
   createTermServer(server);
 })();
