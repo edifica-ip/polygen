@@ -49,7 +49,7 @@ app.options("*", cors(corsOptions)); // preflight with same options
 app.use(express.json({ limit: "1mb" }));
 
 // --- Artifacts (images) static route with CORS ---
-const PUBLIC_ROOT = "/tmp/polycode-artifacts";
+const PUBLIC_ROOT = "/tmp/polygen-artifacts";
 try { fssync.mkdirSync(PUBLIC_ROOT, { recursive: true }); } catch {}
 app.use(
   "/artifacts",
