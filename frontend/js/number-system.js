@@ -47,6 +47,24 @@ tabButtons.forEach(btn => {
 NUMBER CONVERSION
 ========================================= */
 
+/* =========================================
+VALIDATE NUMBER FOR BASE
+========================================= */
+
+function isValidForBase(value, base){
+
+  const patterns = {
+    2: /^[01]+$/,
+    8: /^[0-7]+$/,
+    10: /^[0-9]+$/,
+    16: /^[0-9A-Fa-f]+$/
+  };
+
+  return patterns[base].test(value);
+
+}
+
+
 function convertNumber(){
 
   const input = document.getElementById('convertInput').value.trim();
@@ -58,11 +76,13 @@ function convertNumber(){
 
   try{
 
-    const decimal = parseInt(input, fromBase);
+   /* Validate input properly */
 
-    if(isNaN(decimal)){
-      throw new Error("Invalid number");
-    }
+if(!isValidForBase(input, fromBase)){
+  throw new Error("Invalid number for selected base");
+}
+
+const decimal = parseInt(input, fromBase);
 
     let result = decimal.toString(toBase).toUpperCase();
 
