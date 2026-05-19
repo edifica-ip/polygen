@@ -17,7 +17,7 @@ COPY java-runner.js ./
 
 # ---- Build runner.jar (UTF-8) ----
 COPY io /app/io
-RUN javac -encoding UTF-8 -d out io/polycode/*.java \
+RUN javac -encoding UTF-8 -d out io/polygen/*.java \
  && jar --create --file runner.jar -C out .
 
 # ---- Libraries (JDBC + Local WebSocket support via single jar) ----
