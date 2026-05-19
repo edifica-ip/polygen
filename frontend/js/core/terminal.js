@@ -3,7 +3,7 @@ export function initTerminal(){
   if (term) return term;
   term=new Terminal({ convertEol:true, cols:80, rows:24, fontFamily:'ui-monospace, monospace', fontSize:13 });
   term.open(document.getElementById('term'));
-  term.writeln('PolyCode Terminal — type when your program asks for input.');
+  term.writeln('Polygen Terminal — type when your program asks for input.');
   return term;
 }
 export function clearTerminal(full=false){ if(!term) return; if(full) term.reset(); else term.clear(); }
