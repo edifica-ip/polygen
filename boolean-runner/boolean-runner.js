@@ -5,10 +5,9 @@ import cors from "cors";
 const PORT = process.env.PORT || 8090;
 
 const ALLOW_ORIGINS = [
-  "https://www.polycode.in",
-  "https://polycode.in",
+  "https://www.polygen.in",
+  "https://polygen.in",
   "https://polycode.pages.dev",
-  "https://edifica-polycode.pages.dev",
   "http://localhost:3000",
 ];
 const corsOptions = {
