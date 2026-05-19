@@ -54,10 +54,15 @@ VALIDATE NUMBER FOR BASE
 function isValidForBase(value, base){
 
   const patterns = {
-    2: /^[01]+$/,
-    8: /^[0-7]+$/,
-    10: /^[0-9]+$/,
-    16: /^[0-9A-Fa-f]+$/
+
+    2: /^[01]+(\.[01]+)?$/,
+
+    8: /^[0-7]+(\.[0-7]+)?$/,
+
+    10: /^[0-9]+(\.[0-9]+)?$/,
+
+    16: /^[0-9A-Fa-f]+(\.[0-9A-Fa-f]+)?$/
+
   };
 
   return patterns[base].test(value);
@@ -67,56 +72,70 @@ function isValidForBase(value, base){
 
 function convertNumber(){
 
-  const input = document.getElementById('convertInput').value.trim();
-  const fromBase = parseInt(document.getElementById('fromBase').value);
-  const toBase = parseInt(document.getElementById('toBase').value);
+  const input =
+    document.getElementById('convertInput')
+    .value.trim();
 
-  const resultDiv = document.getElementById('convertResult');
-  const stepsDiv = document.getElementById('convertSteps');
+  const fromBase =
+    parseInt(
+      document.getElementById('fromBase').value
+    );
+
+  const toBase =
+    parseInt(
+      document.getElementById('toBase').value
+    );
+
+  const resultDiv =
+    document.getElementById('convertResult');
+
+  const stepsDiv =
+    document.getElementById('convertSteps');
 
   try{
 
-   /* Validate input properly */
+    if(!isValidForBase(input, fromBase)){
 
-if(!isValidForBase(input, fromBase)){
-  throw new Error("Invalid number for selected base");
-}
-
-const decimal = parseInt(input, fromBase);
-
-    let result = decimal.toString(toBase).toUpperCase();
-
-    resultDiv.innerHTML = `✅ Result: ${result}`;
-
-    let explanation = `
-STEP 1:
-Convert ${input} from base ${fromBase} to Decimal
-
-Decimal Value = ${decimal}
-
-STEP 2:
-Convert Decimal (${decimal}) to Base ${toBase}
-
-Final Answer = ${result}
-`;
-
-    if(toBase === 2){
-
-      explanation += `
-
-Binary Grouping:
-${groupBinary(result)}
-`;
+      throw new Error(
+        "Invalid number for selected base"
+      );
 
     }
 
-    stepsDiv.innerHTML = explanation;
+    const decimal =
+      convertToDecimal(input, fromBase);
+
+    const result =
+      convertFromDecimal(decimal, toBase);
+
+    resultDiv.innerHTML =
+      `✅ Result: ${result}`;
+
+    stepsDiv.innerHTML = `
+STEP 1:
+Convert ${input} from Base ${fromBase}
+to Decimal
+
+Decimal Value:
+${decimal}
+
+--------------------------------
+
+STEP 2:
+Convert Decimal (${decimal})
+to Base ${toBase}
+
+Final Answer:
+${result}
+`;
 
   }
 
   catch(err){
 
-    resultDiv.innerHTML = "❌ Invalid Input";
+    resultDiv.innerHTML =
+      "❌ Invalid Input";
+
     stepsDiv.innerHTML = "";
 
   }
@@ -140,6 +159,109 @@ ${grouped4}
 Grouped into 3 bits (Octal):
 ${grouped3}
 `;
+
+}
+
+
+/* =========================================
+CONVERT ANY BASE → DECIMAL
+========================================= */
+
+function convertToDecimal(value, base){
+
+  const chars =
+    '0123456789ABCDEF';
+
+  value = value.toUpperCase();
+
+  const parts =
+    value.split('.');
+
+  const intPart =
+    parts[0];
+
+  const fracPart =
+    parts[1] || '';
+
+  let decimal = 0;
+
+  // Integer Part
+  for(let i=0;i<intPart.length;i++){
+
+    const digit =
+      chars.indexOf(intPart[i]);
+
+    decimal =
+      decimal * base + digit;
+
+  }
+
+  // Fractional Part
+  for(let i=0;i<fracPart.length;i++){
+
+    const digit =
+      chars.indexOf(fracPart[i]);
+
+    decimal +=
+      digit /
+      Math.pow(base, i+1);
+
+  }
+
+  return decimal;
+
+}
+
+
+/* =========================================
+CONVERT DECIMAL → ANY BASE
+========================================= */
+
+function convertFromDecimal(decimal, base){
+
+  const chars =
+    '0123456789ABCDEF';
+
+  const integerPart =
+    Math.floor(decimal);
+
+  let fractionPart =
+    decimal - integerPart;
+
+  let intResult =
+    integerPart.toString(base)
+    .toUpperCase();
+
+  // No fraction
+  if(fractionPart === 0){
+
+    return intResult;
+
+  }
+
+  let fracResult = '';
+
+  let limit = 10;
+
+  while(
+    fractionPart > 0 &&
+    limit > 0
+  ){
+
+    fractionPart *= base;
+
+    const digit =
+      Math.floor(fractionPart);
+
+    fracResult += chars[digit];
+
+    fractionPart -= digit;
+
+    limit--;
+
+  }
+
+  return intResult + '.' + fracResult;
 
 }
 
