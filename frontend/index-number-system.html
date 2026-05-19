@@ -394,7 +394,11 @@ SELECT DROPDOWN FIX
   Digital Codes
 </button>
 
-          
+
+          <button class="ns-tab"
+        data-tab="cpu">
+  CPU Register
+</button>
           
         </div>
 
@@ -1028,6 +1032,140 @@ SELECT DROPDOWN FIX
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- ================================= -->
+<!-- CPU REGISTER SIMULATOR -->
+<!-- ================================= -->
+
+<div class="ns-card tab-content hidden"
+     id="cpu">
+
+  <div class="ns-grid">
+
+    <!-- LEFT SIDE -->
+
+    <div>
+
+      <div class="ns-input-group">
+
+        <label>Accumulator (ACC)</label>
+
+        <input type="text"
+               id="cpuAcc"
+               value="00000000">
+
+      </div>
+
+      <div class="ns-input-group">
+
+        <label>Operand</label>
+
+        <input type="text"
+               id="cpuOperand"
+               value="00000000">
+
+      </div>
+
+      <div class="ns-input-group">
+
+        <label>Operation</label>
+
+        <select id="cpuOperation">
+
+          <option value="add">
+            ADD
+          </option>
+
+          <option value="sub">
+            SUB
+          </option>
+
+          <option value="and">
+            AND
+          </option>
+
+          <option value="or">
+            OR
+          </option>
+
+          <option value="xor">
+            XOR
+          </option>
+
+          <option value="lshift">
+            LEFT SHIFT
+          </option>
+
+          <option value="rshift">
+            RIGHT SHIFT
+          </option>
+
+        </select>
+
+      </div>
+
+      <button class="ns-btn"
+              onclick="executeCPUOperation()">
+
+        Execute Instruction
+
+      </button>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+
+    <div class="ns-output">
+
+      <div class="ns-result"
+           id="cpuResult">
+
+        CPU Ready
+
+      </div>
+
+      <div class="ns-steps"
+           id="cpuSteps">
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
         
       </div>
 
