@@ -101,7 +101,7 @@ async function ensurePyodideReady() {
       const have = String(window.pyodide.version || "").trim();
       const want = window.__pyodideExpectedVersion;
       if (want && have && have !== want) {
-        console.warn(`[Polycode] Pyodide version mismatch: have ${have}, want ${want}.` +
+        console.warn(`[Polygen] Pyodide version mismatch: have ${have}, want ${want}.` +
                      " This usually means the page cached an older runtime. " +
                      "Hard refresh (Ctrl/Cmd+Shift+R) to reload the correct version.");
       }
@@ -132,7 +132,7 @@ async function ensurePyodideReady() {
     const have = String(window.pyodide.version || "").trim();
     const want = window.__pyodideExpectedVersion;
     if (want && have && have !== want) {
-      console.warn(`[Polycode] Pyodide loaded ${have} but HTML pointed to ${want}.`);
+      console.warn(`[Polygen] Pyodide loaded ${have} but HTML pointed to ${want}.`);
     }
   } catch {}
   return window.pyodide;
@@ -155,10 +155,10 @@ import micropip
 await micropip.install("seaborn==0.13.2")
 `);
         py.loadedPackages.seaborn = true;
-        console.log('[Polycode] Seaborn warmed up');
+        console.log('[Polygen] Seaborn warmed up');
       }
     } catch (e) {
-      console.debug('[Polycode] Seaborn warmup skipped:', e);
+      console.debug('[Polygen] Seaborn warmup skipped:', e);
     }
   }, 2000); // small idle delay after load
 })();
@@ -353,7 +353,7 @@ _payload
     });
 
   } catch (e) {
-    console.warn('[Polycode] inline plot render failed:', e);
+    console.warn('[Polygen] inline plot render failed:', e);
   }
 }
 
@@ -615,8 +615,8 @@ document.getElementById('preview')?.style.setProperty('background','transparent'
     if (ifr && ifr.contentDocument) {
       try {
         const d = ifr.contentDocument;
-        let s = d.getElementById('polycode-theme-css');
-        if (!s) { s = d.createElement('style'); s.id = 'polycode-theme-css'; d.head.appendChild(s); }
+        let s = d.getElementById('polygen-theme-css');
+        if (!s) { s = d.createElement('style'); s.id = 'polygen-theme-css'; d.head.appendChild(s); }
         s.textContent = `
           :root{ color-scheme:${mode}; }
           html,body{ background:transparent !important; color:inherit; }
@@ -624,7 +624,7 @@ document.getElementById('preview')?.style.setProperty('background','transparent'
       } catch {}
     }
 
-    try { localStorage.setItem('polycode_theme', mode); } catch {}
+    try { localStorage.setItem('polygen_theme', mode); } catch {}
   }
 
   // Toggle button uses the API (but reset will *not* toggle; it calls setTheme with current)
@@ -638,7 +638,7 @@ document.getElementById('preview')?.style.setProperty('background','transparent'
 
  
     try {
-  const saved = localStorage.getItem('polycode_theme');
+  const saved = localStorage.getItem('polygen_theme');
   if (saved === 'light' || saved === 'dark') setTheme(saved);
 } catch {}
 
@@ -715,7 +715,7 @@ function spin(on) {
 function installSelectAllAction(ed){
   if (!window.monaco || !ed?.getModel) return;
   ed.addAction({
-    id: 'polycode.selectAll',
+    id: 'polygen.selectAll',
     label: 'Select All',
     keybindings: [ monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyA ],
     // this makes it appear in both desktop right-click and mobile long-press menus
@@ -771,7 +771,7 @@ window.__pcUpdateRunBtn(); // set initial state
 
         // -- lightweight autosave/restore tied to this language page --
 try {
-  const KEY = 'polycode_autosave_c';
+  const KEY = 'polygen_autosave_c';
   const saved = localStorage.getItem(KEY);
   if (saved && !window.editor.getValue()) window.editor.setValue(saved);
 
@@ -915,7 +915,7 @@ function foot(id, text) {
 =========================== */
 function showEditorError(msg, line = 1, col = 1) {
   if (!window.editor || !window.monaco) return;
-  monaco.editor.setModelMarkers(editor.getModel(), 'polycode', [{
+  monaco.editor.setModelMarkers(editor.getModel(), 'polygen', [{
     startLineNumber: line, startColumn: col,
     endLineNumber: line, endColumn: col + 1,
     message: msg, severity: monaco.MarkerSeverity.Error
@@ -923,7 +923,7 @@ function showEditorError(msg, line = 1, col = 1) {
 }
 function clearEditorErrors() {
   if (!window.editor || !window.monaco) return;
-  monaco.editor.setModelMarkers(editor.getModel(), 'polycode', []);
+  monaco.editor.setModelMarkers(editor.getModel(), 'polygen', []);
 }
 
 /* ===========================
@@ -1220,7 +1220,7 @@ async function refreshStderrExplanation({ alsoAlert = false } = {}) {
   if (!looksLikeError) {
     if (explainEl) explainEl.innerHTML = '';
     if (window.monaco && window.editor) {
-      monaco.editor.setModelMarkers(window.editor.getModel(), 'polycode-eh', []);
+      monaco.editor.setModelMarkers(window.editor.getModel(), 'polygen-eh', []);
     }
     return;
   }
@@ -1271,7 +1271,7 @@ const lang = (() => {
   if (explainEl) {
     if (hints.length) {
       explainEl.innerHTML = `
-        <h3 style="margin:8px 0 6px;color:#2e5bea;">Polycode Analysis</h3>
+        <h3 style="margin:8px 0 6px;color:#2e5bea;">Polygen Analysis</h3>
         <div class="eh-wrap">
           <div class="eh-head">
             <strong>Error Explanation</strong>
@@ -1282,7 +1282,7 @@ const lang = (() => {
       `;
     } else {
       explainEl.innerHTML = `
-        <h3 style="margin:8px 0 6px;color:#2e5bea;">Polycode Analysis</h3>
+        <h3 style="margin:8px 0 6px;color:#2e5bea;">Polygen Analysis</h3>
         <div class="eh-wrap">
           <div class="eh-empty">The compiler reported errors, but I couldn’t interpret them confidently.</div>
         </div>
@@ -1294,7 +1294,7 @@ const lang = (() => {
   if (window.monaco && window.editor) {
     monaco.editor.setModelMarkers(
       window.editor.getModel(),
-      'polycode-eh',
+      'polygen-eh',
       (annotations || []).map(a => ({
         startLineNumber: a.line || 1,
         endLineNumber: a.line || 1,
@@ -1308,7 +1308,7 @@ const lang = (() => {
 
   // Optional: show alert dialog too
   if (alsoAlert && (hints?.length || stderr || stdout)) {
-    const head = 'Polycode Analysis';
+    const head = 'Polygen Analysis';
     const errText = stderr || stdout;
     const first = hints?.[0];
     const friendly = first ? `${first.title}${first.line ? ` (line ${first.line})` : ''}\n\n${first.detail}\n\nTry: ${first.fix || 'Check the line reported above.'}` : '';
@@ -1645,7 +1645,7 @@ try {
 
 try {
   if (window.monaco && window.editor) {
-    monaco.editor.setModelMarkers(window.editor.getModel(), 'polycode-eh', []);
+    monaco.editor.setModelMarkers(window.editor.getModel(), 'polygen-eh', []);
   }
 } catch {}
 
@@ -1935,8 +1935,8 @@ try {
 
 
 
-// ===== Global hotkeys for Polycode ==================================
-(function initPolycodeHotkeys(){
+// ===== Global hotkeys for Polygen ==================================
+(function initPolygenHotkeys(){
   function click(id){ document.getElementById(id)?.click(); }
 
   // Global fallbacks (works even when focus isn't in Monaco)
@@ -2005,7 +2005,7 @@ try {
   tryBind();
 
   // If your page creates the editor later, run again then:
-  window.addEventListener('polycode-editor-ready', tryBind);
+  window.addEventListener('polygen-editor-ready', tryBind);
 })();
 
 
@@ -2102,7 +2102,7 @@ try {
   async function saveFile(){
     const { ext, mime, langLabel } = getLangInfo();
     const code = window.editor ? window.editor.getValue() : '';
-    const suggested = `polycode-${langLabel.toLowerCase()}.${ext}`;
+    const suggested = `polygen-${langLabel.toLowerCase()}.${ext}`;
     const name = prompt('Save file as:', suggested) || suggested;
     const blob = new Blob([code], { type: mime + ';charset=utf-8' });
     const a = document.createElement('a');
@@ -2166,7 +2166,7 @@ function ts(){
 // Click handler: share (if possible) and save
 async function onClickCaptureShare(e){
   e?.preventDefault?.(); e?.stopPropagation?.();
-  const fileName = `Polycode-${ts()}.png`;
+  const fileName = `Polygen-${ts()}.png`;
 
   try{
     //const { blob } = await buildReportImageBlob();
@@ -2178,21 +2178,21 @@ async function onClickCaptureShare(e){
       try {
         await navigator.share({
           files: [file],
-          title: 'Polycode Report',
+          title: 'Polygen Report',
           text: 'Code + Output (screenshot)'
         });
       } catch { /* user cancelled; continue to save */ }
     } else {
       // Open WhatsApp chat as a hint; the image will be saved next
-      const msg = 'Polycode report image generated. If not attached automatically, please attach the saved image.';
+      const msg = 'Polygen report image generated. If not attached automatically, please attach the saved image.';
       window.open(`https://wa.me/919836313636?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
     }
 
-    // Save to Downloads (suggest "polycode/" path when picker exists)
+    // Save to Downloads (suggest "polygen/" path when picker exists)
     try {
       if ('showSaveFilePicker' in window) {
         const handle = await showSaveFilePicker({
-          suggestedName: `polycode/${fileName}`,
+          suggestedName: `polygen/${fileName}`,
           types: [{ description: 'PNG Image', accept: { 'image/png': ['.png'] } }]
         });
         const w = await handle.createWritable();
@@ -2382,14 +2382,14 @@ async function buildReportImageBlob() {
   }
   ctx.font = ctxFont(16, true);
   ctx.fillStyle = C.text;
-  ctx.fillText('polycode', bx, y + 2);
+  ctx.fillText('polygen', bx, y + 2);
 
   // right side
   ctx.textAlign = 'right';
   ctx.font = ctxFont(11);
   ctx.fillStyle = C.text;
   ctx.fillText(new Date().toLocaleString(), rightX, y);
-  ctx.fillText('learn.code.execute | www.polycode.in', rightX, y + 16);
+  ctx.fillText('learn.code.execute | www.polygen.in', rightX, y + 16);
   ctx.textAlign = 'left';
 
   // thick HR under header with extra gaps
@@ -2510,7 +2510,7 @@ function widenScrollContainers(rootDoc) {
     // widen only if (a) can clip, and (b) really does clip
     if ((ox === 'auto' || ox === 'scroll' || ox === 'hidden') &&
         (el.scrollWidth > el.clientWidth + 1)) {
-      el.setAttribute('data-polycode-widened', '1');
+      el.setAttribute('data-polygen-widened', '1');
       el.style.overflowX = 'visible';
       el.style.width = el.scrollWidth + 'px';
       el.style.maxWidth = 'none';
@@ -2520,7 +2520,7 @@ function widenScrollContainers(rootDoc) {
   // Loosen table sizing ONLY when it’s overflowing OR inside a widened wrapper
   rootDoc.querySelectorAll('table').forEach(t => {
     const overflowing = t.scrollWidth > t.clientWidth + 1;
-    const inWidened  = !!t.closest('[data-polycode-widened]');
+    const inWidened  = !!t.closest('[data-polygen-widened]');
     if (overflowing || inWidened) {
       t.style.tableLayout = 'auto';
       t.style.width = 'auto';
@@ -2564,7 +2564,7 @@ async function addImagePaginated(pdf, dataURL, env, {
   const ctx = crop.getContext('2d');
 
   // y position on current page (we’ll place “Output” title before calling this)
-  let y = pdf.__polycode_cursorY || marginPt;
+  let y = pdf.__polygen_cursorY || marginPt;
 
   // Iterate over vertical slices
   let srcY = 0; // in scaled pixels
@@ -2604,7 +2604,7 @@ async function addImagePaginated(pdf, dataURL, env, {
   }
 
   // stash cursor for callers
-  pdf.__polycode_cursorY = y;
+  pdf.__polygen_cursorY = y;
   return y;
 }
 
@@ -2772,7 +2772,7 @@ function askPreviewForScreenshot(ifr, timeout=2500){
   return new Promise((resolve, reject) => {
     const onMsg = (e) => {
       const d = e.data;
-      if (!d || d.__polycode !== 'snap') return;
+      if (!d || d.__polygen !== 'snap') return;
       clearTimeout(tid);
       window.removeEventListener('message', onMsg);
       if (d.ok && d.url) resolve(d.url);
@@ -2785,7 +2785,7 @@ function askPreviewForScreenshot(ifr, timeout=2500){
 
     window.addEventListener('message', onMsg);
     try {
-      ifr.contentWindow.postMessage('__polycode_snap__', '*');
+      ifr.contentWindow.postMessage('__polygen_snap__', '*');
     } catch (err) {
       clearTimeout(tid);
       window.removeEventListener('message', onMsg);
@@ -2858,15 +2858,15 @@ function addHeader(pdf, y, { headerLogoBase64, theme='light' } = {}){
   }
   pdf.setTextColor(isDark ? 255 : 0);
   pdf.setFont('helvetica','bold'); pdf.setFontSize(16);
-  pdf.text('polycode', x, textY);
+  pdf.text('polygen', x, textY);
   pdf.setFontSize(11);
   const rightX = pageW - margin;
   const rightText = 'learn.code.execute | ';
-  const link = 'www.polycode.in';
+  const link = 'www.polygen.in';
   pdf.setFont('helvetica','normal');
   pdf.text(rightText + link, rightX, textY, { align:'right' });
   pdf.setTextColor(30,100,200);
-  pdf.textWithLink(link, rightX, textY, { align:'right', url:'https://www.polycode.in' });
+  pdf.textWithLink(link, rightX, textY, { align:'right', url:'https://www.polygen.in' });
   pdf.setTextColor(isDark ? 255 : 0);
 
   let ny = y + 22;
@@ -3059,10 +3059,10 @@ async function installPreviewSnapper(){
   })();
   if (!doc) return false;  // blocked by sandbox? (needs allow-same-origin)
 
-  if (doc.getElementById('polycode-snapper')) return true; // already installed
+  if (doc.getElementById('polygen-snapper')) return true; // already installed
 
   const sc = doc.createElement('script');
-  sc.id = 'polycode-snapper';
+  sc.id = 'polygen-snapper';
   sc.type = 'text/javascript';
   sc.text = `
     (function(){
@@ -3078,7 +3078,7 @@ async function installPreviewSnapper(){
       }
 
       window.addEventListener('message', async (e) => {
-        if (!e || e.data !== '__polycode_snap__') return;
+        if (!e || e.data !== '__polygen_snap__') return;
         try{
           const h2c = await loadHtml2Canvas();
           const canvas = await h2c(document.documentElement, {
@@ -3088,9 +3088,9 @@ async function installPreviewSnapper(){
             allowTaint: true
           });
           const url = canvas.toDataURL('image/png');
-          parent.postMessage({ __polycode:'snap', ok:true, url, w:canvas.width, h:canvas.height }, '*');
+          parent.postMessage({ __polygen:'snap', ok:true, url, w:canvas.width, h:canvas.height }, '*');
         }catch(err){
-          parent.postMessage({ __polycode:'snap', ok:false, error: String(err) }, '*');
+          parent.postMessage({ __polygen:'snap', ok:false, error: String(err) }, '*');
         }
       });
     })();
@@ -3110,14 +3110,14 @@ function askPreviewForScreenshot(timeoutMs = 3000){
 
     const onMsg = (ev) => {
       const d = ev.data;
-      if (!d || d.__polycode !== 'snap') return;
+      if (!d || d.__polygen !== 'snap') return;
       window.removeEventListener('message', onMsg);
       if (d.ok && d.url) resolve({ url:d.url, w:d.w, h:d.h });
       else reject(new Error(d?.error || 'snapshot failed'));
     };
 
     window.addEventListener('message', onMsg);
-    try { ifr.contentWindow.postMessage('__polycode_snap__', '*'); } catch(e){ /* ignore */ }
+    try { ifr.contentWindow.postMessage('__polygen_snap__', '*'); } catch(e){ /* ignore */ }
     setTimeout(() => {
       window.removeEventListener('message', onMsg);
       reject(new Error('snapshot timeout'));
@@ -3525,7 +3525,7 @@ async function savePdfToDisk(e) {
 
   const code  = window.editor?.getValue?.() || ''; 
   const title = extractTitle(code); 
-  const fileName = `Polycode-${(langLabel || '').toUpperCase()}-${sanitizeFilename(title)}-${ts()}.pdf`; 
+  const fileName = `Polygen-${(langLabel || '').toUpperCase()}-${sanitizeFilename(title)}-${ts()}.pdf`; 
 
   // ----- Chromium path: ask WHERE to save *first* (keeps user gesture) -----
   if ('showSaveFilePicker' in window) { 
@@ -3596,15 +3596,15 @@ async function sharePdf() {
     //const blob = await buildPdfBlob(title);
     const blob = await withLightForCapture(() => buildPdfBlob(title));
 
-    const file = new File([blob], `Polycode-${langLabel}.pdf`, { type: 'application/pdf' });
-    const text = `Polycode ${langLabel} — ${title}`;
+    const file = new File([blob], `Polygen-${langLabel}.pdf`, { type: 'application/pdf' });
+    const text = `Polygen ${langLabel} — ${title}`;
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try { await navigator.share({ title, text, files: [file] }); return; } catch {}
     }
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `Polycode-${langLabel}.pdf`;
+    a.download = `Polygen-${langLabel}.pdf`;
     a.click();
     URL.revokeObjectURL(a.href);
 
@@ -3908,7 +3908,7 @@ async function __pc_kickLivePlot() {
   try {
     await renderInlinePlotsIfAny(job.code, job.replay, { append: true, anchor: job.anchor });
   } catch (e) {
-    console.debug('[Polycode] live plot render failed:', e);
+    console.debug('[Polygen] live plot render failed:', e);
   } finally {
     // 🔒 ALWAYS clear the progress box, even if nothing was rendered
     try {
@@ -3939,7 +3939,7 @@ async function __pc_kickLivePlot() {
 
 
 
-// ===== PolyCode: Global connect guard & session gate (drop-in) =====
+// ===== Polygen: Global connect guard & session gate (drop-in) =====
 (() => {
   // ---- Config: tweak as needed ----
   const CONNECT_MODAL_SELECTOR = '#connectModal';   // must exist for auto-detect
@@ -3961,7 +3961,7 @@ async function __pc_kickLivePlot() {
   PC.lockUI   = () => { uiLock = true; };
   PC.unlockUI = () => { uiLock = false; };
 
-// ---- Replace the existing cancel helper in your “Polycode: Global connect guard & session gate” IIFE ----
+// ---- Replace the existing cancel helper in your “Polygen: Global connect guard & session gate” IIFE ----
 PC.cancelCurrentSession = function(reason = 'user') {
   // --- add these two lines ---
   PC.__abortFence = (PC.__abortFence | 0) + 1;            // bump fence: a reset happened
@@ -4342,7 +4342,7 @@ send(data) {
             window.__pc_livePlotPending = { code: codeNow, replay, anchor: (progressChunk || null) };
             __pc_kickLivePlot(); // will also clear spinner if a figure is produced
           } catch (e) {
-            console.debug('[Polycode] live plot schedule failed:', e);
+            console.debug('[Polygen] live plot schedule failed:', e);
           }
         }, 120);
       }
@@ -4723,7 +4723,7 @@ function showErrorExplanation(text) {
 
   if (text && text.trim()) {
     explainEl.innerHTML = `
-      <h3 style="margin:8px 0;color:#2e5bea;">Polycode Analysis</h3>
+      <h3 style="margin:8px 0;color:#2e5bea;">Polygen Analysis</h3>
       <div class="explain-body">${text}</div>
     `;
     explainEl.style.display = 'block';
