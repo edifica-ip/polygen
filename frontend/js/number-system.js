@@ -1683,6 +1683,10 @@ ${instructionQueue.join('\n')}
 
 `;
 
+  try{
+
+
+    
   for(let pc=0; pc<instructionQueue.length; pc++){
 
     const line =
@@ -1697,7 +1701,7 @@ ${line}
 
     const parts =
       line
-      .replace(',', ' ')
+      .replace(/,/g, ' ')
       .split(/\s+/);
 
     const instruction =
@@ -2004,6 +2008,24 @@ ${clockCycles}
 
   }
 
+  }
+
+
+  catch(err){
+
+  resultDiv.innerHTML =
+    "❌ CPU Execution Error";
+
+  stepsDiv.innerHTML =
+    `
+Error:
+${err.message}
+`;
+
+  return;
+
+}
+  
   /* =====================================
   MEMORY DUMP
   ===================================== */
