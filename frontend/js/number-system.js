@@ -776,3 +776,117 @@ ${overflow ? 'YES' : 'NO'}
 `;
 
 }
+
+
+
+
+
+
+
+
+/* =========================================
+BINARY ADDITION VISUALIZER
+========================================= */
+
+function visualizeBinaryAddition(){
+
+  let a =
+    document.getElementById('visualNum1')
+    .value.trim();
+
+  let b =
+    document.getElementById('visualNum2')
+    .value.trim();
+
+  const result =
+    document.getElementById('visualResult');
+
+  const steps =
+    document.getElementById('visualSteps');
+
+  if(
+    !/^[01]+$/.test(a) ||
+    !/^[01]+$/.test(b)
+  ){
+
+    result.innerHTML =
+      "❌ Invalid Binary";
+
+    return;
+  }
+
+  const maxLen =
+    Math.max(a.length, b.length);
+
+  a = a.padStart(maxLen,'0');
+  b = b.padStart(maxLen,'0');
+
+  let carry = 0;
+
+  let carryRow = '';
+  let answer = '';
+
+  for(let i=maxLen-1; i>=0; i--){
+
+    const bitA = parseInt(a[i]);
+    const bitB = parseInt(b[i]);
+
+    const sum =
+      bitA + bitB + carry;
+
+    answer =
+      (sum % 2) + answer;
+
+    carryRow =
+      carry + carryRow;
+
+    carry =
+      Math.floor(sum / 2);
+
+  }
+
+  if(carry){
+
+    answer = carry + answer;
+    carryRow = carry + carryRow;
+
+  }
+  else{
+    carryRow = ' ' + carryRow;
+  }
+
+  result.innerHTML =
+    `✅ Binary Addition Complete`;
+
+  steps.innerHTML = `
+Carry:
+${carryRow}
+
+  ${a}
++ ${b}
+${'-'.repeat(maxLen + 2)}
+
+ ${answer}
+
+--------------------------------
+
+Decimal Verification:
+
+${parseInt(a,2)}
++
+${parseInt(b,2)}
+
+=
+
+${parseInt(answer,2)}
+`;
+
+}
+
+
+
+
+
+
+
+
