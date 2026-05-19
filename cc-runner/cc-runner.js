@@ -29,6 +29,8 @@ const app = express();
 const ALLOW_ORIGINS = [
   "https://www.polygen.in",
   "https://polygen.in",
+  "http://www.polygen.in",
+  "http://polygen.in",
   "https://polycode.pages.dev",
   "http://localhost:3000", // dev
 ];
