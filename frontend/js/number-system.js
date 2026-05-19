@@ -1586,6 +1586,21 @@ ${excess3}
 /* =========================================
 MINI CPU EMULATOR
 ========================================= */
+/* =========================================
+RESOLVE OPERAND
+========================================= */
+
+function resolveValue(value, REG){
+
+  if(REG[value] !== undefined){
+
+    return REG[value];
+
+  }
+
+  return parseInt(value);
+
+}
 
 function runCPUProgram(){
 
@@ -1680,8 +1695,15 @@ ${line}
     const op1 =
       parts[1]?.toUpperCase();
 
+
+    
     const op2 =
       parts[2]?.toUpperCase();
+
+
+        FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
 
     /* =================================
     MOV
@@ -1697,16 +1719,27 @@ ${line}
              .replace(']','');
 
         MEMORY[addr] =
-          REG[op2] ?? parseInt(op2);
+         resolveValue(op2, REG)
 
       }
 
+// MEMORY READ
+else if(op2 && op2.startsWith('[')){
+
+  const addr =
+    op2.replace('[','')
+       .replace(']','');
+
+  REG[op1] =
+    MEMORY[addr] || 0;
+
+}
+        
       // REGISTER WRITE
       else{
 
         REG[op1] =
-          REG[op2] ?? parseInt(op2);
-
+          resolveValue(op2, REG)
       }
 
       clockCycles += 2;
@@ -1720,7 +1753,7 @@ ${line}
     else if(instruction === 'ADD'){
 
       REG[op1] +=
-        REG[op2] ?? parseInt(op2);
+        resolveValue(op2, REG)
 
       if(REG[op1] > 255){
 
@@ -1741,7 +1774,7 @@ ${line}
     else if(instruction === 'SUB'){
 
       REG[op1] -=
-        REG[op2] ?? parseInt(op2);
+        resolveValue(op2, REG)
 
       if(REG[op1] < 0){
 
@@ -1795,7 +1828,7 @@ ${line}
     else if(instruction === 'AND'){
 
       REG[op1] &=
-        REG[op2] ?? parseInt(op2);
+        resolveValue(op2, REG)
 
       clockCycles += 1;
 
@@ -1808,8 +1841,7 @@ ${line}
     else if(instruction === 'OR'){
 
       REG[op1] |=
-        REG[op2] ?? parseInt(op2);
-
+        resolveValue(op2, REG)
       clockCycles += 1;
 
     }
@@ -1821,7 +1853,7 @@ ${line}
     else if(instruction === 'XOR'){
 
       REG[op1] ^=
-        REG[op2] ?? parseInt(op2);
+        resolveValue(op2, REG)
 
       clockCycles += 1;
 
@@ -1906,12 +1938,12 @@ else if(instruction === 'ROR'){
     ZERO FLAG
     ================================= */
 
-    if(REG[op1] === 0){
-
-      FLAGS.ZF = 1;
-
-    }
-
+   if(
+  REG[op1] !== undefined &&
+  REG[op1] === 0
+){
+  FLAGS.ZF = 1;
+}
     /* =================================
     REGISTER DUMP
     ================================= */
