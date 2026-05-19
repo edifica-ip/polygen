@@ -295,3 +295,307 @@ ${twos}
   }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+SIGNED NUMBER REPRESENTATION
+========================================= */
+
+function generateSignedBinary(){
+
+  const num =
+    parseInt(
+      document.getElementById('signedInput').value
+    );
+
+  const bits =
+    parseInt(
+      document.getElementById('signedBits').value
+    );
+
+  const result =
+    document.getElementById('signedResult');
+
+  const steps =
+    document.getElementById('signedSteps');
+
+  if(isNaN(num)){
+    result.innerHTML = "❌ Invalid";
+    return;
+  }
+
+  let binary =
+    (Math.abs(num)).toString(2)
+    .padStart(bits,'0');
+
+  let ones =
+    binary.replace(/0/g,'x')
+          .replace(/1/g,'0')
+          .replace(/x/g,'1');
+
+  let twos =
+    (parseInt(ones,2)+1)
+    .toString(2)
+    .padStart(bits,'0');
+
+  result.innerHTML =
+    `✅ ${num} Representation`;
+
+  steps.innerHTML = `
+Signed Magnitude:
+${binary}
+
+1's Complement:
+${ones}
+
+2's Complement:
+${twos}
+`;
+
+}
+
+/* =========================================
+SHIFT OPERATIONS
+========================================= */
+
+function performShift(){
+
+  const input =
+    document.getElementById('shiftInput')
+    .value.trim();
+
+  const type =
+    document.getElementById('shiftType')
+    .value;
+
+  const count =
+    parseInt(
+      document.getElementById('shiftCount')
+      .value
+    );
+
+  const result =
+    document.getElementById('shiftResult');
+
+  const steps =
+    document.getElementById('shiftSteps');
+
+  if(!/^[01]+$/.test(input)){
+    result.innerHTML = "❌ Invalid Binary";
+    return;
+  }
+
+  let output = input;
+
+  for(let i=0;i<count;i++){
+
+    if(type === 'left'){
+      output = output.substring(1) + '0';
+    }
+    else{
+      output = '0' + output.substring(0, output.length-1);
+    }
+
+  }
+
+  result.innerHTML =
+    `✅ Shifted Result: ${output}`;
+
+  steps.innerHTML = `
+Original:
+${input}
+
+Shift Type:
+${type}
+
+Shift Count:
+${count}
+
+Final Result:
+${output}
+`;
+
+}
+
+/* =========================================
+BITWISE OPERATIONS
+========================================= */
+
+function performBitwise(){
+
+  const a =
+    document.getElementById('bit1')
+    .value.trim();
+
+  const b =
+    document.getElementById('bit2')
+    .value.trim();
+
+  const op =
+    document.getElementById('bitOp')
+    .value;
+
+  const result =
+    document.getElementById('bitResult');
+
+  const steps =
+    document.getElementById('bitSteps');
+
+  if(
+    !/^[01]+$/.test(a) ||
+    !/^[01]+$/.test(b)
+  ){
+    result.innerHTML = "❌ Invalid Binary";
+    return;
+  }
+
+  let x = parseInt(a,2);
+  let y = parseInt(b,2);
+
+  let ans;
+
+  switch(op){
+
+    case 'AND':
+      ans = x & y;
+      break;
+
+    case 'OR':
+      ans = x | y;
+      break;
+
+    case 'XOR':
+      ans = x ^ y;
+      break;
+
+  }
+
+  let finalAns =
+    ans.toString(2);
+
+  result.innerHTML =
+    `✅ Result: ${finalAns}`;
+
+  steps.innerHTML = `
+${a}
+${op}
+${b}
+
+Result:
+${finalAns}
+`;
+
+}
+
+/* =========================================
+IEEE754
+========================================= */
+
+function convertIEEE754(){
+
+  const num =
+    parseFloat(
+      document.getElementById('floatInput')
+      .value
+    );
+
+  const result =
+    document.getElementById('floatResult');
+
+  const steps =
+    document.getElementById('floatSteps');
+
+  if(isNaN(num)){
+    result.innerHTML = "❌ Invalid";
+    return;
+  }
+
+  const buffer = new ArrayBuffer(4);
+
+  const floatView =
+    new Float32Array(buffer);
+
+  const intView =
+    new Uint32Array(buffer);
+
+  floatView[0] = num;
+
+  const binary =
+    intView[0]
+    .toString(2)
+    .padStart(32,'0');
+
+  result.innerHTML =
+    `✅ IEEE754 Generated`;
+
+  steps.innerHTML = `
+Binary Representation:
+
+${binary}
+
+Sign Bit:
+${binary[0]}
+
+Exponent:
+${binary.substring(1,9)}
+
+Mantissa:
+${binary.substring(9)}
+`;
+
+}
+
+/* =========================================
+ASCII HEX CONVERTER
+========================================= */
+
+function convertAsciiHex(){
+
+  const text =
+    document.getElementById('asciiInput')
+    .value;
+
+  const result =
+    document.getElementById('asciiResult');
+
+  const steps =
+    document.getElementById('asciiSteps');
+
+  let hex = '';
+
+  for(let ch of text){
+
+    hex +=
+      ch.charCodeAt(0)
+      .toString(16)
+      .toUpperCase() + ' ';
+
+  }
+
+  result.innerHTML =
+    `✅ HEX: ${hex}`;
+
+  steps.innerHTML = `
+ASCII Text:
+${text}
+
+HEX Representation:
+${hex}
+`;
+
+}
