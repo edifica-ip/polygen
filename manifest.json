@@ -1,7 +1,7 @@
 {
-  "id": "/?app=polycode",
-  "name": "PolyCode",
-  "short_name": "PolyCode",
+  "id": "/?app=polygen",
+  "name": "Polygen",
+  "short_name": "Polygen",
   "start_url": "/frontend/index.html",
   "scope": "/frontend/",
   "display": "standalone",
