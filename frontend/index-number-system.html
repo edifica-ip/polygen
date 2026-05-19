@@ -1,0 +1,313 @@
+<!-- =========================================
+FILE: frontend/index-number-system.html
+========================================= -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Polygen - Number Systems Lab</title>
+
+  <link rel="stylesheet" href="./css/number-system.css"/>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
+
+    body{
+      background:#0f172a;
+      color:#fff;
+      min-height:100vh;
+      padding:30px;
+    }
+
+    .container{
+      max-width:1200px;
+      margin:auto;
+    }
+
+    .title{
+      text-align:center;
+      margin-bottom:30px;
+    }
+
+    .title h1{
+      font-size:42px;
+      color:#38bdf8;
+    }
+
+    .title p{
+      margin-top:10px;
+      color:#cbd5e1;
+    }
+
+    .tabs{
+      display:flex;
+      gap:15px;
+      margin-bottom:25px;
+      flex-wrap:wrap;
+    }
+
+    .tab-btn{
+      padding:12px 22px;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      background:#1e293b;
+      color:#fff;
+      transition:0.3s;
+      font-weight:bold;
+    }
+
+    .tab-btn.active{
+      background:#38bdf8;
+      color:#000;
+    }
+
+    .card{
+      background:#111827;
+      border-radius:20px;
+      padding:25px;
+      box-shadow:0 0 20px rgba(0,0,0,0.4);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+    }
+
+    .input-group{
+      margin-bottom:18px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:8px;
+      color:#cbd5e1;
+    }
+
+    input, select{
+      width:100%;
+      padding:14px;
+      border-radius:10px;
+      border:none;
+      outline:none;
+      background:#1e293b;
+      color:white;
+      font-size:16px;
+    }
+
+    button.action-btn{
+      width:100%;
+      padding:15px;
+      background:#38bdf8;
+      color:black;
+      border:none;
+      border-radius:12px;
+      font-weight:bold;
+      font-size:17px;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    button.action-btn:hover{
+      transform:translateY(-2px);
+      opacity:0.9;
+    }
+
+    .output-box{
+      background:#020617;
+      border-radius:15px;
+      padding:20px;
+      min-height:300px;
+      overflow:auto;
+    }
+
+    .result{
+      font-size:24px;
+      margin-bottom:20px;
+      color:#4ade80;
+      word-break:break-word;
+    }
+
+    .steps{
+      white-space:pre-wrap;
+      line-height:1.7;
+      color:#e2e8f0;
+    }
+
+    .hidden{
+      display:none;
+    }
+
+    @media(max-width:900px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="title">
+    <h1>🔢 Number Systems Lab</h1>
+    <p>Binary • Decimal • Octal • Hexadecimal • Complements • Arithmetic</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="convert">Convert</button>
+    <button class="tab-btn" data-tab="arithmetic">Arithmetic</button>
+    <button class="tab-btn" data-tab="complement">Complements</button>
+  </div>
+
+  <!-- ===================================== -->
+  <!-- CONVERT -->
+  <!-- ===================================== -->
+
+  <div class="card tab-content" id="convert">
+
+    <div class="grid">
+
+      <div>
+
+        <div class="input-group">
+          <label>Enter Number</label>
+          <input type="text" id="convertInput" placeholder="Example: 101101">
+        </div>
+
+        <div class="input-group">
+          <label>From Base</label>
+          <select id="fromBase">
+            <option value="2">Binary</option>
+            <option value="8">Octal</option>
+            <option value="10" selected>Decimal</option>
+            <option value="16">Hexadecimal</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>To Base</label>
+          <select id="toBase">
+            <option value="2">Binary</option>
+            <option value="8">Octal</option>
+            <option value="10">Decimal</option>
+            <option value="16" selected>Hexadecimal</option>
+          </select>
+        </div>
+
+        <button class="action-btn" onclick="convertNumber()">
+          Convert Number
+        </button>
+
+      </div>
+
+      <div class="output-box">
+        <div class="result" id="convertResult">Result will appear here</div>
+        <div class="steps" id="convertSteps"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ===================================== -->
+  <!-- ARITHMETIC -->
+  <!-- ===================================== -->
+
+  <div class="card tab-content hidden" id="arithmetic">
+
+    <div class="grid">
+
+      <div>
+
+        <div class="input-group">
+          <label>First Number</label>
+          <input type="text" id="num1">
+        </div>
+
+        <div class="input-group">
+          <label>Second Number</label>
+          <input type="text" id="num2">
+        </div>
+
+        <div class="input-group">
+          <label>Base</label>
+          <select id="arithBase">
+            <option value="2">Binary</option>
+            <option value="8">Octal</option>
+            <option value="10">Decimal</option>
+            <option value="16">Hexadecimal</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Operation</label>
+          <select id="operation">
+            <option value="+">Addition</option>
+            <option value="-">Subtraction</option>
+            <option value="*">Multiplication</option>
+            <option value="/">Division</option>
+          </select>
+        </div>
+
+        <button class="action-btn" onclick="calculateArithmetic()">
+          Calculate
+        </button>
+
+      </div>
+
+      <div class="output-box">
+        <div class="result" id="arithResult">Result will appear here</div>
+        <div class="steps" id="arithSteps"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ===================================== -->
+  <!-- COMPLEMENT -->
+  <!-- ===================================== -->
+
+  <div class="card tab-content hidden" id="complement">
+
+    <div class="grid">
+
+      <div>
+
+        <div class="input-group">
+          <label>Binary Number</label>
+          <input type="text" id="compInput">
+        </div>
+
+        <button class="action-btn" onclick="findComplements()">
+          Find Complements
+        </button>
+
+      </div>
+
+      <div class="output-box">
+        <div class="result" id="compResult">Complement Result</div>
+        <div class="steps" id="compSteps"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="./js/number-system.js"></script>
+
+</body>
+</html>
