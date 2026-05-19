@@ -1575,3 +1575,186 @@ ${excess3}
 
 
 
+
+
+
+
+
+
+
+
+/* =========================================
+CPU REGISTER SIMULATOR
+========================================= */
+
+function executeCPUOperation(){
+
+  let acc =
+    document.getElementById('cpuAcc')
+    .value.trim();
+
+  let operand =
+    document.getElementById('cpuOperand')
+    .value.trim();
+
+  const operation =
+    document.getElementById('cpuOperation')
+    .value;
+
+  const resultDiv =
+    document.getElementById('cpuResult');
+
+  const stepsDiv =
+    document.getElementById('cpuSteps');
+
+  if(
+    !/^[01]{8}$/.test(acc) ||
+    !/^[01]{8}$/.test(operand)
+  ){
+
+    resultDiv.innerHTML =
+      "❌ Enter valid 8-bit binary";
+
+    return;
+  }
+
+  let A = parseInt(acc,2);
+  let B = parseInt(operand,2);
+
+  let result = 0;
+
+  let carryFlag = 0;
+  let overflowFlag = 0;
+  let zeroFlag = 0;
+
+  /* =====================================
+  OPERATIONS
+  ===================================== */
+
+  switch(operation){
+
+    case 'add':
+
+      result = A + B;
+
+      if(result > 255){
+
+        carryFlag = 1;
+
+      }
+
+      result &= 255;
+
+      break;
+
+    case 'sub':
+
+      result = A - B;
+
+      if(result < 0){
+
+        overflowFlag = 1;
+
+        result = 256 + result;
+
+      }
+
+      break;
+
+    case 'and':
+
+      result = A & B;
+
+      break;
+
+    case 'or':
+
+      result = A | B;
+
+      break;
+
+    case 'xor':
+
+      result = A ^ B;
+
+      break;
+
+    case 'lshift':
+
+      carryFlag =
+        (A & 128) ? 1 : 0;
+
+      result =
+        (A << 1) & 255;
+
+      break;
+
+    case 'rshift':
+
+      carryFlag =
+        (A & 1) ? 1 : 0;
+
+      result =
+        A >> 1;
+
+      break;
+
+  }
+
+  if(result === 0){
+
+    zeroFlag = 1;
+
+  }
+
+  const binaryResult =
+    result
+    .toString(2)
+    .padStart(8,'0');
+
+  resultDiv.innerHTML =
+    `✅ Instruction Executed`;
+
+  stepsDiv.innerHTML = `
+================================
+CPU REGISTER STATE
+================================
+
+ACC:
+${acc}
+
+OPERAND:
+${operand}
+
+--------------------------------
+
+INSTRUCTION:
+${operation.toUpperCase()}
+
+--------------------------------
+
+RESULT (Binary):
+${binaryResult}
+
+RESULT (Decimal):
+${result}
+
+--------------------------------
+
+FLAGS
+
+Carry Flag (CF):
+${carryFlag}
+
+Overflow Flag (OF):
+${overflowFlag}
+
+Zero Flag (ZF):
+${zeroFlag}
+
+================================
+`;
+
+}
+
+
