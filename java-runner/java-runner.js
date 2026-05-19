@@ -142,7 +142,7 @@ wss.on('connection', (ws) => {
         const runArgs = Array.isArray(msg.args) ? msg.args : [];
 
         proc = spawn('java', [
-          ...jvmFlags, '-cp', classpath, 'io.polycode.Launch', cls, ...runArgs
+          ...jvmFlags, '-cp', classpath, 'io.polygen.Launch', cls, ...runArgs
         ], { cwd: workdir });
 
         t2 = Date.now();
