@@ -27,7 +27,7 @@ pre.ascii{ border:1px solid var(--border); border-radius:4px; padding:10px; over
 </head>
 <body>
   <h1>Boolean Algebra — Quick Reference</h1>
-  <p class="muted">Syntax & tools for PolyCode’s Boolean module. Supports implicit AND, common operators, SOP/POS, K-maps, and Quine–McCluskey.</p>
+  <p class="muted">Syntax & tools for Polygen’s Boolean module. Supports implicit AND, common operators, SOP/POS, K-maps, and Quine–McCluskey.</p>
 
   <hr>
 
@@ -77,7 +77,7 @@ pre.ascii{ border:1px solid var(--border); border-radius:4px; padding:10px; over
   <p><b>SOP (Sum of Minterms)</b>: <span class="mono">F(A,B,...) = Σ m(indices)</span></p>
   <p><b>POS (Product of Maxterms)</b>: <span class="mono">F(A,B,...) = Π M(indices)</span></p>
   <div class="note">
-    <b>Minterm numbering (PolyCode):</b> Order is the given vars; if omitted, auto-detected and sorted alphabetically.  
+    <b>Minterm numbering (Polygen):</b> Order is the given vars; if omitted, auto-detected and sorted alphabetically.  
     Index is binary <span class="mono">A B C …</span> with <b>A as MSB</b>. Example (3 vars): <span class="mono">A=0,B=1,C=1 → 0b011 = m(3)</span>.
   </div>
 
@@ -162,7 +162,7 @@ AB 00 (00)   | m0| m1| m3| m2|
    ( "--1" means A,B are don't-cares; C=1 )
   </pre>
 
-  <p class="muted">PolyCode uses essentials + greedy cover; supports ≤ 8 vars (256 rows). For deterministic minterm order, specify vars explicitly (e.g., <span class="mono">A,B,C</span>).</p>
+  <p class="muted">Polygen uses essentials + greedy cover; supports ≤ 8 vars (256 rows). For deterministic minterm order, specify vars explicitly (e.g., <span class="mono">A,B,C</span>).</p>
 
   <hr>
 
