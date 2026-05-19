@@ -587,11 +587,74 @@ ${binary.substring(9)}
 ASCII HEX CONVERTER
 ========================================= */
 
+function convertAsciiHex(){
+
+  const text =
+    document.getElementById('asciiInput')
+    .value;
+
+  const result =
+    document.getElementById('asciiResult');
+
+  const steps =
+    document.getElementById('asciiSteps');
+
+  if(!text){
+
+    result.innerHTML =
+      "❌ Enter Text";
+
+    steps.innerHTML = "";
+
+    return;
+  }
+
+  let hexOutput = '';
+  let binaryOutput = '';
+  let decimalOutput = '';
+
+  for(let ch of text){
+
+    const decimal =
+      ch.charCodeAt(0);
+
+    const hex =
+      decimal
+      .toString(16)
+      .toUpperCase();
+
+    const binary =
+      decimal
+      .toString(2)
+      .padStart(8,'0');
+
+    hexOutput += hex + ' ';
+    binaryOutput += binary + ' ';
+    decimalOutput += decimal + ' ';
+
+  }
+
+  result.innerHTML =
+    `✅ Conversion Generated`;
+
+  steps.innerHTML = `
+Original Text:
+${text}
+
+--------------------------------
+
 ASCII Decimal:
-65 66 67
+${decimalOutput}
+
+--------------------------------
 
 HEX:
-41 42 43
+${hexOutput}
+
+--------------------------------
 
 Binary:
-01000001 01000010 01000011
+${binaryOutput}
+`;
+
+}
