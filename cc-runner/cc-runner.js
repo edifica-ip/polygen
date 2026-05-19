@@ -34,16 +34,73 @@ const ALLOW_ORIGINS = [
 ];
 
 const corsOptions = {
+
   origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // curl / health checks
-    if (ALLOW_ORIGINS.includes(origin)) return cb(null, true);
-    return cb(new Error("CORS: origin not allowed"));
+
+    // Allow curl/server-server/no-origin requests
+    if (!origin)
+      return cb(null, true);
+
+    // Normalize trailing slash
+    const cleanOrigin =
+      origin.replace(/\/$/, '');
+
+    const allowed =
+      ALLOW_ORIGINS.map(o =>
+        o.replace(/\/$/, '')
+      );
+
+    if (allowed.includes(cleanOrigin)) {
+      return cb(null, true);
+    }
+
+    console.log(
+      "Blocked Origin:",
+      origin
+    );
+
+    // IMPORTANT:
+    // Don't throw hard error
+    return cb(null, false);
   },
+
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "X-Requested-With"],
-  maxAge: 86400,
+
+  allowedHeaders: [
+    "Content-Type",
+    "X-Requested-With"
+  ],
+
+  credentials: true,
+
+  maxAge: 86400
 };
+
+
+
 app.use(cors(corsOptions));
+app.use((req,res,next)=>{
+
+  res.header(
+    "Access-Control-Allow-Origin",
+    req.headers.origin || "*"
+  );
+
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,POST,OPTIONS"
+  );
+
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type,X-Requested-With"
+  );
+
+  next();
+
+});
+
+
 app.options("*", cors(corsOptions)); // preflight with same options
 
 app.use(express.json({ limit: "1mb" }));
