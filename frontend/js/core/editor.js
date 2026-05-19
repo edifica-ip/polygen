@@ -37,11 +37,11 @@ export async function initMonaco(sample='// Hello', lang='plaintext'){
        if (!ctxQuickFixBound) {
         ctxQuickFixBound = true;
         editor.addAction({
-          id: 'polycode.quickFix.context',
+          id: 'polygen.quickFix.context',
           label: 'Quick Fix…',
           contextMenuGroupId: 'navigation',
           contextMenuOrder: 0.1,
-          run: () => editor.getAction('polycode.quickFix')?.run()
+          run: () => editor.getAction('polygen.quickFix')?.run()
         });
       }
 
@@ -68,12 +68,12 @@ export function getSelection(){
   return model.getValueInRange(sel);
 }
 
-// ---- Diagnostics (owner defaults unified to 'polycode') ----
-export function clearMarkers(owner='polycode'){
+// ---- Diagnostics (owner defaults unified to 'polygen') ----
+export function clearMarkers(owner='polygen'){
   if (monacoRef && model) monacoRef.editor.setModelMarkers(model, owner, []);
 }
 
-export function setMarkers(diags=[], owner='polycode'){
+export function setMarkers(diags=[], owner='polygen'){
   if (!monacoRef || !model) return;
 
   const markers = diags.map(d=>{
@@ -92,7 +92,7 @@ export function setMarkers(diags=[], owner='polycode'){
       severity: /warn/i.test(d.severity)
         ? monacoRef.MarkerSeverity.Warning
         : monacoRef.MarkerSeverity.Error,
-      source: d.title || 'polycode'
+      source: d.title || 'polygen'
     };
   });
 
