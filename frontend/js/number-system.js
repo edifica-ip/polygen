@@ -673,3 +673,106 @@ ${binaryOutput}
 `;
 
 }
+
+
+
+
+
+/* =========================================
+OVERFLOW DETECTION
+========================================= */
+
+function detectOverflow(){
+
+  const a =
+    document.getElementById('overflowNum1')
+    .value.trim();
+
+  const b =
+    document.getElementById('overflowNum2')
+    .value.trim();
+
+  const bits =
+    parseInt(
+      document.getElementById('overflowBits')
+      .value
+    );
+
+  const result =
+    document.getElementById('overflowResult');
+
+  const steps =
+    document.getElementById('overflowSteps');
+
+  if(
+    !/^[01]+$/.test(a) ||
+    !/^[01]+$/.test(b)
+  ){
+
+    result.innerHTML =
+      "❌ Invalid Binary";
+
+    return;
+  }
+
+  const decA =
+    parseInt(a,2);
+
+  const decB =
+    parseInt(b,2);
+
+  const sum =
+    decA + decB;
+
+  const max =
+    Math.pow(2,bits)-1;
+
+  const overflow =
+    sum > max;
+
+  const binarySum =
+    sum.toString(2);
+
+  const trimmed =
+    binarySum.slice(-bits);
+
+  result.innerHTML =
+    overflow
+      ? "⚠️ Overflow Detected"
+      : "✅ No Overflow";
+
+  steps.innerHTML = `
+First Number:
+${a}
+
+Second Number:
+${b}
+
+--------------------------------
+
+Decimal Calculation:
+
+${decA} + ${decB} = ${sum}
+
+--------------------------------
+
+Binary Addition:
+
+  ${a.padStart(bits,'0')}
++ ${b.padStart(bits,'0')}
+
+= ${binarySum}
+
+Stored ${bits}-bit Result:
+${trimmed}
+
+--------------------------------
+
+Maximum ${bits}-bit Value:
+${max}
+
+Overflow:
+${overflow ? 'YES' : 'NO'}
+`;
+
+}
