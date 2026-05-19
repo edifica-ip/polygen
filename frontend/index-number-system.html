@@ -344,7 +344,39 @@ SELECT DROPDOWN FIX
           <button class="ns-tab"
                   data-tab="complement">
             Complements
+
+
+            
           </button>
+
+
+
+
+
+          <button class="ns-tab"
+        data-tab="signed">
+  Signed Numbers
+</button>
+
+<button class="ns-tab"
+        data-tab="shift">
+  Shift Operations
+</button>
+
+<button class="ns-tab"
+        data-tab="bitwise">
+  Bitwise
+</button>
+
+<button class="ns-tab"
+        data-tab="float">
+  IEEE754
+</button>
+
+<button class="ns-tab"
+        data-tab="ascii">
+  ASCII / Hex
+</button>
 
         </div>
 
@@ -521,6 +553,249 @@ SELECT DROPDOWN FIX
           </div>
 
         </div>
+
+
+
+
+
+        <div class="ns-card tab-content hidden"
+     id="signed">
+
+  <div class="ns-grid">
+
+    <div>
+
+      <div class="ns-input-group">
+        <label>Decimal Number</label>
+
+        <input type="number"
+               id="signedInput">
+      </div>
+
+      <div class="ns-input-group">
+        <label>Bit Size</label>
+
+        <select id="signedBits">
+          <option value="8">8-bit</option>
+          <option value="16">16-bit</option>
+          <option value="32">32-bit</option>
+        </select>
+      </div>
+
+      <button class="ns-btn"
+              onclick="generateSignedBinary()">
+        Generate Representation
+      </button>
+
+    </div>
+
+    <div class="ns-output">
+
+      <div class="ns-result"
+           id="signedResult">
+      </div>
+
+      <div class="ns-steps"
+           id="signedSteps">
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+        <div class="ns-card tab-content hidden"
+     id="shift">
+
+  <div class="ns-grid">
+
+    <div>
+
+      <div class="ns-input-group">
+        <label>Binary Number</label>
+
+        <input type="text"
+               id="shiftInput">
+      </div>
+
+      <div class="ns-input-group">
+        <label>Shift Type</label>
+
+        <select id="shiftType">
+          <option value="left">Left Shift</option>
+          <option value="right">Right Shift</option>
+        </select>
+      </div>
+
+      <div class="ns-input-group">
+        <label>Shift Count</label>
+
+        <input type="number"
+               id="shiftCount"
+               value="1">
+      </div>
+
+      <button class="ns-btn"
+              onclick="performShift()">
+        Perform Shift
+      </button>
+
+    </div>
+
+    <div class="ns-output">
+
+      <div class="ns-result"
+           id="shiftResult">
+      </div>
+
+      <div class="ns-steps"
+           id="shiftSteps">
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+        <div class="ns-card tab-content hidden"
+     id="bitwise">
+
+  <div class="ns-grid">
+
+    <div>
+
+      <div class="ns-input-group">
+        <label>First Binary</label>
+
+        <input type="text"
+               id="bit1">
+      </div>
+
+      <div class="ns-input-group">
+        <label>Second Binary</label>
+
+        <input type="text"
+               id="bit2">
+      </div>
+
+      <div class="ns-input-group">
+        <label>Operation</label>
+
+        <select id="bitOp">
+          <option value="AND">AND</option>
+          <option value="OR">OR</option>
+          <option value="XOR">XOR</option>
+        </select>
+      </div>
+
+      <button class="ns-btn"
+              onclick="performBitwise()">
+        Execute
+      </button>
+
+    </div>
+
+    <div class="ns-output">
+
+      <div class="ns-result"
+           id="bitResult">
+      </div>
+
+      <div class="ns-steps"
+           id="bitSteps">
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+        <div class="ns-card tab-content hidden"
+     id="float">
+
+  <div class="ns-grid">
+
+    <div>
+
+      <div class="ns-input-group">
+        <label>Decimal Number</label>
+
+        <input type="number"
+               id="floatInput"
+               step="any">
+      </div>
+
+      <button class="ns-btn"
+              onclick="convertIEEE754()">
+        Convert IEEE754
+      </button>
+
+    </div>
+
+    <div class="ns-output">
+
+      <div class="ns-result"
+           id="floatResult">
+      </div>
+
+      <div class="ns-steps"
+           id="floatSteps">
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+        <div class="ns-card tab-content hidden"
+     id="ascii">
+
+  <div class="ns-grid">
+
+    <div>
+
+      <div class="ns-input-group">
+        <label>Text</label>
+
+        <input type="text"
+               id="asciiInput">
+      </div>
+
+      <button class="ns-btn"
+              onclick="convertAsciiHex()">
+        Convert ASCII / HEX
+      </button>
+
+    </div>
+
+    <div class="ns-output">
+
+      <div class="ns-result"
+           id="asciiResult">
+      </div>
+
+      <div class="ns-steps"
+           id="asciiSteps">
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+        
 
       </div>
 
