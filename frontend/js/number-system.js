@@ -587,38 +587,11 @@ ${binary.substring(9)}
 ASCII HEX CONVERTER
 ========================================= */
 
-function convertAsciiHex(){
+ASCII Decimal:
+65 66 67
 
-  const text =
-    document.getElementById('asciiInput')
-    .value;
+HEX:
+41 42 43
 
-  const result =
-    document.getElementById('asciiResult');
-
-  const steps =
-    document.getElementById('asciiSteps');
-
-  let hex = '';
-
-  for(let ch of text){
-
-    hex +=
-      ch.charCodeAt(0)
-      .toString(16)
-      .toUpperCase() + ' ';
-
-  }
-
-  result.innerHTML =
-    `✅ HEX: ${hex}`;
-
-  steps.innerHTML = `
-ASCII Text:
-${text}
-
-HEX Representation:
-${hex}
-`;
-
-}
+Binary:
+01000001 01000010 01000011
