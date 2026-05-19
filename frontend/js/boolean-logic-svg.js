@@ -1,6 +1,6 @@
 
 (() => {
-  // ======== Tiny Boolean -> SVG renderer for Polycode ========
+  // ======== Tiny Boolean -> SVG renderer for Polygen ========
   // API: drawLogic(expr, mountElOrSelector, opts?)
   // opts: { width, height, palette }
 
