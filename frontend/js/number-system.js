@@ -1014,7 +1014,6 @@ function visualizeOnesComplementSubtraction(a,b){
   a = a.padStart(bits,'0');
   b = b.padStart(bits,'0');
 
-  // 1's complement
   let ones = '';
 
   for(let bit of b){
@@ -1022,6 +1021,7 @@ function visualizeOnesComplementSubtraction(a,b){
     ones += bit === '0'
       ? '1'
       : '0';
+
   }
 
   const sum =
@@ -1032,23 +1032,41 @@ function visualizeOnesComplementSubtraction(a,b){
   let binary =
     sum.toString(2);
 
-  let carry = '';
+  let carry = false;
 
-  // End-around carry
+  // End-around carry exists
   if(binary.length > bits){
 
-    carry = binary[0];
+    carry = true;
 
     binary =
       binary.slice(1);
 
     binary =
       (
-        parseInt(binary,2)
-        + 1
+        parseInt(binary,2) + 1
       )
       .toString(2)
       .padStart(bits,'0');
+
+  }
+
+  // No carry → negative answer
+  else{
+
+    let corrected = '';
+
+    for(let bit of binary.padStart(bits,'0')){
+
+      corrected +=
+        bit === '0'
+        ? '1'
+        : '0';
+
+    }
+
+    binary = corrected;
+
   }
 
   result.innerHTML =
@@ -1068,22 +1086,30 @@ ${ones}
 
 --------------------------------
 
-Addition:
-
-${a}
-+
-${ones}
-
-=
+Binary Sum:
 ${sum.toString(2)}
 
 --------------------------------
 
-End Around Carry:
-${carry || 'None'}
+Carry Generated:
+${carry ? 'YES' : 'NO'}
 
-Final Result:
+${
+carry
+? `
+Positive Result:
 ${binary}
+`
+: `
+Negative Result
+
+1's Complement of Sum:
+${binary}
+
+Final Answer:
+-${binary}
+`
+}
 `;
 
 }
@@ -1110,7 +1136,6 @@ function visualizeTwosComplementSubtraction(a,b){
   a = a.padStart(bits,'0');
   b = b.padStart(bits,'0');
 
-  // 1's complement
   let ones = '';
 
   for(let bit of b){
@@ -1118,9 +1143,9 @@ function visualizeTwosComplementSubtraction(a,b){
     ones += bit === '0'
       ? '1'
       : '0';
+
   }
 
-  // 2's complement
   let twos =
     (
       parseInt(ones,2) + 1
@@ -1136,14 +1161,39 @@ function visualizeTwosComplementSubtraction(a,b){
   let binary =
     sum.toString(2);
 
-  let carry = '';
+  let carry = false;
 
+  // Carry exists
   if(binary.length > bits){
 
-    carry = binary[0];
+    carry = true;
 
     binary =
       binary.slice(1);
+
+  }
+
+  // No carry → negative
+  else{
+
+    let inverted = '';
+
+    for(let bit of binary.padStart(bits,'0')){
+
+      inverted +=
+        bit === '0'
+        ? '1'
+        : '0';
+
+    }
+
+    binary =
+      (
+        parseInt(inverted,2) + 1
+      )
+      .toString(2)
+      .padStart(bits,'0');
+
   }
 
   result.innerHTML =
@@ -1166,22 +1216,30 @@ ${twos}
 
 --------------------------------
 
-Addition:
-
-${a}
-+
-${twos}
-
-=
+Binary Sum:
 ${sum.toString(2)}
 
 --------------------------------
 
-Carry:
-${carry || 'None'}
+Carry Generated:
+${carry ? 'YES' : 'NO'}
 
-Final Result:
+${
+carry
+? `
+Positive Result:
 ${binary}
+`
+: `
+Negative Result
+
+2's Complement of Sum:
+${binary}
+
+Final Answer:
+-${binary}
+`
+}
 `;
 
 }
