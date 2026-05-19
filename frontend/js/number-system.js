@@ -7,25 +7,41 @@ FILE: frontend/js/number-system.js
 TAB SWITCHING
 ========================================= */
 
-const tabButtons = document.querySelectorAll('.tab-btn');
+/* =========================================
+TAB SWITCHING
+========================================= */
+
+const tabButtons = document.querySelectorAll('.ns-tab');
 const tabContents = document.querySelectorAll('.tab-content');
 
 tabButtons.forEach(btn => {
 
   btn.addEventListener('click', () => {
 
-    tabButtons.forEach(b => b.classList.remove('active'));
-    tabContents.forEach(c => c.classList.add('hidden'));
+    // Remove active state
+    tabButtons.forEach(b => {
+      b.classList.remove('active');
+    });
 
+    // Hide all tabs
+    tabContents.forEach(content => {
+      content.classList.add('hidden');
+    });
+
+    // Activate clicked tab
     btn.classList.add('active');
 
-    document.getElementById(btn.dataset.tab)
-      .classList.remove('hidden');
+    // Show target tab
+    const target =
+      document.getElementById(btn.dataset.tab);
+
+    if(target){
+      target.classList.remove('hidden');
+    }
 
   });
 
 });
-
 
 /* =========================================
 NUMBER CONVERSION
