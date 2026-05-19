@@ -396,29 +396,43 @@ function performShift(){
     document.getElementById('shiftSteps');
 
   if(!/^[01]+$/.test(input)){
-    result.innerHTML = "❌ Invalid Binary";
+
+    result.innerHTML =
+      "❌ Invalid Binary";
+
     return;
   }
 
-  let output = input;
+  const decimal =
+    parseInt(input, 2);
 
-  for(let i=0;i<count;i++){
+  let shiftedDecimal;
 
-    if(type === 'left'){
-      output = output.substring(1) + '0';
-    }
-    else{
-      output = '0' + output.substring(0, output.length-1);
-    }
+  if(type === 'left'){
+
+    shiftedDecimal =
+      decimal << count;
+
+  }
+  else{
+
+    shiftedDecimal =
+      decimal >> count;
 
   }
 
+  const shiftedBinary =
+    shiftedDecimal.toString(2);
+
   result.innerHTML =
-    `✅ Shifted Result: ${output}`;
+    `✅ Shifted Result: ${shiftedBinary}`;
 
   steps.innerHTML = `
-Original:
+Original Binary:
 ${input}
+
+Decimal Value:
+${decimal}
 
 Shift Type:
 ${type}
@@ -426,8 +440,17 @@ ${type}
 Shift Count:
 ${count}
 
-Final Result:
-${output}
+Operation:
+
+${decimal}
+${type === 'left' ? '<<' : '>>'}
+${count}
+
+Shifted Decimal:
+${shiftedDecimal}
+
+Final Binary:
+${shiftedBinary}
 `;
 
 }
