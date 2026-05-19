@@ -1,10 +1,10 @@
 // sw.js — navigation network-first; assets stale-while-revalidate
-const CACHE = 'polycode-v6';
+const CACHE = 'polygen-v6';
 const CORE = [
   '/manifest.json',
   '/frontend/index.html',
-  '/frontend/assets/icons/polycode-icon-192.png?v=2',
-  '/frontend/assets/icons/polycode-icon-512.png?v=2'
+  '/frontend/assets/icons/polygen-icon-192.png?v=2',
+  '/frontend/assets/icons/polygen-icon-512.png?v=2'
 ];
 
 self.addEventListener('install', (event) => {
