@@ -161,8 +161,15 @@ function calculateArithmetic(){
 
   try{
 
-    const dec1 = parseInt(num1, base);
-    const dec2 = parseInt(num2, base);
+    if(
+  !isValidForBase(num1, base) ||
+  !isValidForBase(num2, base)
+){
+  throw new Error("Invalid number for selected base");
+}
+
+const dec1 = parseInt(num1, base);
+const dec2 = parseInt(num2, base);
 
     if(isNaN(dec1) || isNaN(dec2)){
       throw new Error("Invalid");
