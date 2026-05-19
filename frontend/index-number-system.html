@@ -1,528 +1,311 @@
-<!doctype html>
+<!-- =========================================
+FILE: frontend/index-number-system.html
+========================================= -->
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Polygen - Number Systems Lab</title>
 
-  <title>Polygen | Number Systems</title>
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, viewport-fit=cover" />
-
-  <link rel="icon" href="./assets/logo.png" />
-
-  <!-- SAME SHELL CSS -->
-  <link rel="stylesheet" href="./css/shell.css" />
+  <link rel="stylesheet" href="./css/number-system.css"/>
 
   <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
 
-    .ns-tabs{
+    body{
+      background:#0f172a;
+      color:#fff;
+      min-height:100vh;
+      padding:30px;
+    }
+
+    .container{
+      max-width:1200px;
+      margin:auto;
+    }
+
+    .title{
+      text-align:center;
+      margin-bottom:30px;
+    }
+
+    .title h1{
+      font-size:42px;
+      color:#38bdf8;
+    }
+
+    .title p{
+      margin-top:10px;
+      color:#cbd5e1;
+    }
+
+    .tabs{
       display:flex;
-      gap:10px;
-      margin-bottom:20px;
+      gap:15px;
+      margin-bottom:25px;
       flex-wrap:wrap;
     }
 
-    .ns-tab{
-      padding:10px 18px;
-      border-radius:10px;
+    .tab-btn{
+      padding:12px 22px;
       border:none;
+      border-radius:12px;
       cursor:pointer;
-      background:var(--panel2);
-      color:var(--text);
-      font-weight:600;
+      background:#1e293b;
+      color:#fff;
+      transition:0.3s;
+      font-weight:bold;
     }
 
-    .ns-tab.active{
+    .tab-btn.active{
       background:#38bdf8;
       color:#000;
     }
 
-    .ns-card{
-      background:var(--panel);
-      border-radius:14px;
-      padding:18px;
-      border:1px solid var(--border);
+    .card{
+      background:#111827;
+      border-radius:20px;
+      padding:25px;
+      box-shadow:0 0 20px rgba(0,0,0,0.4);
     }
 
-    .ns-grid{
+    .grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:18px;
+      gap:20px;
     }
 
-    .ns-input-group{
-      margin-bottom:16px;
+    .input-group{
+      margin-bottom:18px;
     }
 
-    .ns-input-group label{
+    label{
       display:block;
-      margin-bottom:6px;
-      opacity:.85;
+      margin-bottom:8px;
+      color:#cbd5e1;
     }
 
-    .ns-input-group input,
-    .ns-input-group select{
-      width:100%;
-      padding:12px;
-      border-radius:10px;
-      border:1px solid var(--border);
-      background:var(--panel2);
-      color:var(--text);
-    }
-
-    .ns-btn{
+    input, select{
       width:100%;
       padding:14px;
+      border-radius:10px;
       border:none;
-      border-radius:12px;
-      background:#38bdf8;
-      color:#000;
-      font-weight:700;
-      cursor:pointer;
+      outline:none;
+      background:#1e293b;
+      color:white;
+      font-size:16px;
     }
 
-    .ns-output{
-      min-height:320px;
-      background:#020617;
+    button.action-btn{
+      width:100%;
+      padding:15px;
+      background:#38bdf8;
+      color:black;
+      border:none;
       border-radius:12px;
-      padding:18px;
+      font-weight:bold;
+      font-size:17px;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    button.action-btn:hover{
+      transform:translateY(-2px);
+      opacity:0.9;
+    }
+
+    .output-box{
+      background:#020617;
+      border-radius:15px;
+      padding:20px;
+      min-height:300px;
       overflow:auto;
     }
 
-    .ns-result{
-      font-size:22px;
+    .result{
+      font-size:24px;
+      margin-bottom:20px;
       color:#4ade80;
-      margin-bottom:18px;
       word-break:break-word;
     }
 
-    .ns-steps{
+    .steps{
       white-space:pre-wrap;
       line-height:1.7;
+      color:#e2e8f0;
     }
 
     .hidden{
       display:none;
     }
 
-    .topic-list{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      margin-top:14px;
-    }
-
-    .topic-item{
-      padding:12px;
-      border-radius:10px;
-      background:var(--panel2);
-      border:1px solid var(--border);
-    }
-
     @media(max-width:900px){
-
-      .ns-grid{
+      .grid{
         grid-template-columns:1fr;
       }
-
     }
 
   </style>
 </head>
 
-<body class="page-fade">
+<body>
 
-<!-- ========================================= -->
-<!-- HEADER -->
-<!-- ========================================= -->
+<div class="container">
 
-<header class="site-header">
-
-  <div class="brand-wrap">
-    <div class="brand-grid">
-      <img src="./assets/PC-Logo.png"
-           alt="polygen"
-           class="brand-logo" />
-
-      <div class="brand-title2">
-        polygen
-      </div>
-
-      <div class="brand-tagline2">
-        next-gen<span class="dot">.</span>learning<span class="dot">.</span>system
-      </div>
-    </div>
+  <div class="title">
+    <h1>🔢 Number Systems Lab</h1>
+    <p>Binary • Decimal • Octal • Hexadecimal • Complements • Arithmetic</p>
   </div>
 
-  <nav class="site-nav">
-    <a href="./index.html">Home</a>
-    <a href="./about.html">About</a>
-    <a href="./contact.html">Contact</a>
-  </nav>
-
-</header>
-
-<!-- ========================================= -->
-<!-- MAIN -->
-<!-- ========================================= -->
-
-<main class="stage">
-
-<div class="app">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="convert">Convert</button>
+    <button class="tab-btn" data-tab="arithmetic">Arithmetic</button>
+    <button class="tab-btn" data-tab="complement">Complements</button>
+  </div>
 
   <!-- ===================================== -->
-  <!-- LEFT PANEL -->
+  <!-- CONVERT -->
   <!-- ===================================== -->
 
-  <section class="panel left">
+  <div class="card tab-content" id="convert">
 
-    <div class="pane-head">
-      <strong>📘 Concepts</strong>
-    </div>
+    <div class="grid">
 
-    <div class="pane-scroll">
+      <div>
 
-      <div class="pane-body">
-
-        <div class="topic-list">
-
-          <div class="topic-item">Decimal System</div>
-          <div class="topic-item">Binary System</div>
-          <div class="topic-item">Octal System</div>
-          <div class="topic-item">Hexadecimal</div>
-          <div class="topic-item">Complements</div>
-          <div class="topic-item">Bitwise Operations</div>
-
+        <div class="input-group">
+          <label>Enter Number</label>
+          <input type="text" id="convertInput" placeholder="Example: 101101">
         </div>
+
+        <div class="input-group">
+          <label>From Base</label>
+          <select id="fromBase">
+            <option value="2">Binary</option>
+            <option value="8">Octal</option>
+            <option value="10" selected>Decimal</option>
+            <option value="16">Hexadecimal</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>To Base</label>
+          <select id="toBase">
+            <option value="2">Binary</option>
+            <option value="8">Octal</option>
+            <option value="10">Decimal</option>
+            <option value="16" selected>Hexadecimal</option>
+          </select>
+        </div>
+
+        <button class="action-btn" onclick="convertNumber()">
+          Convert Number
+        </button>
 
       </div>
 
-      <div class="pane-foot">
-        <span class="msg">Number System Theory</span>
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- ===================================== -->
-  <!-- CENTER PANEL -->
-  <!-- ===================================== -->
-
-  <section class="panel center">
-
-    <div class="pane-head">
-
-      <strong>🔢 Number Systems Lab</strong>
-
-    </div>
-
-    <div class="pane-scroll">
-
-      <div class="pane-body">
-
-        <!-- TABS -->
-
-        <div class="ns-tabs">
-
-          <button class="ns-tab active"
-                  data-tab="convert">
-            Convert
-          </button>
-
-          <button class="ns-tab"
-                  data-tab="arithmetic">
-            Arithmetic
-          </button>
-
-          <button class="ns-tab"
-                  data-tab="complement">
-            Complements
-          </button>
-
-        </div>
-
-        <!-- ================================ -->
-        <!-- CONVERT -->
-        <!-- ================================ -->
-
-        <div class="ns-card tab-content"
-             id="convert">
-
-          <div class="ns-grid">
-
-            <div>
-
-              <div class="ns-input-group">
-                <label>Enter Number</label>
-
-                <input type="text"
-                       id="convertInput"
-                       placeholder="Example: 101101">
-              </div>
-
-              <div class="ns-input-group">
-                <label>From Base</label>
-
-                <select id="fromBase">
-                  <option value="2">Binary</option>
-                  <option value="8">Octal</option>
-                  <option value="10">Decimal</option>
-                  <option value="16">Hexadecimal</option>
-                </select>
-              </div>
-
-              <div class="ns-input-group">
-                <label>To Base</label>
-
-                <select id="toBase">
-                  <option value="2">Binary</option>
-                  <option value="8">Octal</option>
-                  <option value="10">Decimal</option>
-                  <option value="16">Hexadecimal</option>
-                </select>
-              </div>
-
-              <button class="ns-btn"
-                      onclick="convertNumber()">
-                Convert Number
-              </button>
-
-            </div>
-
-            <div class="ns-output">
-
-              <div class="ns-result"
-                   id="convertResult">
-                Result will appear here
-              </div>
-
-              <div class="ns-steps"
-                   id="convertSteps">
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- ================================ -->
-        <!-- ARITHMETIC -->
-        <!-- ================================ -->
-
-        <div class="ns-card tab-content hidden"
-             id="arithmetic">
-
-          <div class="ns-grid">
-
-            <div>
-
-              <div class="ns-input-group">
-                <label>First Number</label>
-                <input type="text" id="num1">
-              </div>
-
-              <div class="ns-input-group">
-                <label>Second Number</label>
-                <input type="text" id="num2">
-              </div>
-
-              <div class="ns-input-group">
-                <label>Base</label>
-
-                <select id="arithBase">
-                  <option value="2">Binary</option>
-                  <option value="8">Octal</option>
-                  <option value="10">Decimal</option>
-                  <option value="16">Hexadecimal</option>
-                </select>
-              </div>
-
-              <div class="ns-input-group">
-                <label>Operation</label>
-
-                <select id="operation">
-                  <option value="+">Addition</option>
-                  <option value="-">Subtraction</option>
-                  <option value="*">Multiplication</option>
-                  <option value="/">Division</option>
-                </select>
-              </div>
-
-              <button class="ns-btn"
-                      onclick="calculateArithmetic()">
-                Calculate
-              </button>
-
-            </div>
-
-            <div class="ns-output">
-
-              <div class="ns-result"
-                   id="arithResult">
-                Result will appear here
-              </div>
-
-              <div class="ns-steps"
-                   id="arithSteps">
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- ================================ -->
-        <!-- COMPLEMENT -->
-        <!-- ================================ -->
-
-        <div class="ns-card tab-content hidden"
-             id="complement">
-
-          <div class="ns-grid">
-
-            <div>
-
-              <div class="ns-input-group">
-                <label>Binary Number</label>
-
-                <input type="text"
-                       id="compInput">
-              </div>
-
-              <button class="ns-btn"
-                      onclick="findComplements()">
-                Find Complements
-              </button>
-
-            </div>
-
-            <div class="ns-output">
-
-              <div class="ns-result"
-                   id="compResult">
-                Complement Result
-              </div>
-
-              <div class="ns-steps"
-                   id="compSteps">
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="pane-foot">
-        <span class="msg">
-          Ready for Number System Operations
-        </span>
+      <div class="output-box">
+        <div class="result" id="convertResult">Result will appear here</div>
+        <div class="steps" id="convertSteps"></div>
       </div>
 
     </div>
 
-  </section>
+  </div>
 
   <!-- ===================================== -->
-  <!-- RIGHT PANEL -->
+  <!-- ARITHMETIC -->
   <!-- ===================================== -->
 
-  <section class="panel right">
+  <div class="card tab-content hidden" id="arithmetic">
 
-    <div class="pane-head">
-      <strong>📖 Explanation</strong>
-    </div>
+    <div class="grid">
 
-    <div class="pane-scroll">
+      <div>
 
-      <div class="pane-body">
-
-        <div class="topic-list">
-
-          <div class="topic-item">
-            Binary uses base 2
-          </div>
-
-          <div class="topic-item">
-            Octal uses base 8
-          </div>
-
-          <div class="topic-item">
-            Hexadecimal uses base 16
-          </div>
-
-          <div class="topic-item">
-            2's complement = 1's complement + 1
-          </div>
-
+        <div class="input-group">
+          <label>First Number</label>
+          <input type="text" id="num1">
         </div>
 
+        <div class="input-group">
+          <label>Second Number</label>
+          <input type="text" id="num2">
+        </div>
+
+        <div class="input-group">
+          <label>Base</label>
+          <select id="arithBase">
+            <option value="2">Binary</option>
+            <option value="8">Octal</option>
+            <option value="10">Decimal</option>
+            <option value="16">Hexadecimal</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Operation</label>
+          <select id="operation">
+            <option value="+">Addition</option>
+            <option value="-">Subtraction</option>
+            <option value="*">Multiplication</option>
+            <option value="/">Division</option>
+          </select>
+        </div>
+
+        <button class="action-btn" onclick="calculateArithmetic()">
+          Calculate
+        </button>
+
       </div>
 
-      <div class="pane-foot">
-        <span class="msg">
-          Learning Mode Enabled
-        </span>
+      <div class="output-box">
+        <div class="result" id="arithResult">Result will appear here</div>
+        <div class="steps" id="arithSteps"></div>
       </div>
 
     </div>
 
-  </section>
+  </div>
+
+  <!-- ===================================== -->
+  <!-- COMPLEMENT -->
+  <!-- ===================================== -->
+
+  <div class="card tab-content hidden" id="complement">
+
+    <div class="grid">
+
+      <div>
+
+        <div class="input-group">
+          <label>Binary Number</label>
+          <input type="text" id="compInput">
+        </div>
+
+        <button class="action-btn" onclick="findComplements()">
+          Find Complements
+        </button>
+
+      </div>
+
+      <div class="output-box">
+        <div class="result" id="compResult">Complement Result</div>
+        <div class="steps" id="compSteps"></div>
+      </div>
+
+    </div>
+
+  </div>
 
 </div>
-
-</main>
-
-<!-- ========================================= -->
-<!-- FOOTER -->
-<!-- ========================================= -->
-
-<footer class="site-footer">
-
-  <div class="footer-grid">
-
-    <div class="footer-left">
-
-      <img src="./assets/logo.png"
-           alt="Edifica"
-           class="footer-logo" />
-
-      <div class="txt">
-
-        <span class="powered">
-          powered by edifica
-        </span>
-
-        <span class="subline">
-          education<span class="dot">.</span>
-          consultation<span class="dot">.</span>
-          assistance
-        </span>
-
-      </div>
-
-    </div>
-
-    <div class="footer-right">
-
-      <a href="./privacy.html">
-        Privacy Policy
-      </a>
-
-      <a href="./terms.html">
-        Terms & Conditions
-      </a>
-
-    </div>
-
-  </div>
-
-</footer>
 
 <script src="./js/number-system.js"></script>
 
