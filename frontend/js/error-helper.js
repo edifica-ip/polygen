@@ -1,5 +1,5 @@
 /* =======================================================================
-   PolyCode Error Helper
+   Polygen Error Helper
    - Parse stderr/stdout from real compilers (C/C++/Java/Python)
    - Produce student-friendly explanations, quick fixes, and annotations
    - No deps. Works in browser.
