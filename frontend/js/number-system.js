@@ -985,3 +985,206 @@ ${final}
 
 
 
+
+
+
+
+/* =========================================
+DIGITAL CODES
+========================================= */
+
+function convertDigitalCodes(){
+
+  const input =
+    document.getElementById('digitalInput')
+    .value.trim();
+
+  const type =
+    document.getElementById('digitalType')
+    .value;
+
+  const result =
+    document.getElementById('digitalResult');
+
+  const steps =
+    document.getElementById('digitalSteps');
+
+  let output = '';
+
+  /* =====================================
+  BINARY → GRAY
+  ===================================== */
+
+  if(type === 'binaryToGray'){
+
+    if(!/^[01]+$/.test(input)){
+
+      result.innerHTML =
+        "❌ Invalid Binary";
+
+      steps.innerHTML = "";
+
+      return;
+    }
+
+    output += input[0];
+
+    for(let i=1;i<input.length;i++){
+
+      output +=
+        input[i-1] === input[i]
+        ? '0'
+        : '1';
+
+    }
+
+    result.innerHTML =
+      `✅ Gray Code: ${output}`;
+
+    steps.innerHTML = `
+Binary:
+${input}
+
+--------------------------------
+
+Gray Code:
+${output}
+`;
+
+  }
+
+  /* =====================================
+  GRAY → BINARY
+  ===================================== */
+
+  else if(type === 'grayToBinary'){
+
+    if(!/^[01]+$/.test(input)){
+
+      result.innerHTML =
+        "❌ Invalid Gray Code";
+
+      steps.innerHTML = "";
+
+      return;
+    }
+
+    output += input[0];
+
+    for(let i=1;i<input.length;i++){
+
+      output +=
+        output[i-1] === input[i]
+        ? '0'
+        : '1';
+
+    }
+
+    result.innerHTML =
+      `✅ Binary Code: ${output}`;
+
+    steps.innerHTML = `
+Gray Code:
+${input}
+
+--------------------------------
+
+Recovered Binary:
+${output}
+`;
+
+  }
+
+  /* =====================================
+  DECIMAL → BCD
+  ===================================== */
+
+  else if(type === 'decimalToBCD'){
+
+    if(!/^[0-9]+$/.test(input)){
+
+      result.innerHTML =
+        "❌ Decimal Only";
+
+      steps.innerHTML = "";
+
+      return;
+    }
+
+    let bcd = '';
+
+    for(let digit of input){
+
+      bcd +=
+        parseInt(digit)
+        .toString(2)
+        .padStart(4,'0')
+        + ' ';
+
+    }
+
+    result.innerHTML =
+      `✅ BCD Generated`;
+
+    steps.innerHTML = `
+Decimal Number:
+${input}
+
+--------------------------------
+
+BCD Representation:
+${bcd}
+`;
+
+  }
+
+  /* =====================================
+  DECIMAL → EXCESS-3
+  ===================================== */
+
+  else if(type === 'decimalToExcess3'){
+
+    if(!/^[0-9]+$/.test(input)){
+
+      result.innerHTML =
+        "❌ Decimal Only";
+
+      steps.innerHTML = "";
+
+      return;
+    }
+
+    let excess3 = '';
+
+    for(let digit of input){
+
+      const val =
+        parseInt(digit) + 3;
+
+      excess3 +=
+        val.toString(2)
+        .padStart(4,'0')
+        + ' ';
+
+    }
+
+    result.innerHTML =
+      `✅ Excess-3 Generated`;
+
+    steps.innerHTML = `
+Decimal Number:
+${input}
+
+--------------------------------
+
+Excess-3 Representation:
+${excess3}
+`;
+
+  }
+
+}
+
+
+
+
