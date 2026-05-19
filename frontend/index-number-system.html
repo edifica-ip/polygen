@@ -892,10 +892,25 @@ SELECT DROPDOWN FIX
         <input type="text"
                id="visualNum2"
                placeholder="Example: 0111">
+
+         <label>Operation</label>
+
+  <select id="visualOperation">
+
+    <option value="add">
+      Addition
+    </option>
+
+    <option value="multiply">
+      Multiplication
+    </option>
+
+  </select>
+        
       </div>
 
       <button class="ns-btn"
-              onclick="visualizeBinaryAddition()">
+              onclick="visualizeBinaryOperation()">
         Visualize Addition
       </button>
 
