@@ -378,6 +378,14 @@ SELECT DROPDOWN FIX
   ASCII Interchange
 </button>
 
+          <button class="ns-tab"
+        data-tab="overflow">
+  Overflow
+</button>
+
+
+
+          
         </div>
 
         <!-- ================================ -->
@@ -796,7 +804,62 @@ SELECT DROPDOWN FIX
 
 
         
+<div class="ns-card tab-content hidden"
+     id="overflow">
 
+  <div class="ns-grid">
+
+    <div>
+
+      <div class="ns-input-group">
+        <label>First Binary Number</label>
+
+        <input type="text"
+               id="overflowNum1"
+               placeholder="Example: 11111111">
+      </div>
+
+      <div class="ns-input-group">
+        <label>Second Binary Number</label>
+
+        <input type="text"
+               id="overflowNum2"
+               placeholder="Example: 00000001">
+      </div>
+
+      <div class="ns-input-group">
+        <label>Bit Size</label>
+
+        <select id="overflowBits">
+          <option value="8">8-bit</option>
+          <option value="16">16-bit</option>
+        </select>
+      </div>
+
+      <button class="ns-btn"
+              onclick="detectOverflow()">
+        Detect Overflow
+      </button>
+
+    </div>
+
+    <div class="ns-output">
+
+      <div class="ns-result"
+           id="overflowResult">
+      </div>
+
+      <div class="ns-steps"
+           id="overflowSteps">
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+        
       </div>
 
       <div class="pane-foot">
