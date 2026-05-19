@@ -58,7 +58,7 @@ async function loadPlugins(app) {
     const register = mod.register || (mod.default && mod.default.register);
     if (typeof register !== 'function') continue;
     await register(app, { USE_DOCKER, JOB_ROOT, execCapture, parseJavac, parseGcc });
-    console.log('[polycode] plugin loaded:', ent.name);
+    console.log('[polygen] plugin loaded:', ent.name);
   }
 }
 
