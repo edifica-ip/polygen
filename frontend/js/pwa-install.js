@@ -33,7 +33,7 @@
 
   function showIOSInstructions() {
     alert(
-      "Install PolyCode:\n\n" +
+      "Install Polygen:\n\n" +
       "1) Tap the Share button (square with arrow).\n" +
       "2) Choose 'Add to Home Screen'.\n" +
       "3) Open from your Home Screen for the full app."
@@ -51,7 +51,7 @@ function updateUI() {
 
   if (standalone) {
     if (btn) btn.hidden = true;
-    if (hint) { hint.hidden = false; hint.textContent = 'PolyCode is installed. Open it from your Home Screen.'; }
+    if (hint) { hint.hidden = false; hint.textContent = 'Polygen is installed. Open it from your Home Screen.'; }
     return;
   }
 
@@ -105,7 +105,7 @@ function updateUI() {
       } else {
         // No prompt yet → show gentle instructions (Android/desktop)
         alert(
-          "To install PolyCode:\n\n" +
+          "To install Polygen:\n\n" +
           "• Open the browser menu (⋮ or ⋯)\n" +
           "• Tap 'Install app' or 'Add to Home screen'\n"
         );
