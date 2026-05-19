@@ -81,10 +81,25 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use((req,res,next)=>{
 
+  console.log(
+    "Origin:",
+    req.headers.origin
+  );
+
+  
+  if(req.headers.origin){
+
   res.header(
     "Access-Control-Allow-Origin",
-    req.headers.origin || "*"
+    req.headers.origin
   );
+
+}
+
+  res.header(
+  "Access-Control-Allow-Credentials",
+  "true"
+);
 
   res.header(
     "Access-Control-Allow-Methods",
@@ -101,7 +116,35 @@ app.use((req,res,next)=>{
 });
 
 
-app.options("*", cors(corsOptions)); // preflight with same options
+app.options("*", (req,res)=>{
+
+  if(req.headers.origin){
+
+    res.header(
+      "Access-Control-Allow-Origin",
+      req.headers.origin
+    );
+
+  }
+
+  res.header(
+    "Access-Control-Allow-Credentials",
+    "true"
+  );
+
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,POST,OPTIONS"
+  );
+
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type,X-Requested-With"
+  );
+
+  return res.sendStatus(204);
+
+});
 
 app.use(express.json({ limit: "1mb" }));
 
