@@ -290,8 +290,11 @@ function calculateArithmetic(){
   throw new Error("Invalid number for selected base");
 }
 
-const dec1 = parseInt(num1, base);
-const dec2 = parseInt(num2, base);
+const dec1 =
+  convertToDecimal(num1, base);
+
+const dec2 =
+  convertToDecimal(num2, base);
 
     if(isNaN(dec1) || isNaN(dec2)){
       throw new Error("Invalid");
@@ -319,7 +322,8 @@ const dec2 = parseInt(num2, base);
 
     }
 
-    let finalAnswer = answer.toString(base).toUpperCase();
+   let finalAnswer =
+  convertFromDecimal(answer, base);
 
     resultDiv.innerHTML = `✅ Result: ${finalAnswer}`;
 
