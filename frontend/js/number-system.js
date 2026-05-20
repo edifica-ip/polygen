@@ -93,6 +93,81 @@ function isValidForBase(value, base){
 
 
 
+
+function generateCrossGroupingSteps(
+  value,
+  fromBase,
+  toBase
+){
+
+  let steps =
+    'Steps of Calculation:\n\n';
+
+  /* ================================
+  STEP 1
+  ================================ */
+
+  steps +=
+`STEP 1:
+Convert to Binary\n\n`;
+
+  const binarySteps =
+    generateGroupingSteps(
+      value,
+      fromBase
+    );
+
+  steps +=
+    binarySteps;
+
+  /* ================================
+  GET PURE BINARY
+  ================================ */
+
+  const decimal =
+    convertToDecimal(
+      value,
+      fromBase
+    );
+
+  const binary =
+    convertFromDecimal(
+      decimal,
+      2
+    );
+
+  /* ================================
+  STEP 2
+  ================================ */
+
+  steps += `
+
+================================
+
+STEP 2:
+Convert Binary to ${
+  toBase === 16
+    ? 'Hexadecimal'
+    : 'Octal'
+}
+
+\n`;
+
+  const regroupSteps =
+    generateBinaryGroupingSteps(
+      binary,
+      toBase
+    );
+
+  steps +=
+    regroupSteps;
+
+  return steps;
+
+}
+
+
+
 function generateBinaryGroupingSteps(
   value,
   toBase
@@ -111,9 +186,9 @@ function generateBinaryGroupingSteps(
   steps +=
     toBase === 16
 
-    ? 'Binary to Hexadecimal\n\n'
+    ? 'Binary to Hexadecimal (4 bit grouping)\n'
 
-    : 'Binary to Octal\n\n';
+    : 'Binary to Octal (3 bit grouping)\n';
 
   // Split decimal part
   const parts =
@@ -239,9 +314,9 @@ function generateGroupingSteps(value, fromBase){
   steps +=
     fromBase === 16
 
-    ? 'Hexadecimal to Binary\n\n'
+    ? 'Hexadecimal to Binary (4 bit grouping) \n'
 
-    : 'Octal to Binary\n\n';
+    : 'Octal to Binary (3 bit grouping)\n';
 
   for(let ch of value){
 
@@ -649,7 +724,32 @@ if(
     );
 
 }
-       
+
+   else if(
+
+  (
+    fromBase === 8 &&
+    toBase === 16
+  )
+
+  ||
+
+  (
+    fromBase === 16 &&
+    toBase === 8
+  )
+
+){
+
+  detailedSteps =
+
+    generateCrossGroupingSteps(
+      input,
+      fromBase,
+      toBase
+    );
+
+}
 else{
 
   detailedSteps = `
