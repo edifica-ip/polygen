@@ -102,7 +102,7 @@ function generateDecimalToAnySteps(num, base){
   let n = parseInt(num);
 
   let steps =
-    'Steps of Calculation:\n';
+    'Steps of Calculation:\n\n';
 
   let remainders = [];
 
@@ -110,7 +110,7 @@ function generateDecimalToAnySteps(num, base){
   if(n === 0){
 
     return `
-Steps of Calculation:
+Steps of Calculation\n:
 0 ÷ ${base} = 0
 
 --------------------------------
@@ -130,9 +130,9 @@ Final Answer:
     const remainder =
       n % base;
 
-    steps += `${n} ÷ ${base} = ${quotient}
-Remainder = ${chars[remainder]}
-
+    //steps += `${n} ÷ ${base} = ${quotient}
+//Remainder = ${chars[remainder]}
+steps += ${base} | ${n} - ${chars[remainder]}
 `;
 
     remainders.unshift(
@@ -143,8 +143,7 @@ Remainder = ${chars[remainder]}
 
   }
 
-  steps += `
---------------------------------
+  steps += `--------------------------------
 Arrange remainders from bottom to top to find the result:
 ${remainders.join('')}
 `;
