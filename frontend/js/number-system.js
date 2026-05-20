@@ -125,8 +125,7 @@ function generateDecimalToAnySteps(num, base){
   ================================ */
 
   steps +=
-`INTEGER PART:
-
+`Integer Part:
 \n`;
 
   // Handle integer 0
@@ -181,10 +180,8 @@ function generateDecimalToAnySteps(num, base){
 
     steps += `
 --------------------------------
-
-FRACTIONAL PART:
-
-`;
+Remainder upwards (↑): ${remainders.join('')}\n\n
+Fractional Part:\n\n`;
 
     let limit = 10;
 
@@ -199,22 +196,28 @@ FRACTIONAL PART:
       const digit =
         Math.floor(product);
 
-      steps += `
-${fractionPart.toFixed(10)}
-× ${base}
-=
-${product.toFixed(10)}
+     const fracLeft =
 
-Integer Part = ${chars[digit]}
+  `${fractionPart.toFixed(10)} × ${base} = `
+  + `${product.toFixed(10)}`
+      .padEnd(15,' ');
 
-`;
+const fracRight =
+
+  `Integer Part = ${chars[digit]}`;
+
+steps +=
+  fracLeft + fracRight + '\n';
 
       fractionalDigits.push(
         chars[digit]
       );
 
       fractionPart =
-        product - digit;
+  Number(
+    (product - digit)
+    .toFixed(12)
+  );
 
       limit--;
 
@@ -236,11 +239,9 @@ Integer Part = ${chars[digit]}
 
   steps += `
 --------------------------------
-
-Final Answer:
-
-${finalAnswer}
-`;
+Fractional Digits downwards (↓): ${fractionalDigits.join('')}\n\n
+--------------------------------
+Final Answer: ${finalAnswer}`;
 
   return steps;
 
