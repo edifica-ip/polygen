@@ -132,7 +132,7 @@ Final Answer:
 
     //steps += `${n} ÷ ${base} = ${quotient}
 //Remainder = ${chars[remainder]}
-steps += ${base} | ${n} - ${chars[remainder]}
+steps += `${base} | ${n} - ${chars[remainder]}
 `;
 
     remainders.unshift(
