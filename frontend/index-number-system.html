@@ -232,16 +232,7 @@ SELECT DROPDOWN FIX
 
   }
 
-    .global-output{
-
-  height:100%;
-  min-height:650px;
-
-  display:flex;
-  flex-direction:column;
-
-}
-
+  
 #globalSteps{
 
   flex:1;
@@ -460,46 +451,56 @@ SELECT DROPDOWN FIX
         <!-- ================================ -->
 
         <div class="ns-card tab-content"
-             id="convert">
+     id="convert">
 
+  <div class="ns-input-group">
 
+    <label>Enter Number</label>
 
-              <div class="ns-input-group">
-                <label>Enter Number</label>
+    <input type="text"
+           id="convertInput"
+           placeholder="Example: 101101">
 
-                <input type="text"
-                       id="convertInput"
-                       placeholder="Example: 101101">
-              </div>
+  </div>
 
-              <div class="ns-input-group">
-                <label>From Base</label>
+  <div class="ns-input-group">
 
-                <select id="fromBase">
-                  <option value="2">Binary</option>
-                  <option value="8">Octal</option>
-                  <option value="10">Decimal</option>
-                  <option value="16">Hexadecimal</option>
-                </select>
-              </div>
+    <label>From Base</label>
 
-              <div class="ns-input-group">
-                <label>To Base</label>
+    <select id="fromBase">
 
-                <select id="toBase">
-                  <option value="2">Binary</option>
-                  <option value="8">Octal</option>
-                  <option value="10">Decimal</option>
-                  <option value="16">Hexadecimal</option>
-                </select>
-              </div>
+      <option value="2">Binary</option>
+      <option value="8">Octal</option>
+      <option value="10">Decimal</option>
+      <option value="16">Hexadecimal</option>
 
-              <button class="ns-btn"
-                      onclick="convertNumber()">
-                Convert Number
-              </button>
+    </select>
 
-            </div>
+  </div>
+
+  <div class="ns-input-group">
+
+    <label>To Base</label>
+
+    <select id="toBase">
+
+      <option value="2">Binary</option>
+      <option value="8">Octal</option>
+      <option value="10">Decimal</option>
+      <option value="16">Hexadecimal</option>
+
+    </select>
+
+  </div>
+
+  <button class="ns-btn"
+          onclick="convertNumber()">
+
+    Convert Number
+
+  </button>
+
+</div>
 
             
           </div>
@@ -856,7 +857,8 @@ SELECT DROPDOWN FIX
         <input type="text"
                id="visualNum2"
                placeholder="Example: 0111">
-
+      </div>
+        <div class="ns-input-group">
          <label>Operation</label>
 
   <select id="visualOperation">
@@ -979,7 +981,7 @@ SELECT DROPDOWN FIX
 <div class="ns-card tab-content hidden"
      id="cpu">
 
-  <div class="ns-grid">
+  <div>
 
     <!-- LEFT SIDE -->
 
