@@ -18,7 +18,7 @@
     .ns-tabs{
  position:sticky;
   top:0;
-  width:220px;
+  width:280px;
 max-height:75vh;
 
   overflow:auto;
@@ -40,22 +40,29 @@ max-height:75vh;
 
 }
     
-    .ns-tab{
-      padding:10px 18px;
-      border-radius:10px;
-      border:none;
-      cursor:pointer;
-      background:var(--panel2);
-      color:var(--text);
-      font-weight:600;
-      width:100%;
-text-align:left;
-      transition:
-    background .2s ease,
-    color .2s ease,
-    transform .15s ease;
-    }
+   .ns-tab{
 
+  padding:14px 18px;
+
+  border-radius:2px;
+  border:none;
+
+  cursor:pointer;
+
+  background:var(--panel2);
+  color:var(--text);
+
+  font-weight:600;
+
+  width:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+
+}
     .ns-tab:hover{
 
   transform:translateX(2px);
