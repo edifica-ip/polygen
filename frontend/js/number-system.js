@@ -1640,7 +1640,11 @@ function runCPUProgram(){
   };
 
   let MEMORY = {};
+let STACK = [];
 
+let SP = 255;
+
+let PC = 0;
   let FLAGS = {
 
     CF: 0,
@@ -1724,7 +1728,11 @@ ${instructionQueue.join('\n')}
 
 
     
-  for(let pc=0; pc<instructionQueue.length; pc++){
+  for(
+  PC = 0;
+  PC < instructionQueue.length;
+  PC++
+){
 
     executionCount++;
 
@@ -1736,7 +1744,7 @@ if(executionCount > 1000){
 
 }
     const line =
-      instructionQueue[pc];
+      instructionQueue[PC];
 
     output += `
 --------------------------------
@@ -1935,7 +1943,7 @@ else if(instruction === 'JMP'){
 
   if(LABELS[label] !== undefined){
 
-    pc = LABELS[label] - 1;
+    PC = LABELS[label] - 1;
 
   }
 
@@ -1955,7 +1963,7 @@ else if(instruction === 'JZ'){
 
     if(LABELS[label] !== undefined){
 
-      pc = LABELS[label] - 1;
+      PC = LABELS[label] - 1;
 
     }
 
@@ -1978,7 +1986,7 @@ else if(instruction === 'JNZ'){
 
     if(LABELS[label] !== undefined){
 
-      pc = LABELS[label] - 1;
+      PC = LABELS[label] - 1;
 
     }
 
@@ -2001,7 +2009,7 @@ else if(instruction === 'JC'){
 
     if(LABELS[label] !== undefined){
 
-      pc = LABELS[label] - 1;
+      PC = LABELS[label] - 1;
 
     }
 
@@ -2024,7 +2032,7 @@ else if(instruction === 'JO'){
 
     if(LABELS[label] !== undefined){
 
-      pc = LABELS[label] - 1;
+      PC = LABELS[label] - 1;
 
     }
 
@@ -2078,8 +2086,154 @@ if(REG[op1] === 0){
   FLAGS.ZF = 1;
 
 }
+     
     }
 
+
+
+/* =================================
+PUSH
+================================= */
+
+else if(instruction === 'PUSH'){
+
+  const value =
+    resolveValue(op1, REG);
+
+  STACK.push({
+
+  type: 'DATA',
+
+  value: value & 255
+
+});
+
+  SP--;
+
+  clockCycles += 2;
+
+}
+
+  /* =================================
+POP
+================================= */
+
+else if(instruction === 'POP'){
+
+  
+  if(STACK.length === 0){
+
+    throw new Error(
+      "Stack Underflow"
+    );
+
+  }
+
+  const item =
+  STACK.pop();
+
+if(item.type !== 'DATA'){
+
+  throw new Error(
+    "Cannot POP Return Address"
+  );
+
+}
+
+REG[op1] =
+  item.value;
+
+  SP++;
+
+  clockCycles += 2;
+
+}
+
+  /* =================================
+CALL
+================================= */
+
+else if(instruction === 'CALL'){
+
+  const label =
+    op1;
+
+  if(LABELS[label] === undefined){
+
+    throw new Error(
+      `Unknown Label: ${label}`
+    );
+
+  }
+
+  // Save return address
+  STACK.push({
+
+  type: 'RETURN',
+
+  value: PC
+
+});
+
+  SP--;
+
+  // Jump
+  PC =
+    LABELS[label] - 1;
+
+  clockCycles += 3;
+
+}
+
+  /* =================================
+RET
+================================= */
+
+else if(instruction === 'RET'){
+
+  if(STACK.length === 0){
+
+    throw new Error(
+      "Stack Underflow"
+    );
+
+  }
+
+  const item =
+  STACK.pop();
+
+if(item.type !== 'RETURN'){
+
+  throw new Error(
+    "Invalid Return Address"
+  );
+
+}
+
+const returnAddress =
+  item.value;
+
+if(
+  returnAddress < 0 ||
+  returnAddress >= instructionQueue.length
+){
+
+  throw new Error(
+    "Invalid Return Address"
+  );
+
+}
+
+PC = returnAddress - 1;
+  SP++;
+
+  clockCycles += 3;
+
+}
+
+  
+
+      
     /* =================================
     AND
     ================================= */
@@ -2265,6 +2419,13 @@ for(let reg in REG){
     output += `
 REGISTERS
 
+PC:
+${PC}
+
+SP:
+${SP}
+
+--------------------------------
 AX:
 ${REG.AX}
 (${REG.AX.toString(2).padStart(8,'0')})
@@ -2318,6 +2479,43 @@ ${err.message}
 `;
 
   return;
+
+}
+
+
+  /* =====================================
+STACK DUMP
+===================================== */
+
+output += `
+================================
+STACK MEMORY
+================================
+`;
+
+if(STACK.length === 0){
+
+  output += `
+EMPTY STACK
+`;
+
+}
+else{
+
+  for(let i=STACK.length-1; i>=0; i--){
+
+    output += `
+[${i}]
+TYPE:
+${STACK[i].type}
+
+VALUE:
+${STACK[i].value}
+
+--------------------------------
+`;
+
+  }
 
 }
   
