@@ -16,12 +16,30 @@
   <style>
 
     .ns-tabs{
-      display:flex;
-      gap:10px;
-      margin-bottom:20px;
-      flex-wrap:wrap;
-    }
+ position:sticky;
+  top:0;
+  width:220px;
+max-height:75vh;
 
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+
+  gap:10px;
+
+  flex-shrink:0;
+
+}
+
+    .ns-layout{
+
+  display:flex;
+  gap:20px;
+
+  align-items:stretch;
+
+}
+    
     .ns-tab{
       padding:10px 18px;
       border-radius:10px;
@@ -30,7 +48,29 @@
       background:var(--panel2);
       color:var(--text);
       font-weight:600;
+      width:100%;
+text-align:left;
+      transition:
+    background .2s ease,
+    color .2s ease,
+    transform .15s ease;
     }
+
+    .ns-tab:hover{
+
+  transform:translateX(2px);
+
+}
+    
+    .ns-content{
+
+  flex:1;
+min-height:600px;
+
+  display:flex;
+  flex-direction:column;
+
+}
 
     .ns-tab.active{
       background:#38bdf8;
@@ -265,7 +305,32 @@ font-family:monospace;
 }
 
 
-    
+    @media(max-width:900px){
+
+  .ns-layout{
+
+    flex-direction:column;
+
+  }
+
+  .ns-tabs{
+
+    width:100%;
+
+    flex-direction:row;
+
+    flex-wrap:wrap;
+
+  }
+
+  .ns-tab{
+
+    width:auto;
+    text-align:center;
+
+  }
+
+}
   </style>
 </head>
 
@@ -361,6 +426,7 @@ font-family:monospace;
       <div class="pane-body">
 
         <!-- TABS -->
+<div class="ns-layout">
 
         <div class="ns-tabs">
 
@@ -435,6 +501,11 @@ font-family:monospace;
           
         </div>
 
+
+
+   <div class="ns-content">
+
+     
         <!-- ================================ -->
         <!-- CONVERT -->
         <!-- ================================ -->
@@ -1037,6 +1108,9 @@ MOV [100],AX
 
         
         
+      </div>
+
+</div>
       </div>
 
       <div class="pane-foot">
