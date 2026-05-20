@@ -202,7 +202,7 @@ Remainder upwards (↑): ${remainders.join('')}\n\n`
 
 const fracRight =
 
-  `Integer Part = ${chars[digit]}`;
+  `Integer = ${chars[digit]}`;
 
 steps +=
   fracLeft + fracRight + '\n';
@@ -238,10 +238,10 @@ steps +=
   if(fractionPart > 0)
   steps += `
 --------------------------------
-Fractional Digits downwards (↓): ${fractionalDigits.join('')}\n`
+Integer downwards (↓): ${fractionalDigits.join('')}\n`
 
   steps += `--------------------------------
-Final Answer: ${finalAnswer}`;
+Answer: ${finalAnswer}`;
 
   return steps;
 
