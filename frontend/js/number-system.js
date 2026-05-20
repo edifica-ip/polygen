@@ -98,7 +98,7 @@ function generateDecimalToBinarySteps(num){
 
   let n = parseInt(num);
 
-  let steps = '';
+  let steps = 'Steps of Calculation:\n';
 
   let remainders = [];
 
@@ -113,7 +113,6 @@ function generateDecimalToBinarySteps(num){
     steps += `
 ${n} ÷ 2 = ${quotient}
 Remainder = ${remainder}
-
 `;
 
     remainders.unshift(remainder);
@@ -125,7 +124,7 @@ Remainder = ${remainder}
   steps += `
 --------------------------------
 
-Read remainders from bottom:
+Read remainders from bottom to top:
 
 ${remainders.join('')}
 `;
