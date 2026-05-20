@@ -1650,9 +1650,9 @@ function runCPUProgram(){
   };
 
   let clockCycles = 0;
-
+let executionCount = 0;
   let instructionQueue = [];
-
+let LABELS = {};
   let output = '';
 
   const lines =
@@ -1665,11 +1665,48 @@ function runCPUProgram(){
   EXECUTION LOOP
   ===================================== */
 
-  for(let line of lines){
+ /* =====================================
+LABEL PREPROCESSOR
+===================================== */
+
+for(let i=0; i<lines.length; i++){
+
+  const line =
+    lines[i];
+
+  // LABEL
+  if(line.includes(':')){
+
+    const split =
+  line.split(':');
+
+const label =
+  split[0]
+  .trim()
+  .toUpperCase();
+
+LABELS[label] =
+  instructionQueue.length;
+
+const remaining =
+  split[1]?.trim();
+
+if(remaining){
+
+  instructionQueue.push(
+    remaining
+  );
+
+}
+  }
+  // NORMAL INSTRUCTION
+  else{
 
     instructionQueue.push(line);
 
   }
+
+}
 
   output += `
 ================================
@@ -1689,6 +1726,15 @@ ${instructionQueue.join('\n')}
     
   for(let pc=0; pc<instructionQueue.length; pc++){
 
+    executionCount++;
+
+if(executionCount > 1000){
+
+  throw new Error(
+    "Infinite Loop Detected"
+  );
+
+}
     const line =
       instructionQueue[pc];
 
@@ -1707,6 +1753,12 @@ ${line}
     const instruction =
       parts[0]?.toUpperCase();
 
+    if(!instruction){
+
+  continue;
+
+}
+    
     const op1 =
       parts[1]?.toUpperCase();
 
@@ -1716,9 +1768,7 @@ ${line}
       parts[2]?.toUpperCase();
 
 
-        FLAGS.CF = 0;
-FLAGS.ZF = 0;
-FLAGS.OF = 0;
+        
 
     /* =================================
     MOV
@@ -1733,6 +1783,14 @@ FLAGS.OF = 0;
           op1.replace('[','')
              .replace(']','');
 
+        if(op2.startsWith('[')){
+
+  throw new Error(
+    "Memory-to-Memory MOV Not Supported"
+  );
+
+}
+        
         MEMORY[addr] =
          resolveValue(op2, REG)
 
@@ -1770,7 +1828,9 @@ else if(
     ================================= */
 
     else if(instruction === 'ADD'){
-
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
       REG[op1] +=
         resolveValue(op2, REG)
 
@@ -1783,7 +1843,11 @@ else if(
       }
 
       clockCycles += 1;
+if(REG[op1] === 0){
 
+  FLAGS.ZF = 1;
+
+}
     }
 
     /* =================================
@@ -1791,7 +1855,9 @@ else if(
     ================================= */
 
     else if(instruction === 'SUB'){
-
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
       REG[op1] -=
         resolveValue(op2, REG)
 
@@ -1805,21 +1871,189 @@ else if(
       }
 
       clockCycles += 1;
+if(REG[op1] === 0){
+
+  FLAGS.ZF = 1;
+
+}
+    }
+
+
+
+      /* =================================
+CMP
+================================= */
+
+else if(instruction === 'CMP'){
+
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
+  const val1 =
+    REG[op1];
+
+  const val2 =
+    resolveValue(op2, REG);
+
+  const temp =
+    val1 - val2;
+
+  // ZERO FLAG
+  if(temp === 0){
+
+    FLAGS.ZF = 1;
+
+  }
+
+  // CARRY FLAG
+  if(temp < 0){
+
+    FLAGS.CF = 1;
+
+  }
+
+  // OVERFLOW FLAG
+  if(temp > 255 || temp < -255){
+
+    FLAGS.OF = 1;
+
+  }
+
+  clockCycles += 1;
+
+}
+
+
+  /* =================================
+JMP
+================================= */
+
+else if(instruction === 'JMP'){
+
+  const label =
+    op1;
+
+  if(LABELS[label] !== undefined){
+
+    pc = LABELS[label] - 1;
+
+  }
+
+  clockCycles += 1;
+
+}
+
+  /* =================================
+JZ
+================================= */
+
+else if(instruction === 'JZ'){
+
+  if(FLAGS.ZF === 1){
+
+    const label = op1;
+
+    if(LABELS[label] !== undefined){
+
+      pc = LABELS[label] - 1;
 
     }
 
+  }
+
+  clockCycles += 1;
+
+}
+
+
+  /* =================================
+JNZ
+================================= */
+
+else if(instruction === 'JNZ'){
+
+  if(FLAGS.ZF === 0){
+
+    const label = op1;
+
+    if(LABELS[label] !== undefined){
+
+      pc = LABELS[label] - 1;
+
+    }
+
+  }
+
+  clockCycles += 1;
+
+}
+
+
+  /* =================================
+JC
+================================= */
+
+else if(instruction === 'JC'){
+
+  if(FLAGS.CF === 1){
+
+    const label = op1;
+
+    if(LABELS[label] !== undefined){
+
+      pc = LABELS[label] - 1;
+
+    }
+
+  }
+
+  clockCycles += 1;
+
+}
+
+
+  /* =================================
+JO
+================================= */
+
+else if(instruction === 'JO'){
+
+  if(FLAGS.OF === 1){
+
+    const label = op1;
+
+    if(LABELS[label] !== undefined){
+
+      pc = LABELS[label] - 1;
+
+    }
+
+  }
+
+  clockCycles += 1;
+
+}
+
+
+  
     /* =================================
     INC
     ================================= */
 
     else if(instruction === 'INC'){
-
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
       REG[op1]++;
 
       REG[op1] &= 255;
 
       clockCycles += 1;
+if(REG[op1] === 0){
 
+  FLAGS.ZF = 1;
+
+}
     }
 
     /* =================================
@@ -1827,7 +2061,9 @@ else if(
     ================================= */
 
     else if(instruction === 'DEC'){
-
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
       REG[op1]--;
 
       if(REG[op1] < 0){
@@ -1837,7 +2073,11 @@ else if(
       }
 
       clockCycles += 1;
+if(REG[op1] === 0){
 
+  FLAGS.ZF = 1;
+
+}
     }
 
     /* =================================
@@ -1845,12 +2085,18 @@ else if(
     ================================= */
 
     else if(instruction === 'AND'){
-
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
       REG[op1] &=
         resolveValue(op2, REG)
 
       clockCycles += 1;
+if(REG[op1] === 0){
 
+  FLAGS.ZF = 1;
+
+}
     }
 
     /* =================================
@@ -1858,11 +2104,17 @@ else if(
     ================================= */
 
     else if(instruction === 'OR'){
-
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
       REG[op1] |=
         resolveValue(op2, REG)
       clockCycles += 1;
+if(REG[op1] === 0){
 
+  FLAGS.ZF = 1;
+
+}
     }
 
     /* =================================
@@ -1870,12 +2122,18 @@ else if(
     ================================= */
 
     else if(instruction === 'XOR'){
-
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
       REG[op1] ^=
         resolveValue(op2, REG)
 
       clockCycles += 1;
+if(REG[op1] === 0){
 
+  FLAGS.ZF = 1;
+
+}
     }
 
     /* =================================
@@ -1883,7 +2141,9 @@ else if(
     ================================= */
 
     else if(instruction === 'SHL'){
-
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
       FLAGS.CF =
         (REG[op1] & 128)
         ? 1
@@ -1893,7 +2153,11 @@ else if(
         (REG[op1] << 1) & 255;
 
       clockCycles += 1;
+if(REG[op1] === 0){
 
+  FLAGS.ZF = 1;
+
+}
     }
 
 
@@ -1902,7 +2166,9 @@ ROL
 ================================= */
 
 else if(instruction === 'ROL'){
-
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
   const msb =
     (REG[op1] & 128)
     ? 1
@@ -1915,7 +2181,11 @@ else if(instruction === 'ROL'){
   FLAGS.CF = msb;
 
   clockCycles += 1;
+if(REG[op1] === 0){
 
+  FLAGS.ZF = 1;
+
+}
 }
 
   /* =================================
@@ -1923,7 +2193,9 @@ ROR
 ================================= */
 
 else if(instruction === 'ROR'){
-
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
   const lsb =
     (REG[op1] & 1);
 
@@ -1934,14 +2206,20 @@ else if(instruction === 'ROR'){
   FLAGS.CF = lsb;
 
   clockCycles += 1;
+if(REG[op1] === 0){
 
+  FLAGS.ZF = 1;
+
+}
 }
     /* =================================
     SHR
     ================================= */
 
     else if(instruction === 'SHR'){
-
+FLAGS.CF = 0;
+FLAGS.ZF = 0;
+FLAGS.OF = 0;
       FLAGS.CF =
         (REG[op1] & 1)
         ? 1
@@ -1950,19 +2228,36 @@ else if(instruction === 'ROR'){
       REG[op1] >>= 1;
 
       clockCycles += 1;
+if(REG[op1] === 0){
 
+  FLAGS.ZF = 1;
+
+}
     }
 
     /* =================================
-    ZERO FLAG
-    ================================= */
+UNKNOWN INSTRUCTION
+================================= */
 
-   if(
-  REG[op1] !== undefined &&
-  REG[op1] === 0
-){
-  FLAGS.ZF = 1;
+else{
+
+  throw new Error(
+    `Unknown Instruction: ${instruction}`
+  );
+
 }
+
+    /* =================================
+8-BIT REGISTER WRAP
+================================= */
+
+for(let reg in REG){
+
+  REG[reg] &= 255;
+
+}
+    
+   
     /* =================================
     REGISTER DUMP
     ================================= */
