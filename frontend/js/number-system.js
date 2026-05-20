@@ -130,7 +130,17 @@ Final Answer:
     const remainder =
       n % base;
 
-    steps += `${n} ÷ ${base} = ${quotient}    Remainder = ${chars[remainder]}
+    //steps += `${n} ÷ ${base} = ${quotient}    Remainder = ${chars[remainder]}
+
+    const left =
+  `${n}`.padStart(3,' ')
+  + ` ÷ ${base} = `
+  + `${quotient}`.padEnd(3,' ');
+
+const right =
+  `Remainder = ${chars[remainder]}`;
+
+steps += left + right + '\n';
 `;
 
     remainders.unshift(
