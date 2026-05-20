@@ -1592,7 +1592,10 @@ RESOLVE OPERAND
 
 function resolveValue(value, REG){
 
-  if(REG[value] !== undefined){
+  if(
+  ['AX','BX','CX','DX']
+  .includes(value)
+){
 
     return REG[value];
 
@@ -1610,6 +1613,84 @@ function resolveValue(value, REG){
   }
 
   return parsed;
+
+}
+/* =========================================
+SIGNED 8-BIT CONVERSION
+========================================= */
+
+function toSigned8Bit(value){
+
+  value &= 255;
+
+  return value > 127
+    ? value - 256
+    : value;
+
+}
+
+
+
+/* =========================================
+RESOLVE MEMORY ADDRESS
+========================================= */
+
+function resolveAddress(addr, REG){
+
+  addr =
+    addr.trim().toUpperCase();
+
+  // REGISTER INDIRECT
+  if(
+  ['AX','BX','CX','DX']
+  .includes(addr)
+){
+
+    return REG[addr] & 255;
+
+  }
+
+  // DIRECT ADDRESS
+  const parsed =
+    parseInt(addr);
+
+  if(isNaN(parsed)){
+
+    throw new Error(
+      `Invalid Memory Address: ${addr}`
+    );
+
+  }
+
+  return parsed & 255;
+
+}
+
+
+
+
+/* =========================================
+VALIDATE REGISTER
+========================================= */
+
+function validateRegister(reg){
+
+  const validRegisters = [
+
+    'AX',
+    'BX',
+    'CX',
+    'DX'
+
+  ];
+
+  if(!validRegisters.includes(reg)){
+
+    throw new Error(
+      `Invalid Register: ${reg}`
+    );
+
+  }
 
 }
 
@@ -1658,7 +1739,10 @@ let executionCount = 0;
   let instructionQueue = [];
 let LABELS = {};
   let output = '';
+let halted = false;
+const STACK_LIMIT = 256;
 
+  
   const lines =
     code
     .split('\n')
@@ -1675,25 +1759,42 @@ LABEL PREPROCESSOR
 
 for(let i=0; i<lines.length; i++){
 
-  const line =
-    lines[i];
+  const rawLine =
+  lines[i];
+
+const line =
+  rawLine
+    .split(';')[0]
+    .trim();
+
+  if(!line){
+
+  continue;
+
+}
 
   // LABEL
-  if(line.includes(':')){
+ if(
+  line.indexOf(':') !== -1
+){
 
-    const split =
-  line.split(':');
+    const colonIndex =
+  line.indexOf(':');
 
 const label =
-  split[0]
-  .trim()
-  .toUpperCase();
+  line
+    .substring(0, colonIndex)
+    .trim()
+    .toUpperCase();
 
 LABELS[label] =
   instructionQueue.length;
 
 const remaining =
-  split[1]?.trim();
+  line
+    .substring(colonIndex + 1)
+    .trim();
+
 
 if(remaining){
 
@@ -1730,7 +1831,7 @@ ${instructionQueue.join('\n')}
     
   for(
   PC = 0;
-  PC < instructionQueue.length;
+  PC < instructionQueue.length && !halted;
   PC++
 ){
 
@@ -1743,8 +1844,19 @@ if(executionCount > 1000){
   );
 
 }
-    const line =
-      instructionQueue[PC];
+    const rawLine =
+  instructionQueue[PC];
+
+const line =
+  rawLine
+    .split(';')[0]
+    .trim();
+
+    if(!line){
+
+  continue;
+
+}
 
     output += `
 --------------------------------
@@ -1753,10 +1865,12 @@ ${line}
 --------------------------------
 `;
 
-    const parts =
-      line
-      .replace(/,/g, ' ')
-      .split(/\s+/);
+const parts =
+  line
+    .replace(/,/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
 
     const instruction =
       parts[0]?.toUpperCase();
@@ -1787,23 +1901,33 @@ ${line}
       // MEMORY WRITE
       if(op1 && op1.startsWith('[')){
 
-        const addr =
-          op1.replace('[','')
-             .replace(']','');
+        const rawAddr =
+  op1.replace('[','')
+     .replace(']','');
 
-        if(op2.startsWith('[')){
+const addr =
+  resolveAddress(rawAddr, REG);
+
+        if(op2 && op2.startsWith('[')){
 
   throw new Error(
     "Memory-to-Memory MOV Not Supported"
   );
 
 }
-        
-        MEMORY[addr] =
-         resolveValue(op2, REG)
+        if(
+  isNaN(parseInt(op2))
+){
+
+  validateRegister(op2);
+
+}
+       MEMORY[addr] =
+  resolveValue(op2, REG) & 255;
 
       }
 
+// MEMORY READ
 // MEMORY READ
 else if(
   op2 &&
@@ -1811,20 +1935,25 @@ else if(
   op2.startsWith('[')
 ){
 
-  const addr =
+  validateRegister(op1);
+
+  const rawAddr =
     op2.replace('[','')
        .replace(']','');
 
+  const addr =
+    resolveAddress(rawAddr, REG);
+
   REG[op1] =
-    MEMORY[addr] || 0;
+    (MEMORY[addr] || 0) & 255;
 
 }
         
       // REGISTER WRITE
       else{
-
+validateRegister(op1);
         REG[op1] =
-          resolveValue(op2, REG)
+          resolveValue(op2, REG) & 255;
       }
 
       clockCycles += 2;
@@ -1835,56 +1964,230 @@ else if(
     ADD
     ================================= */
 
-    else if(instruction === 'ADD'){
-FLAGS.CF = 0;
-FLAGS.ZF = 0;
-FLAGS.OF = 0;
-      REG[op1] +=
-        resolveValue(op2, REG)
+  else if(instruction === 'ADD'){
 
-      if(REG[op1] > 255){
+  FLAGS.CF = 0;
+  FLAGS.ZF = 0;
+  FLAGS.OF = 0;
+validateRegister(op1);
+  const val1 =
+    REG[op1];
 
-        FLAGS.CF = 1;
+  const val2 =
+    resolveValue(op2, REG) & 255;
 
-        REG[op1] &= 255;
+  const signed1 =
+    toSigned8Bit(val1);
 
-      }
+  const signed2 =
+    toSigned8Bit(val2);
 
-      clockCycles += 1;
-if(REG[op1] === 0){
+  let result =
+    val1 + val2;
 
-  FLAGS.ZF = 1;
+  // Carry flag
+  if(result > 255){
+
+    FLAGS.CF = 1;
+
+  }
+
+  result &= 255;
+
+  REG[op1] = result;
+
+  const signedResult =
+    toSigned8Bit(result);
+
+  // Signed overflow detection
+  if(
+
+    (signed1 > 0 &&
+     signed2 > 0 &&
+     signedResult < 0)
+
+    ||
+
+    (signed1 < 0 &&
+     signed2 < 0 &&
+     signedResult > 0)
+
+  ){
+
+    FLAGS.OF = 1;
+
+  }
+
+  if(result === 0){
+
+    FLAGS.ZF = 1;
+
+  }
+
+  clockCycles += 1;
 
 }
-    }
+
+
+      /* =================================
+MUL
+================================= */
+
+/* =================================
+MUL
+================================= */
+
+else if(instruction === 'MUL'){
+
+  FLAGS.CF = 0;
+  FLAGS.ZF = 0;
+  FLAGS.OF = 0;
+validateRegister(op1);
+  const val1 =
+    REG[op1];
+
+  const val2 =
+    resolveValue(op2, REG) & 255;
+
+  const signed1 =
+    toSigned8Bit(val1);
+
+  const signed2 =
+    toSigned8Bit(val2);
+
+  const fullResult =
+    signed1 * signed2;
+
+  // Signed overflow
+  if(
+    fullResult > 127 ||
+    fullResult < -128
+  ){
+
+    FLAGS.OF = 1;
+    FLAGS.CF = 1;
+
+  }
+
+  REG[op1] =
+    fullResult & 255;
+
+  if(REG[op1] === 0){
+
+    FLAGS.ZF = 1;
+
+  }
+
+  clockCycles += 2;
+
+}
+
+
+  /* =================================
+DIV
+================================= */
+
+else if(instruction === 'DIV'){
+
+  FLAGS.CF = 0;
+  FLAGS.ZF = 0;
+  FLAGS.OF = 0;
+
+  const divisor =
+    resolveValue(op2, REG);
+
+  if(divisor === 0){
+
+    throw new Error(
+      "Division By Zero"
+    );
+
+  }
+validateRegister(op1);
+  REG[op1] =
+    Math.trunc(
+      toSigned8Bit(REG[op1]) /
+toSigned8Bit(divisor)
+    ) & 255;
+
+  if(REG[op1] === 0){
+
+    FLAGS.ZF = 1;
+
+  }
+
+  clockCycles += 2;
+
+}
 
     /* =================================
     SUB
     ================================= */
 
-    else if(instruction === 'SUB'){
-FLAGS.CF = 0;
-FLAGS.ZF = 0;
-FLAGS.OF = 0;
-      REG[op1] -=
-        resolveValue(op2, REG)
+   else if(instruction === 'SUB'){
 
-      if(REG[op1] < 0){
+  FLAGS.CF = 0;
+  FLAGS.ZF = 0;
+  FLAGS.OF = 0;
+validateRegister(op1);
+  const val1 =
+    REG[op1];
 
-        FLAGS.OF = 1;
+  const val2 =
+    resolveValue(op2, REG) & 255;
 
-        REG[op1] =
-          256 + REG[op1];
+  const signed1 =
+    toSigned8Bit(val1);
 
-      }
+  const signed2 =
+    toSigned8Bit(val2);
 
-      clockCycles += 1;
-if(REG[op1] === 0){
+  let result =
+    val1 - val2;
 
-  FLAGS.ZF = 1;
+  if(result < 0){
+
+    FLAGS.CF = 1;
+
+    result += 256;
+
+  }
+
+  result &= 255;
+
+  REG[op1] = result;
+
+  const signedResult =
+    toSigned8Bit(result);
+
+  // Signed overflow
+  if(
+
+    (signed1 > 0 &&
+     signed2 < 0 &&
+     signedResult < 0)
+
+    ||
+
+    (signed1 < 0 &&
+     signed2 > 0 &&
+     signedResult > 0)
+
+  ){
+
+    FLAGS.OF = 1;
+
+  }
+
+  if(result === 0){
+
+    FLAGS.ZF = 1;
+
+  }
+
+  clockCycles += 1;
 
 }
-    }
 
 
 
@@ -1897,6 +2200,7 @@ else if(instruction === 'CMP'){
 FLAGS.CF = 0;
 FLAGS.ZF = 0;
 FLAGS.OF = 0;
+  validateRegister(op1);
   const val1 =
     REG[op1];
 
@@ -1921,11 +2225,32 @@ FLAGS.OF = 0;
   }
 
   // OVERFLOW FLAG
-  if(temp > 255 || temp < -255){
+  const signed1 =
+  toSigned8Bit(val1);
 
-    FLAGS.OF = 1;
+const signed2 =
+  toSigned8Bit(val2);
 
-  }
+const signedTemp =
+  toSigned8Bit(temp);
+
+if(
+
+  (signed1 > 0 &&
+   signed2 < 0 &&
+   signedTemp < 0)
+
+  ||
+
+  (signed1 < 0 &&
+   signed2 > 0 &&
+   signedTemp > 0)
+
+){
+
+  FLAGS.OF = 1;
+
+}
 
   clockCycles += 1;
 
@@ -1946,6 +2271,13 @@ else if(instruction === 'JMP'){
     PC = LABELS[label] - 1;
 
   }
+  else{
+
+  throw new Error(
+    `Unknown Label: ${label}`
+  );
+
+}
 
   clockCycles += 1;
 
@@ -1966,6 +2298,13 @@ else if(instruction === 'JZ'){
       PC = LABELS[label] - 1;
 
     }
+    else{
+
+  throw new Error(
+    `Unknown Label: ${label}`
+  );
+
+}
 
   }
 
@@ -1989,6 +2328,13 @@ else if(instruction === 'JNZ'){
       PC = LABELS[label] - 1;
 
     }
+    else{
+
+  throw new Error(
+    `Unknown Label: ${label}`
+  );
+
+}
 
   }
 
@@ -2012,6 +2358,13 @@ else if(instruction === 'JC'){
       PC = LABELS[label] - 1;
 
     }
+    else{
+
+  throw new Error(
+    `Unknown Label: ${label}`
+  );
+
+}
 
   }
 
@@ -2035,6 +2388,13 @@ else if(instruction === 'JO'){
       PC = LABELS[label] - 1;
 
     }
+    else{
+
+  throw new Error(
+    `Unknown Label: ${label}`
+  );
+
+}
 
   }
 
@@ -2048,46 +2408,85 @@ else if(instruction === 'JO'){
     INC
     ================================= */
 
-    else if(instruction === 'INC'){
-FLAGS.CF = 0;
-FLAGS.ZF = 0;
-FLAGS.OF = 0;
-      REG[op1]++;
+   else if(instruction === 'INC'){
 
-      REG[op1] &= 255;
+  FLAGS.CF = 0;
+  FLAGS.ZF = 0;
+  FLAGS.OF = 0;
+validateRegister(op1);
+  const oldVal =
+    REG[op1];
 
-      clockCycles += 1;
-if(REG[op1] === 0){
+  REG[op1]++;
 
-  FLAGS.ZF = 1;
+  REG[op1] &= 255;
+
+  const oldSigned =
+    toSigned8Bit(oldVal);
+
+  const newSigned =
+    toSigned8Bit(REG[op1]);
+
+  if(
+    oldSigned > 0 &&
+    newSigned < 0
+  ){
+    FLAGS.OF = 1;
+  }
+
+  if(REG[op1] === 0){
+
+    FLAGS.ZF = 1;
+
+  }
+
+  clockCycles += 1;
 
 }
-    }
 
     /* =================================
     DEC
     ================================= */
 
-    else if(instruction === 'DEC'){
-FLAGS.CF = 0;
-FLAGS.ZF = 0;
-FLAGS.OF = 0;
-      REG[op1]--;
+   else if(instruction === 'DEC'){
 
-      if(REG[op1] < 0){
+  FLAGS.CF = 0;
+  FLAGS.ZF = 0;
+  FLAGS.OF = 0;
+validateRegister(op1);
+  const oldVal =
+    REG[op1];
 
-        REG[op1] = 255;
+  REG[op1]--;
 
-      }
+  if(REG[op1] < 0){
 
-      clockCycles += 1;
-if(REG[op1] === 0){
+    REG[op1] = 255;
 
-  FLAGS.ZF = 1;
+  }
+
+  const oldSigned =
+    toSigned8Bit(oldVal);
+
+  const newSigned =
+    toSigned8Bit(REG[op1]);
+
+  if(
+    oldSigned < 0 &&
+    newSigned > 0
+  ){
+    FLAGS.OF = 1;
+  }
+
+  if(REG[op1] === 0){
+
+    FLAGS.ZF = 1;
+
+  }
+
+  clockCycles += 1;
 
 }
-     
-    }
 
 
 
@@ -2097,9 +2496,22 @@ PUSH
 
 else if(instruction === 'PUSH'){
 
-  const value =
-    resolveValue(op1, REG);
+  if(isNaN(parseInt(op1))){
 
+  validateRegister(op1);
+
+}
+
+const value =
+  resolveValue(op1, REG);
+
+  if(STACK.length >= STACK_LIMIT){
+
+  throw new Error(
+    "Stack Overflow"
+  );
+
+}
   STACK.push({
 
   type: 'DATA',
@@ -2114,6 +2526,42 @@ else if(instruction === 'PUSH'){
 
 }
 
+  /* =================================
+PUSHF
+================================= */
+
+else if(instruction === 'PUSHF'){
+
+  if(STACK.length >= STACK_LIMIT){
+
+    throw new Error(
+      "Stack Overflow"
+    );
+
+  }
+
+  STACK.push({
+
+    type: 'FLAGS',
+
+    value: {
+
+      CF: FLAGS.CF,
+      ZF: FLAGS.ZF,
+      OF: FLAGS.OF
+
+    }
+
+  });
+
+  SP--;
+
+  clockCycles += 2;
+
+}
+
+
+  
   /* =================================
 POP
 ================================= */
@@ -2135,13 +2583,53 @@ else if(instruction === 'POP'){
 if(item.type !== 'DATA'){
 
   throw new Error(
-    "Cannot POP Return Address"
+    "Cannot POP Non-Data Value"
   );
 
 }
-
+validateRegister(op1);
 REG[op1] =
   item.value;
+
+  SP++;
+
+  clockCycles += 2;
+
+}
+
+  /* =================================
+POPF
+================================= */
+
+else if(instruction === 'POPF'){
+
+  if(STACK.length === 0){
+
+    throw new Error(
+      "Stack Underflow"
+    );
+
+  }
+
+  const item =
+    STACK.pop();
+
+  if(item.type !== 'FLAGS'){
+
+    throw new Error(
+      "Cannot POPF Non-Flag Data"
+    );
+
+  }
+
+  FLAGS.CF =
+    item.value.CF;
+
+  FLAGS.ZF =
+    item.value.ZF;
+
+  FLAGS.OF =
+    item.value.OF;
 
   SP++;
 
@@ -2166,12 +2654,19 @@ else if(instruction === 'CALL'){
 
   }
 
+  if(STACK.length >= STACK_LIMIT){
+
+  throw new Error(
+    "Stack Overflow"
+  );
+
+}
   // Save return address
   STACK.push({
 
   type: 'RETURN',
 
-  value: PC
+  value: PC+1
 
 });
 
@@ -2231,9 +2726,46 @@ PC = returnAddress - 1;
 
 }
 
-  
+  /* =================================
+NOP
+================================= */
 
-      
+else if(instruction === 'NOP'){
+
+  clockCycles += 1;
+
+}
+
+
+  /* =================================
+HLT
+================================= */
+
+else if(instruction === 'HLT'){
+
+  halted = true;
+
+  clockCycles += 1;
+
+}
+
+      /* =================================
+BREAK
+================================= */
+
+else if(instruction === 'BREAK'){
+
+  halted = true;
+
+  output += `
+================================
+BREAKPOINT REACHED
+================================
+`;
+
+  clockCycles += 1;
+
+}
     /* =================================
     AND
     ================================= */
@@ -2242,8 +2774,9 @@ PC = returnAddress - 1;
 FLAGS.CF = 0;
 FLAGS.ZF = 0;
 FLAGS.OF = 0;
+      validateRegister(op1);
       REG[op1] &=
-        resolveValue(op2, REG)
+        resolveValue(op2, REG) & 255;
 
       clockCycles += 1;
 if(REG[op1] === 0){
@@ -2261,8 +2794,9 @@ if(REG[op1] === 0){
 FLAGS.CF = 0;
 FLAGS.ZF = 0;
 FLAGS.OF = 0;
+      validateRegister(op1);
       REG[op1] |=
-        resolveValue(op2, REG)
+        resolveValue(op2, REG) & 255;
       clockCycles += 1;
 if(REG[op1] === 0){
 
@@ -2279,8 +2813,9 @@ if(REG[op1] === 0){
 FLAGS.CF = 0;
 FLAGS.ZF = 0;
 FLAGS.OF = 0;
+      validateRegister(op1);
       REG[op1] ^=
-        resolveValue(op2, REG)
+        resolveValue(op2, REG) & 255;
 
       clockCycles += 1;
 if(REG[op1] === 0){
@@ -2295,24 +2830,38 @@ if(REG[op1] === 0){
     ================================= */
 
     else if(instruction === 'SHL'){
-FLAGS.CF = 0;
-FLAGS.ZF = 0;
-FLAGS.OF = 0;
-      FLAGS.CF =
-        (REG[op1] & 128)
-        ? 1
-        : 0;
 
-      REG[op1] =
-        (REG[op1] << 1) & 255;
+  FLAGS.CF = 0;
+  FLAGS.ZF = 0;
+  FLAGS.OF = 0;
 
-      clockCycles += 1;
-if(REG[op1] === 0){
+  const rawCount =
+  resolveValue(op2 || 1, REG);
 
-  FLAGS.ZF = 1;
+const count =
+ Math.abs( rawCount % 8);
+validateRegister(op1);
+  for(let i=0; i<count; i++){
+
+    FLAGS.CF =
+      (REG[op1] & 128)
+      ? 1
+      : 0;
+
+    REG[op1] =
+      (REG[op1] << 1) & 255;
+
+  }
+
+  if(REG[op1] === 0){
+
+    FLAGS.ZF = 1;
+
+  }
+
+  clockCycles += count;
 
 }
-    }
 
 
       /* =================================
@@ -2320,26 +2869,42 @@ ROL
 ================================= */
 
 else if(instruction === 'ROL'){
-FLAGS.CF = 0;
-FLAGS.ZF = 0;
-FLAGS.OF = 0;
-  const msb =
-    (REG[op1] & 128)
-    ? 1
-    : 0;
 
-  REG[op1] =
-    ((REG[op1] << 1) & 255)
-    | msb;
+  FLAGS.CF = 0;
+  FLAGS.ZF = 0;
+  FLAGS.OF = 0;
 
-  FLAGS.CF = msb;
+  const rawCount =
+  resolveValue(op2 || 1, REG);
 
-  clockCycles += 1;
-if(REG[op1] === 0){
+const count =
+  Math.abs( rawCount % 8);
+  validateRegister(op1);
+  for(let i=0; i<count; i++){
 
-  FLAGS.ZF = 1;
+    const msb =
+      (REG[op1] & 128)
+      ? 1
+      : 0;
 
-}
+    REG[op1] =
+      (
+        ((REG[op1] << 1) & 255)
+        | msb
+      ) & 255;
+
+    FLAGS.CF = msb;
+
+  }
+
+  if(REG[op1] === 0){
+
+    FLAGS.ZF = 1;
+
+  }
+
+  clockCycles += count;
+
 }
 
   /* =================================
@@ -2347,47 +2912,78 @@ ROR
 ================================= */
 
 else if(instruction === 'ROR'){
-FLAGS.CF = 0;
-FLAGS.ZF = 0;
-FLAGS.OF = 0;
-  const lsb =
-    (REG[op1] & 1);
 
-  REG[op1] =
-    (REG[op1] >> 1)
-    | (lsb << 7);
+  FLAGS.CF = 0;
+  FLAGS.ZF = 0;
+  FLAGS.OF = 0;
 
-  FLAGS.CF = lsb;
+  const rawCount =
+  resolveValue(op2 || 1, REG);
 
-  clockCycles += 1;
-if(REG[op1] === 0){
+const count =
+  Math.abs( rawCount % 8);
+validateRegister(op1);
+  for(let i=0; i<count; i++){
 
-  FLAGS.ZF = 1;
+    const lsb =
+      (REG[op1] & 1);
 
-}
+    REG[op1] =
+      (
+        (REG[op1] >> 1)
+        | (lsb << 7)
+      ) & 255;
+
+    FLAGS.CF = lsb;
+
+  }
+
+  if(REG[op1] === 0){
+
+    FLAGS.ZF = 1;
+
+  }
+
+  clockCycles += count;
+
 }
     /* =================================
     SHR
     ================================= */
 
-    else if(instruction === 'SHR'){
-FLAGS.CF = 0;
-FLAGS.ZF = 0;
-FLAGS.OF = 0;
-      FLAGS.CF =
-        (REG[op1] & 1)
-        ? 1
-        : 0;
+ else if(instruction === 'SHR'){
 
-      REG[op1] >>= 1;
+  FLAGS.CF = 0;
+  FLAGS.ZF = 0;
+  FLAGS.OF = 0;
 
-      clockCycles += 1;
-if(REG[op1] === 0){
+  const rawCount =
+  resolveValue(op2 || 1, REG);
 
-  FLAGS.ZF = 1;
+const count =
+  Math.abs( rawCount % 8);
+validateRegister(op1);
+  for(let i=0; i<count; i++){
+
+    FLAGS.CF =
+      (REG[op1] & 1)
+      ? 1
+      : 0;
+
+    REG[op1] =
+      (REG[op1] >> 1) & 255;
+
+  }
+
+  if(REG[op1] === 0){
+
+    FLAGS.ZF = 1;
+
+  }
+
+  clockCycles += count;
 
 }
-    }
 
     /* =================================
 UNKNOWN INSTRUCTION
@@ -2510,7 +3106,11 @@ TYPE:
 ${STACK[i].type}
 
 VALUE:
-${STACK[i].value}
+${
+  typeof STACK[i].value === 'object'
+  ? JSON.stringify(STACK[i].value)
+  : STACK[i].value
+}
 
 --------------------------------
 `;
@@ -2529,13 +3129,16 @@ MEMORY DUMP
 ================================
 `;
 
-  for(let addr in MEMORY){
+Object
+  .keys(MEMORY)
+  .sort((a,b)=>a-b)
+  .forEach(addr=>{
 
     output += `
 [${addr}] = ${MEMORY[addr]}
 `;
 
-  }
+});
 
   resultDiv.innerHTML =
     `✅ Program Executed`;
