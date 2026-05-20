@@ -141,7 +141,7 @@ const right =
   `Remainder = ${chars[remainder]}`;
 
 steps += left + right + '\n';
-`;
+;
 
     remainders.unshift(
       chars[remainder]
