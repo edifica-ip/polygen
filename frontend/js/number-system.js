@@ -92,6 +92,56 @@ function isValidForBase(value, base){
 }
 
 
+
+
+function generateDecimalToBinarySteps(num){
+
+  let n = parseInt(num);
+
+  let steps = '';
+
+  let remainders = [];
+
+  while(n > 0){
+
+    const quotient =
+      Math.floor(n / 2);
+
+    const remainder =
+      n % 2;
+
+    steps += `
+${n} ÷ 2 = ${quotient}
+Remainder = ${remainder}
+
+`;
+
+    remainders.unshift(remainder);
+
+    n = quotient;
+
+  }
+
+  steps += `
+--------------------------------
+
+Read remainders from bottom:
+
+${remainders.join('')}
+`;
+
+  return steps;
+
+}
+
+
+
+
+
+
+
+
+
 function convertNumber(){
 
   const input =
@@ -133,7 +183,22 @@ function convertNumber(){
     resultDiv.innerHTML =
       `✅ Result: ${result}`;
 
-    stepsDiv.innerHTML = `
+    let detailedSteps = '';
+
+if(
+  fromBase === 10 &&
+  toBase === 2
+){
+
+  detailedSteps =
+    generateDecimalToBinarySteps(
+      input
+    );
+
+}
+else{
+
+  detailedSteps = `
 STEP 1:
 Convert ${input} from Base ${fromBase}
 to Decimal
@@ -150,6 +215,11 @@ to Base ${toBase}
 Final Answer:
 ${result}
 `;
+
+}
+
+stepsDiv.innerHTML =
+  detailedSteps;
 
   }
 
