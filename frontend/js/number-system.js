@@ -143,7 +143,7 @@ steps += `${base} | ${n} - ${chars[remainder]}
 
   }
 
-  steps += `${base} | ${n}'
+  steps += `${base} | ${n}`
 
   
   steps += `--------------------------------
