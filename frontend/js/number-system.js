@@ -143,6 +143,9 @@ steps += `${base} | ${n} - ${chars[remainder]}
 
   }
 
+  steps += `${base} | ${n}'
+
+  
   steps += `--------------------------------
 Arrange remainders from bottom to top to find the result:
 ${remainders.join('')}
