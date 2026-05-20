@@ -93,6 +93,135 @@ function isValidForBase(value, base){
 
 
 
+function generateAnyToDecimalSteps(value, base){
+
+  const chars =
+    '0123456789ABCDEF';
+
+  value =
+    value.toUpperCase();
+
+  let steps =
+    'Steps of Calculation:\n\n';
+
+  const parts =
+    value.split('.');
+
+  const intPart =
+    parts[0];
+
+  const fracPart =
+    parts[1] || '';
+
+  let decimal = 0;
+
+  let expansions = [];
+
+  let calculations = [];
+
+  /* ================================
+  INTEGER PART
+  ================================ */
+
+  steps +=
+`Integer Part:\n\n`;
+
+  for(
+    let i = 0;
+    i < intPart.length;
+    i++
+  ){
+
+    const digit =
+      chars.indexOf(intPart[i]);
+
+    const power =
+      intPart.length - 1 - i;
+
+    const calc =
+      digit * Math.pow(base, power);
+
+    expansions.push(
+      `${digit} × ${base}^${power}`
+    );
+
+    calculations.push(calc);
+
+    steps +=
+`${digit} × ${base}^${power} = ${calc}\n`;
+
+    decimal += calc;
+
+  }
+
+  /* ================================
+  FRACTIONAL PART
+  ================================ */
+
+  if(fracPart){
+
+    steps += `
+--------------------------------
+
+Fractional Part:\n\n`;
+
+    for(
+      let i = 0;
+      i < fracPart.length;
+      i++
+    ){
+
+      const digit =
+        chars.indexOf(fracPart[i]);
+
+      const power =
+        -(i + 1);
+
+      const calc =
+        digit * Math.pow(base, power);
+
+      expansions.push(
+        `${digit} × ${base}^(${power})`
+      );
+
+      calculations.push(calc);
+
+      steps +=
+`${digit} × ${base}^(${power}) = ${calc}\n`;
+
+      decimal += calc;
+
+    }
+
+  }
+
+  /* ================================
+  FINAL
+  ================================ */
+
+  steps += `
+--------------------------------
+
+Expanded Form:
+
+${expansions.join('\n+ ')}
+
+--------------------------------
+
+Decimal Calculation:
+
+${calculations.join(' + ')}
+
+--------------------------------
+
+Final Answer:
+${decimal}
+`;
+
+  return steps;
+
+}
+
 
 function generateDecimalToAnySteps(num, base){
 
@@ -304,6 +433,15 @@ if(
   detailedSteps =
     generateDecimalToAnySteps(
       input,toBase
+    );
+
+}
+  else if(
+  toBase === 10 ){
+
+  detailedSteps =
+    generateAnyToDecimalSteps(
+      input,fromBase
     );
 
 }
