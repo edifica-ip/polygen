@@ -122,7 +122,7 @@ Final Answer:
   }
 
   // Division Process
-  while(n > base){
+  while(n >= base){
 
     const quotient =
       Math.floor(n / base);
