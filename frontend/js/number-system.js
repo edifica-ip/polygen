@@ -122,7 +122,7 @@ Final Answer:
   }
 
   // Division Process
-  while(n >= base){
+  while(n > 0){
 
     const quotient =
       Math.floor(n / base);
@@ -130,9 +130,7 @@ Final Answer:
     const remainder =
       n % base;
 
-    //steps += `${n} ÷ ${base} = ${quotient}
-//Remainder = ${chars[remainder]}
-steps += `${base} | ${n} - ${chars[remainder]}
+    steps += `${n} ÷ ${base} = ${quotient}, Remainder = ${chars[remainder]}
 `;
 
     remainders.unshift(
@@ -142,13 +140,9 @@ steps += `${base} | ${n} - ${chars[remainder]}
     n = quotient;
 
   }
-
-  steps += `${base} | ${n}`
-
-  
+   
   steps += `--------------------------------
-Arrange remainders from bottom to top to find the result:
-${remainders.join('')}
+Read remainders upwards: ${remainders.join('')}
 `;
 
   return steps;
