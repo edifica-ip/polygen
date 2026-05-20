@@ -110,7 +110,7 @@ function generateDecimalToAnySteps(num, base){
   if(n === 0){
 
     return `
-Steps of Calculation\n:
+Steps of Calculation:\n\n
 0 ÷ ${base} = 0
 
 --------------------------------
@@ -122,7 +122,7 @@ Final Answer:
   }
 
   // Division Process
-  while(n > 0){
+  while(n > base){
 
     const quotient =
       Math.floor(n / base);
