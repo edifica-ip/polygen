@@ -99,60 +99,147 @@ function generateDecimalToAnySteps(num, base){
   const chars =
     '0123456789ABCDEF';
 
-  let n = parseInt(num);
+  let number =
+    parseFloat(num);
+
+  if(isNaN(number)){
+
+    return 'Invalid Number';
+
+  }
 
   let steps =
     'Steps of Calculation:\n\n';
 
+  // Split parts
+  let integerPart =
+    Math.floor(number);
+
+  let fractionPart =
+    number - integerPart;
+
   let remainders = [];
 
-  // Handle 0
-  if(n === 0){
+  /* ================================
+  INTEGER PART
+  ================================ */
 
-    return `
-Steps of Calculation:\n\n
-0 ÷ ${base} = 0
+  steps +=
+`INTEGER PART:
 
---------------------------------
+\n`;
 
-Final Answer:
-0
+  // Handle integer 0
+  if(integerPart === 0){
+
+    remainders.push('0');
+
+    steps +=
+`0 ÷ ${base} = 0
+
 `;
 
   }
 
-  // Division Process
-  while(n > 0){
+  while(integerPart > 0){
 
     const quotient =
-      Math.floor(n / base);
+      Math.floor(
+        integerPart / base
+      );
 
     const remainder =
-      n % base;
-
-    //steps += `${n} ÷ ${base} = ${quotient}    Remainder = ${chars[remainder]}
+      integerPart % base;
 
     const left =
-  `${n}`.padStart(3,' ')
-  + ` ÷ ${base} = `
-  + `${quotient}`.padEnd(3,' ');
 
-const right =
-  `Remainder = ${chars[remainder]}`;
+      `${integerPart}`.padStart(3,' ')
+      + ` ÷ ${base} = `
+      + `${quotient}`.padEnd(6,' ');
 
-steps += left + right + '\n';
-;
+    const right =
+
+      `Remainder = ${chars[remainder]}`;
+
+    steps += left + right + '\n';
 
     remainders.unshift(
       chars[remainder]
     );
 
-    n = quotient;
+    integerPart = quotient;
 
   }
-   
-  steps += `--------------------------------
-Read remainders upwards: ${remainders.join('')}
+
+  /* ================================
+  FRACTIONAL PART
+  ================================ */
+
+  let fractionalDigits = [];
+
+  if(fractionPart > 0){
+
+    steps += `
+--------------------------------
+
+FRACTIONAL PART:
+
+`;
+
+    let limit = 10;
+
+    while(
+      fractionPart > 0 &&
+      limit > 0
+    ){
+
+      const product =
+        fractionPart * base;
+
+      const digit =
+        Math.floor(product);
+
+      steps += `
+${fractionPart.toFixed(10)}
+× ${base}
+=
+${product.toFixed(10)}
+
+Integer Part = ${chars[digit]}
+
+`;
+
+      fractionalDigits.push(
+        chars[digit]
+      );
+
+      fractionPart =
+        product - digit;
+
+      limit--;
+
+    }
+
+  }
+
+  /* ================================
+  FINAL ANSWER
+  ================================ */
+
+  const finalAnswer =
+
+    fractionalDigits.length > 0
+
+    ? `${remainders.join('')}.${fractionalDigits.join('')}`
+
+    : remainders.join('');
+
+  steps += `
+--------------------------------
+
+Final Answer:
+
+${finalAnswer}
 `;
 
   return steps;
