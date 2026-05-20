@@ -313,7 +313,7 @@ font-family:monospace;
 }
 
 
-    @media(max-width:900px){
+  @media(max-width:900px){
 
   .ns-layout{
 
@@ -325,15 +325,20 @@ font-family:monospace;
 
     width:100%;
 
-    flex-direction:row;
+    max-height:none;
 
-    flex-wrap:wrap;
+    flex-direction:column;
+
+    overflow:visible;
 
   }
 
   .ns-tab{
 
-    width:auto;
+    width:100%;
+ min-height:48px;
+    justify-content:center;
+
     text-align:center;
 
   }
