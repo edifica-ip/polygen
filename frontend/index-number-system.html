@@ -312,9 +312,73 @@ font-family:monospace;
   white-space:pre-wrap;
 }
 
+.mobile-menu-btn{
 
+  display:none;
+
+}
+
+    
   @media(max-width:900px){
 
+     .mobile-menu-btn{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    width:100%;
+
+    padding:14px;
+
+    margin-bottom:14px;
+
+    border:none;
+    border-radius:12px;
+
+    background:#374151;
+
+    color:#fff;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+  }
+
+
+    .ns-tabs{
+
+  display:none;
+
+}
+
+    .ns-tabs.show{
+
+  display:flex;
+
+}
+
+    .ns-tabs{
+
+  width:100%;
+
+  flex-direction:column;
+
+  gap:8px;
+
+}
+
+    .ns-tab{
+
+  width:100%;
+
+  justify-content:center;
+
+  text-align:center;
+
+}
   .ns-layout{
 
     flex-direction:column;
@@ -438,6 +502,13 @@ font-family:monospace;
 
       <div class="pane-body">
 
+        <button class="mobile-menu-btn"
+        id="mobileMenuBtn">
+
+  ☰ Modules
+
+</button>
+        
         <!-- TABS -->
 <div class="ns-layout">
 
