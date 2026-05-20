@@ -93,6 +93,67 @@ function isValidForBase(value, base){
 
 
 
+
+function generateGroupingSteps(value, fromBase){
+
+  value =
+    value.toUpperCase();
+
+  let steps =
+    'Steps of Calculation:\n\n';
+
+  let result = '';
+
+  // Group size
+  const groupSize =
+    fromBase === 16 ? 4 : 3;
+
+  steps +=
+    fromBase === 16
+
+    ? 'Hexadecimal to Binary\n\n'
+
+    : 'Octal to Binary\n\n';
+
+  for(let ch of value){
+
+    // Ignore decimal point
+    if(ch === '.'){
+
+      result += '.';
+
+      steps += '\nDecimal Point\n\n';
+
+      continue;
+
+    }
+
+    const digit =
+      parseInt(ch, fromBase);
+
+    const binary =
+      digit
+      .toString(2)
+      .padStart(groupSize,'0');
+
+    steps +=
+`${ch} → ${binary}\n`;
+
+    result += binary;
+
+  }
+
+  steps += `
+--------------------------------
+Answer: ${result}
+`;
+
+  return steps;
+
+}
+
+
+
 function generateAnyToDecimalSteps(value, base){
 
   const chars =
@@ -213,10 +274,7 @@ Decimal Calculation:
 ${calculations.join(' + ')}
 
 --------------------------------
-
-Answer:
-${decimal}
-`;
+Answer: ${decimal} `;
 
   return steps;
 
@@ -445,6 +503,17 @@ if(
     );
 
 }
+     else if(
+  toBase === 2 && (fromBase===8 ||fromBase===16) ){
+
+  detailedSteps =
+    generateGroupingSteps(
+      input,fromBase
+    );
+
+}
+
+       
 else{
 
   detailedSteps = `
