@@ -259,7 +259,7 @@ ${intGroups.join(' ')}
       );
 
     steps += `
---------------------------------
+    --------------------------------
 
 Grouped Fractional Part:
 
@@ -661,6 +661,17 @@ function convertNumber(){
       document.getElementById('toBase').value
     );
 
+
+  if(fromBase === toBase){
+
+  alert(
+    'From Base and To Base are the same. Please alter your selection!'
+  );
+
+  return;
+
+}
+
   const resultDiv =
     document.getElementById('globalResult');
 
@@ -687,15 +698,7 @@ function convertNumber(){
       `✅ Result: ${result}`;
 
     let detailedSteps = '';
-if(fromBase === toBase){
 
-  alert(
-    'From Base and To Base are the same. Please alter your selection!'
-  );
-
-  return;
-
-}
     
 if(
   fromBase === 10 ){
