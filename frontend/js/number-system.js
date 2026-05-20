@@ -687,7 +687,16 @@ function convertNumber(){
       `✅ Result: ${result}`;
 
     let detailedSteps = '';
+if(fromBase === toBase){
 
+  alert(
+    'From Base and To Base are the same. Please alter your selection!'
+  );
+
+  return;
+
+}
+    
 if(
   fromBase === 10 ){
 
