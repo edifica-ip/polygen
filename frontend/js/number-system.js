@@ -94,28 +94,52 @@ function isValidForBase(value, base){
 
 
 
-function generateDecimalToBinarySteps(num){
+function generateDecimalToAnySteps(num, base){
+
+  const chars =
+    '0123456789ABCDEF';
 
   let n = parseInt(num);
 
-  let steps = 'Steps of Calculation:\n';
+  let steps =
+    'Steps of Calculation:\n';
 
   let remainders = [];
 
+  // Handle 0
+  if(n === 0){
+
+    return `
+Steps of Calculation:
+0 ÷ ${base} = 0
+
+--------------------------------
+
+Final Answer:
+0
+`;
+
+  }
+
+  // Division Process
   while(n > 0){
 
     const quotient =
-      Math.floor(n / 2);
+      Math.floor(n / base);
 
     const remainder =
-      n % 2;
+      n % base;
 
-    steps += `Divide ${n} by 2
-${n} ÷ 2 = ${quotient}
-Remainder = ${remainder}
+    steps += `
+${n} ÷ ${base} = ${quotient}
+
+Remainder = ${chars[remainder]}
+
 `;
 
-    remainders.unshift(remainder);
+    remainders.unshift(
+      chars[remainder]
+    );
 
     n = quotient;
 
@@ -123,7 +147,8 @@ Remainder = ${remainder}
 
   steps += `
 --------------------------------
-Find remainders from bottom to top, to find the result:
+
+Read remainders from bottom to top:
 
 ${remainders.join('')}
 `;
@@ -184,13 +209,11 @@ function convertNumber(){
     let detailedSteps = '';
 
 if(
-  fromBase === 10 &&
-  toBase === 2
-){
+  fromBase === 10 ){
 
   detailedSteps =
-    generateDecimalToBinarySteps(
-      input
+    generateDecimalToAnySteps(
+      input,toBase
     );
 
 }
