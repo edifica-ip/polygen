@@ -232,6 +232,40 @@ SELECT DROPDOWN FIX
 
   }
 
+    .global-output{
+
+  height:100%;
+  min-height:650px;
+
+  display:flex;
+  flex-direction:column;
+
+}
+
+#globalSteps{
+
+  flex:1;
+
+  overflow:auto;
+
+  font-family:monospace;
+
+  white-space:pre-wrap;
+
+}
+
+#globalResult{
+
+  position:sticky;
+  top:0;
+
+  background:#020617;
+
+  z-index:10;
+
+  padding-bottom:12px;
+
+}
     
   </style>
 </head>
@@ -505,20 +539,7 @@ SELECT DROPDOWN FIX
 
             </div>
 
-            <div class="ns-output">
-
-              <div class="ns-result"
-                   id="arithResult">
-                Result will appear here
-              </div>
-
-              <div class="ns-steps"
-                   id="arithSteps">
-              </div>
-
-            </div>
-
-          </div>
+                      </div>
 
         </div>
 
@@ -547,19 +568,7 @@ SELECT DROPDOWN FIX
 
             </div>
 
-            <div class="ns-output">
-
-              <div class="ns-result"
-                   id="compResult">
-                Complement Result
-              </div>
-
-              <div class="ns-steps"
-                   id="compSteps">
-              </div>
-
-            </div>
-
+           
           </div>
 
         </div>
@@ -599,17 +608,7 @@ SELECT DROPDOWN FIX
 
     </div>
 
-    <div class="ns-output">
-
-      <div class="ns-result"
-           id="signedResult">
-      </div>
-
-      <div class="ns-steps"
-           id="signedSteps">
-      </div>
-
-    </div>
+   
 
   </div>
 
@@ -655,17 +654,7 @@ SELECT DROPDOWN FIX
 
     </div>
 
-    <div class="ns-output">
-
-      <div class="ns-result"
-           id="shiftResult">
-      </div>
-
-      <div class="ns-steps"
-           id="shiftSteps">
-      </div>
-
-    </div>
+    
 
   </div>
 
@@ -711,17 +700,7 @@ SELECT DROPDOWN FIX
 
     </div>
 
-    <div class="ns-output">
 
-      <div class="ns-result"
-           id="bitResult">
-      </div>
-
-      <div class="ns-steps"
-           id="bitSteps">
-      </div>
-
-    </div>
 
   </div>
 
@@ -750,17 +729,7 @@ SELECT DROPDOWN FIX
 
     </div>
 
-    <div class="ns-output">
 
-      <div class="ns-result"
-           id="floatResult">
-      </div>
-
-      <div class="ns-steps"
-           id="floatSteps">
-      </div>
-
-    </div>
 
   </div>
 
@@ -788,18 +757,7 @@ SELECT DROPDOWN FIX
 
     </div>
 
-    <div class="ns-output">
-
-      <div class="ns-result"
-           id="asciiResult">
-      </div>
-
-      <div class="ns-steps"
-           id="asciiSteps">
-      </div>
-
-    </div>
-
+    
   </div>
 
 </div>
@@ -845,17 +803,7 @@ SELECT DROPDOWN FIX
 
     </div>
 
-    <div class="ns-output">
-
-      <div class="ns-result"
-           id="overflowResult">
-      </div>
-
-      <div class="ns-steps"
-           id="overflowSteps">
-      </div>
-
-    </div>
+    
 
   </div>
 
@@ -921,19 +869,7 @@ SELECT DROPDOWN FIX
 
     </div>
 
-    <div class="ns-output">
-
-      <div class="ns-result"
-           id="visualResult">
-      </div>
-
-      <div class="ns-steps"
-           id="visualSteps"
-           style="font-family:monospace;
-                  font-size:18px;">
-      </div>
-
-    </div>
+   
 
   </div>
 
@@ -998,20 +934,7 @@ SELECT DROPDOWN FIX
 
     </div>
 
-    <div class="ns-output">
-
-      <div class="ns-result"
-           id="digitalResult">
-
-        Result will appear here
-
-      </div>
-
-      <div class="ns-steps"
-           id="digitalSteps">
-      </div>
-
-    </div>
+   
 
   </div>
 
@@ -1080,18 +1003,20 @@ MOV [100],AX
 
     <!-- RIGHT SIDE -->
 
-<div class="ns-output">
+<div class="ns-output global-output">
 
-              <div class="ns-result"
-                   id="convertResult">
-                Result will appear here
-              </div>
+  <div class="ns-result"
+       id="globalResult">
 
-              <div class="ns-steps"
-                   id="convertSteps">
-              </div>
+    Ready
 
-            </div>
+  </div>
+
+  <div class="ns-steps"
+       id="globalSteps">
+  </div>
+
+</div>
 
 
   </div>
