@@ -214,7 +214,7 @@ ${calculations.join(' + ')}
 
 --------------------------------
 
-Final Answer:
+Answer:
 ${decimal}
 `;
 
