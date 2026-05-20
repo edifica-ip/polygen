@@ -51,6 +51,10 @@ NUMBER CONVERSION
 VALIDATE NUMBER FOR BASE
 ========================================= */
 
+
+
+
+
 function isValidForBase(value, base){
 
   const patterns = {
@@ -87,10 +91,10 @@ function convertNumber(){
     );
 
   const resultDiv =
-    document.getElementById('convertResult');
+    document.getElementById('globalResult');
 
   const stepsDiv =
-    document.getElementById('convertSteps');
+    document.getElementById('globalSteps');
 
   try{
 
@@ -281,8 +285,8 @@ function calculateArithmetic(){
   const base = parseInt(document.getElementById('arithBase').value);
   const operation = document.getElementById('operation').value;
 
-  const resultDiv = document.getElementById('arithResult');
-  const stepsDiv = document.getElementById('arithSteps');
+  const resultDiv = document.getElementById('globalResult');
+  const stepsDiv = document.getElementById('globalSteps');
 
   try{
 
@@ -320,6 +324,11 @@ const dec2 =
         break;
 
       case '/':
+        if(dec2 === 0){
+  throw new Error(
+    "Division By Zero"
+  );
+}
         answer = dec1 / dec2;
         break;
 
@@ -367,8 +376,8 @@ function findComplements(){
 
   const input = document.getElementById('compInput').value.trim();
 
-  const resultDiv = document.getElementById('compResult');
-  const stepsDiv = document.getElementById('compSteps');
+  const resultDiv = document.getElementById('globalResult');
+  const stepsDiv = document.getElementById('globalSteps');
 
   try{
 
@@ -458,10 +467,10 @@ function generateSignedBinary(){
     );
 
   const result =
-    document.getElementById('signedResult');
+    document.getElementById('globalResult');
 
   const steps =
-    document.getElementById('signedSteps');
+    document.getElementById('globalSteps');
 
   if(isNaN(num)){
 
@@ -534,10 +543,10 @@ function performShift(){
     );
 
   const result =
-    document.getElementById('shiftResult');
+    document.getElementById('globalResult');
 
   const steps =
-    document.getElementById('shiftSteps');
+    document.getElementById('globalSteps');
 
   if(!/^[01]+$/.test(input)){
 
@@ -618,10 +627,10 @@ function performBitwise(){
     .value;
 
   const result =
-    document.getElementById('bitResult');
+    document.getElementById('globalResult');
 
   const steps =
-    document.getElementById('bitSteps');
+    document.getElementById('globalSteps');
 
   if(
     !/^[01]+$/.test(a) ||
@@ -682,10 +691,10 @@ function convertIEEE754(){
     );
 
   const result =
-    document.getElementById('floatResult');
+    document.getElementById('globalResult');
 
   const steps =
-    document.getElementById('floatSteps');
+    document.getElementById('globalSteps');
 
   if(isNaN(num)){
     result.innerHTML = "❌ Invalid";
@@ -738,10 +747,10 @@ function convertAsciiHex(){
     .value;
 
   const result =
-    document.getElementById('asciiResult');
+    document.getElementById('globalResult');
 
   const steps =
-    document.getElementById('asciiSteps');
+    document.getElementById('globalSteps');
 
   if(!text){
 
@@ -828,10 +837,10 @@ function detectOverflow(){
     );
 
   const result =
-    document.getElementById('overflowResult');
+    document.getElementById('globalResult');
 
   const steps =
-    document.getElementById('overflowSteps');
+    document.getElementById('globalSteps');
 
   if(
     !/^[01]+$/.test(a) ||
@@ -935,10 +944,10 @@ function visualizeBinaryOperation(){
   
 
   const result =
-    document.getElementById('visualResult');
+    document.getElementById('globalResult');
 
   const steps =
-    document.getElementById('visualSteps');
+    document.getElementById('globalSteps');
 
   if(
     !/^[01]+$/.test(a) ||
@@ -1046,10 +1055,10 @@ BINARY MULTIPLICATION VISUALIZER
 function visualizeBinaryMultiplication(a,b){
 
   const result =
-    document.getElementById('visualResult');
+    document.getElementById('globalResult');
 
   const steps =
-    document.getElementById('visualSteps');
+    document.getElementById('globalSteps');
 
   const decA =
     parseInt(a,2);
@@ -1132,10 +1141,10 @@ ${final}
 function visualizeOnesComplementSubtraction(a,b){
 
   const result =
-    document.getElementById('visualResult');
+    document.getElementById('globalResult');
 
   const steps =
-    document.getElementById('visualSteps');
+    document.getElementById('globalSteps');
 
   const bits =
     Math.max(a.length,b.length);
@@ -1254,10 +1263,10 @@ Final Answer:
 function visualizeTwosComplementSubtraction(a,b){
 
   const result =
-    document.getElementById('visualResult');
+    document.getElementById('globalResult');
 
   const steps =
-    document.getElementById('visualSteps');
+    document.getElementById('globalSteps');
 
   const bits =
     Math.max(a.length,b.length);
@@ -1391,10 +1400,10 @@ function convertDigitalCodes(){
     .value;
 
   const result =
-    document.getElementById('digitalResult');
+    document.getElementById('globalResult');
 
   const steps =
-    document.getElementById('digitalSteps');
+    document.getElementById('globalSteps');
 
   let output = '';
 
@@ -1702,10 +1711,10 @@ function runCPUProgram(){
     .trim();
 
   const resultDiv =
-    document.getElementById('cpuResult');
+    document.getElementById('globalResult');
 
   const stepsDiv =
-    document.getElementById('cpuSteps');
+    document.getElementById('globalSteps');
 
   /* =====================================
   CPU STATE
