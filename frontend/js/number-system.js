@@ -13,11 +13,29 @@ TAB SWITCHING
 
 const tabButtons = document.querySelectorAll('.ns-tab');
 const tabContents = document.querySelectorAll('.tab-content');
+const mobileMenuBtn =
+  document.getElementById(
+    'mobileMenuBtn'
+  );
+
+const tabsMenu =
+  document.querySelector(
+    '.ns-tabs'
+  );
+
 
 tabButtons.forEach(btn => {
 
   btn.addEventListener('click', () => {
 
+    if(window.innerWidth <= 900){
+
+  tabsMenu.classList.remove(
+    'show'
+  );
+
+}
+    
     // Remove active state
     tabButtons.forEach(b => {
       b.classList.remove('active');
@@ -2848,7 +2866,7 @@ if(REG[op1] === 0){
   resolveValue(op2 || 1, REG);
 
 const count =
- Math.abs( rawCount % 8);
+ Math.abs(rawCount % 8);
 validateRegister(op1);
   for(let i=0; i<count; i++){
 
@@ -2887,7 +2905,7 @@ else if(instruction === 'ROL'){
   resolveValue(op2 || 1, REG);
 
 const count =
-  Math.abs( rawCount % 8);
+  Math.abs(rawCount % 8);
   validateRegister(op1);
   for(let i=0; i<count; i++){
 
@@ -2930,7 +2948,7 @@ else if(instruction === 'ROR'){
   resolveValue(op2 || 1, REG);
 
 const count =
-  Math.abs( rawCount % 8);
+  Math.abs(rawCount % 8);
 validateRegister(op1);
   for(let i=0; i<count; i++){
 
@@ -2970,7 +2988,7 @@ validateRegister(op1);
   resolveValue(op2 || 1, REG);
 
 const count =
-  Math.abs( rawCount % 8);
+  Math.abs(rawCount % 8);
 validateRegister(op1);
   for(let i=0; i<count; i++){
 
@@ -3154,5 +3172,29 @@ Object
 
   stepsDiv.innerHTML =
     output;
+
+}
+
+
+
+
+
+
+
+if(
+  mobileMenuBtn &&
+  tabsMenu
+){
+
+  mobileMenuBtn.addEventListener(
+    'click',
+    ()=>{
+
+      tabsMenu.classList.toggle(
+        'show'
+      );
+
+    }
+  );
 
 }
