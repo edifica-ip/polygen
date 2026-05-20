@@ -130,9 +130,7 @@ Final Answer:
     const remainder =
       n % base;
 
-    steps += `
-${n} ÷ ${base} = ${quotient}
-
+    steps += `${n} ÷ ${base} = ${quotient}
 Remainder = ${chars[remainder]}
 
 `;
@@ -147,9 +145,7 @@ Remainder = ${chars[remainder]}
 
   steps += `
 --------------------------------
-
-Read remainders from bottom to top:
-
+Arrange remainders from bottom to top to find the result:
 ${remainders.join('')}
 `;
 
