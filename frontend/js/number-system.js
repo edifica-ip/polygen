@@ -110,7 +110,7 @@ function generateDecimalToBinarySteps(num){
     const remainder =
       n % 2;
 
-    steps += `
+    steps += `Divide ${n} by 2
 ${n} ÷ 2 = ${quotient}
 Remainder = ${remainder}
 `;
@@ -123,8 +123,7 @@ Remainder = ${remainder}
 
   steps += `
 --------------------------------
-
-Read remainders from bottom to top:
+Find remainders from bottom to top, to find the result:
 
 ${remainders.join('')}
 `;
