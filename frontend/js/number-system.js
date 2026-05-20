@@ -93,6 +93,134 @@ function isValidForBase(value, base){
 
 
 
+function generateBinaryGroupingSteps(
+  value,
+  toBase
+){
+
+  const chars =
+    '0123456789ABCDEF';
+
+  let steps =
+    'Steps of Calculation:\n\n';
+
+  // Group size
+  const groupSize =
+    toBase === 16 ? 4 : 3;
+
+  steps +=
+    toBase === 16
+
+    ? 'Binary to Hexadecimal\n\n'
+
+    : 'Binary to Octal\n\n';
+
+  // Split decimal part
+  const parts =
+    value.split('.');
+
+  let intPart =
+    parts[0];
+
+  let fracPart =
+    parts[1] || '';
+
+  /* ================================
+  INTEGER PART
+  ================================ */
+
+  // Pad left side
+  while(
+    intPart.length % groupSize !== 0
+  ){
+
+    intPart = '0' + intPart;
+
+  }
+
+  const intGroups =
+    intPart.match(
+      new RegExp(`.{1,${groupSize}}`,'g')
+    );
+
+  steps += `
+Grouped Integer Part:
+
+${intGroups.join(' ')}
+
+\n`;
+
+  let result = '';
+
+  for(let grp of intGroups){
+
+    const digit =
+      parseInt(grp,2);
+
+    steps +=
+`${grp} → ${chars[digit]}\n`;
+
+    result += chars[digit];
+
+  }
+
+  /* ================================
+  FRACTIONAL PART
+  ================================ */
+
+  if(fracPart){
+
+    while(
+      fracPart.length % groupSize !== 0
+    ){
+
+      fracPart += '0';
+
+    }
+
+    const fracGroups =
+      fracPart.match(
+        new RegExp(`.{1,${groupSize}}`,'g')
+      );
+
+    steps += `
+--------------------------------
+
+Grouped Fractional Part:
+
+${fracGroups.join(' ')}
+
+\n`;
+
+    result += '.';
+
+    for(let grp of fracGroups){
+
+      const digit =
+        parseInt(grp,2);
+
+      steps +=
+`${grp} → ${chars[digit]}\n`;
+
+      result += chars[digit];
+
+    }
+
+  }
+
+  /* ================================
+  FINAL
+  ================================ */
+
+  steps += `
+  --------------------------------
+Answer: ${result}
+`;
+
+  return steps;
+
+}
+
 
 function generateGroupingSteps(value, fromBase){
 
@@ -512,7 +640,15 @@ if(
     );
 
 }
+ else if(
+  fromBase === 2 && (toBase===8 || toBase===16) ){
 
+  detailedSteps =
+    generateBinaryGroupingSteps(
+      input,toBase
+    );
+
+}
        
 else{
 
