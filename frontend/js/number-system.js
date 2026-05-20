@@ -125,8 +125,7 @@ function generateDecimalToAnySteps(num, base){
   ================================ */
 
   steps +=
-`Integer Part:
-\n`;
+`Integer Part:\n`;
 
   // Handle integer 0
   if(integerPart === 0){
@@ -169,7 +168,9 @@ function generateDecimalToAnySteps(num, base){
     integerPart = quotient;
 
   }
-
+steps += `
+--------------------------------
+Remainder upwards (↑): ${remainders.join('')}\n\n`
   /* ================================
   FRACTIONAL PART
   ================================ */
@@ -178,10 +179,7 @@ function generateDecimalToAnySteps(num, base){
 
   if(fractionPart > 0){
 
-    steps += `
---------------------------------
-Remainder upwards (↑): ${remainders.join('')}\n\n
-Fractional Part:\n\n`;
+    steps += `Fractional Part:\n`;
 
     let limit = 10;
 
@@ -237,10 +235,12 @@ steps +=
 
     : remainders.join('');
 
+  if(fractionPart > 0)
   steps += `
 --------------------------------
-Fractional Digits downwards (↓): ${fractionalDigits.join('')}\n\n
---------------------------------
+Fractional Digits downwards (↓): ${fractionalDigits.join('')}\n`
+
+  steps += `--------------------------------
 Final Answer: ${finalAnswer}`;
 
   return steps;
