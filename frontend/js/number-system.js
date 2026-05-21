@@ -644,15 +644,7 @@ function convertNumber(){
     );
 
 
-  if(fromBase === toBase){
 
-  alert(
-    'From Base and To Base are the same. Please alter your selection!'
-  );
-
-  return;
-
-}
 
   const resultDiv =
     document.getElementById('globalResult');
@@ -663,6 +655,20 @@ function convertNumber(){
   resultDiv.innerHTML = "";
     stepsDiv.innerHTML = "";
 
+  
+    if(fromBase === toBase){
+
+  alert(
+    'From Base and To Base are the same. Please alter your selection!'
+  );
+resultDiv.innerHTML =
+    '⚠️ Same Base Selected';
+
+  stepsDiv.innerHTML =
+    'Choose different bases for conversion.';
+  return;
+
+}
   
   try{
 
