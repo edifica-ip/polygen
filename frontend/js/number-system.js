@@ -527,8 +527,7 @@ function generateDecimalToAnySteps(num, base){
 
     const left =
 
-      `${integerPart}`.padStart(3,' ')
-      + ` ÷ ${base} = `
+      `${integerPart}` + ` ÷ ${base} = `
       + `${quotient}`.padEnd(6,' ');
 
     const right =
@@ -609,13 +608,12 @@ steps +=
 
     : remainders.join('');
 
-  steps += `\nStep: Reading the values and join\n--------------------------------\n
-Remainder upwards (↑): ${remainders.join('')}`
+  steps += `\nStep: Reading the Remainder(s)\n--------------------------------\nUpwards (↑): ${remainders.join('')}`
   
   if(fractionPart > 0)
-  steps += `\nInteger downwards (↓): ${fractionalDigits.join('')}\n`
+  steps += `\nStep: Reading the Integer(s)\n--------------------------------\nDownwards (↓): ${fractionalDigits.join('')}\n`
 
-  steps += `\n--------------------------------Answer: ${finalAnswer}\n--------------------------------`;
+  steps += `\n--------------------------------\nAnswer: ${finalAnswer}\n--------------------------------`;
 
   return steps;
 
