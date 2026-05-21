@@ -386,7 +386,7 @@ function generateAnyToDecimalSteps(value, base){
   ================================ */
 
   steps +=
-`Step 1: Integer Part\n--------------------------------\n`;
+`Step: Integer Part\n--------------------------------\n`;
 
   for(
     let i = 0;
@@ -422,7 +422,7 @@ function generateAnyToDecimalSteps(value, base){
 
   if(fracPart){
 
-    steps += `\nStep 2: Fractional Part\n--------------------------------\n`;
+    steps += `\nStep: Fractional Part\n--------------------------------\n`;
 
     for(
       let i = 0;
@@ -458,9 +458,9 @@ function generateAnyToDecimalSteps(value, base){
   FINAL
   ================================ */
 
-  steps += `\nStep 3: Expanded Form (Optional)\n--------------------------------\n${expansions.join('\n+ ')}
+  steps += `\nStep: Expanded Form (Optional)\n--------------------------------\n${expansions.join('\n+ ')}
 
-Step 4: Finding Sum\n--------------------------------\n${calculations.join(' + ')}
+Step: Finding Sum\n--------------------------------\n${calculations.join(' + ')}
 
 --------------------------------
 Answer: ${decimal}\n-------------------------------- `;
@@ -501,7 +501,7 @@ function generateDecimalToAnySteps(num, base){
   ================================ */
 
   steps +=
-`Integer Part:\n`;
+`Step: Integer Part\n--------------------------------\n`;
 
   // Handle integer 0
   if(integerPart === 0){
@@ -533,7 +533,7 @@ function generateDecimalToAnySteps(num, base){
 
     const right =
 
-      `Remainder = ${chars[remainder]}`;
+      `\nRemainder = ${chars[remainder]}`;
 
     steps += left + right + '\n';
 
@@ -544,9 +544,7 @@ function generateDecimalToAnySteps(num, base){
     integerPart = quotient;
 
   }
-steps += `
---------------------------------
-Remainder upwards (↑): ${remainders.join('')}\n\n`
+
   /* ================================
   FRACTIONAL PART
   ================================ */
@@ -555,7 +553,7 @@ Remainder upwards (↑): ${remainders.join('')}\n\n`
 
   if(fractionPart > 0){
 
-    steps += `Fractional Part:\n`;
+    steps += `\nStep: Fractional Part:\n--------------------------------\n`;
 
     let limit = 10;
 
@@ -578,7 +576,7 @@ Remainder upwards (↑): ${remainders.join('')}\n\n`
 
 const fracRight =
 
-  `Integer = ${chars[digit]}`;
+  `\nInteger = ${chars[digit]}`;
 
 steps +=
   fracLeft + fracRight + '\n';
@@ -611,13 +609,13 @@ steps +=
 
     : remainders.join('');
 
+  steps += `\nStep: Reading the values and join\n--------------------------------\n
+Remainder upwards (↑): ${remainders.join('')}`
+  
   if(fractionPart > 0)
-  steps += `
---------------------------------
-Integer downwards (↓): ${fractionalDigits.join('')}\n`
+  steps += `\nInteger downwards (↓): ${fractionalDigits.join('')}\n`
 
-  steps += `--------------------------------
-Answer: ${finalAnswer}`;
+  steps += `\n--------------------------------Answer: ${finalAnswer}\n--------------------------------`;
 
   return steps;
 
