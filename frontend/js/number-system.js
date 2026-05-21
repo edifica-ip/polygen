@@ -186,9 +186,9 @@ function generateBinaryGroupingSteps(
   steps +=
     toBase === 16
 
-    ? 'Step: Integer Part (4-bit grouping)\nRight to Left (←)\n--------------------------------\n'
+    ? 'Step: Integer Part (4-bit grouping) R-L (←)\n--------------------------------\n'
 
-    : 'Step: Integer Part (3-bit grouping)\nRight to Left (←)\n--------------------------------\n';
+    : 'Step: Integer Part (3-bit grouping) R-L (←)\n--------------------------------\n';
 
   // Split decimal part
   const parts =
@@ -219,7 +219,7 @@ function generateBinaryGroupingSteps(
     );
 
   
-  steps += `${intGroups.join('  ')}\n`;
+  steps += `${intGroups.join('  ')}\n\n`;
 
   let result = '';
 
@@ -257,12 +257,12 @@ function generateBinaryGroupingSteps(
      steps +=
     toBase === 16
 
-    ? 'Step: Fractional Part (4-bit grouping)\nLeft to Right (→)\n--------------------------------\n'
+    ? '\nStep: Fractional Part (4-bit grouping) L-R (→)\n--------------------------------\n'
 
-    : 'Step: Fractional Part (3-bit grouping)\nLeft to Right (→)\n--------------------------------\n';
+    : '\nStep: Fractional Part (3-bit grouping) L-R (→)\n--------------------------------\n';
 
     
-    steps += `${fracGroups.join(' ')}\n`;
+    steps += `${fracGroups.join(' ')}\n\n`;
 
     result += '.';
 
@@ -307,9 +307,9 @@ function generateGroupingSteps(value, fromBase){
   steps +=
     fromBase === 16
 
-    ? 'Step: Integer Part (in 4-bit binary)\nLeft to Right (→)\n--------------------------------\n'
+    ? 'Step: Integer Part (in 4-bits) L-R (→)\n--------------------------------\n'
 
-    : 'Step: Integer Part (in 3-bit binary)\nLeft to Right (→)\n--------------------------------\n';
+    : 'Step: Integer Part (in 3-bits) L-R (→)\n--------------------------------\n';
 
   for(let ch of value){
 
@@ -321,9 +321,9 @@ function generateGroupingSteps(value, fromBase){
        steps +=
     fromBase === 16
 
-    ? '\nStep: Fractional Part (in 4-bit binary)\nLeft to Right (→)\n--------------------------------\n'
+    ? '\nStep: Fractional Part (in 4-bits) L-R (→)\n--------------------------------\n'
 
-    : '\nStep: Fractional Part (in 3-bit binary)\nLeft to Right (→)\n--------------------------------\n';
+    : '\nStep: Fractional Part (in 3-bits) L-R (→)\n--------------------------------\n';
 
       continue;
 
