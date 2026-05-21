@@ -1099,7 +1099,7 @@ b = b.padStart(maxLen,'0');
 
   let carryRow = [];
 
-  let steps = '';
+  let steps = 'Explanation:\n';
 
   /* ================================
   MAIN ADDITION LOOP
@@ -1128,18 +1128,8 @@ b = b.padStart(maxLen,'0');
 
     carryRow.unshift(carry);
 
-    steps += `
-${a[i]} + ${b[i]}
-+ Carry
-
-= ${sum}
-
-Write:
-${valueToChar(digit)}
-
-Carry:
-${carry}
-
+    steps += `${a[i]} + ${b[i]} = ${sum}
+Write: ${valueToChar(digit)}, Carry: ${carry}
 --------------------------------
 `;
 
@@ -1260,9 +1250,9 @@ if(fracLen > 0){
     result:
       rawAnswer,
 
-    visual: `
+    visual: ` ${spaced(rawA.padStart(totalDigits) )} + ${spaced(rawB.padStart(totalDigits - 1))} →
 
-Carry:
+Carry (↓)
 ${spaced(
   formattedCarryRaw.padStart(totalDigits - 1)
 )}
@@ -1270,19 +1260,16 @@ ${spaced(
 ${spaced(
   rawA.padStart(totalDigits)
 )}
-
 + ${spaced(
   rawB.padStart(totalDigits - 1)
 )}
-
 ${'-'.repeat(totalDigits * 2 + 2 )}
-
 ${spaced(
   rawAnswer.padStart(totalDigits)
 )}
+${'-'.repeat(totalDigits * 2 + 2 )}
 
 ================================
-
 ${steps}
 
 `
