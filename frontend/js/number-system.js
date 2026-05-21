@@ -1006,6 +1006,14 @@ function spaced(str){
 TRUE BASE ADDITION
 ========================================= */
 
+function convertDecimalToBaseLocal(
+  num,
+  base
+){
+  return num.toString(base)
+    .toUpperCase();
+}
+
 function addInBase(a,b,base){
 
 a = a.toUpperCase();
