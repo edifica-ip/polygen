@@ -312,9 +312,9 @@ function generateGroupingSteps(value, fromBase){
   steps +=
     fromBase === 16
 
-    ? 'Hexadecimal to Binary (4 bit grouping) \n'
+    ? 'Step: Integer Part (4-bit grouping) Right to Left (←)\n--------------------------------\n'
 
-    : 'Octal to Binary (3 bit grouping)\n';
+    : 'Step: Integer Part (3-bit grouping) Right to Left (←)\n--------------------------------\n';
 
   for(let ch of value){
 
@@ -323,7 +323,12 @@ function generateGroupingSteps(value, fromBase){
 
       result += '.';
 
-      steps += '\nDecimal Point\n\n';
+       steps +=
+    fromBase === 16
+
+    ? '\nStep: Fractional Part (4-bit grouping) Left to Right (→)\n--------------------------------\n'
+
+    : '\nStep: Fractional Part (3-bit grouping) Left to Right (→)\n--------------------------------\n';
 
       continue;
 
@@ -345,9 +350,7 @@ function generateGroupingSteps(value, fromBase){
   }
 
   steps += `
---------------------------------
-Answer: ${result}
-`;
+--------------------------------\nAnswer: ${result}\n--------------------------------`;
 
   return steps;
 
@@ -657,10 +660,7 @@ function convertNumber(){
 
   
     if(fromBase === toBase){
-
-  alert(
-    'From Base and To Base are the same. Please alter your selection!'
-  );
+ 
 resultDiv.innerHTML =
     '⚠️ Same Base Selected';
 
