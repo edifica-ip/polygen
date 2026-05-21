@@ -608,10 +608,10 @@ steps +=
 
     : remainders.join('');
 
-  steps += `\nStep: Reading the Remainder(s)\n--------------------------------\nUpwards (↑): ${remainders.join('')}`
+  steps += `\nStep: Reading the Remainder(s)\n--------------------------------\nUpwards (↑): ${remainders.join('')}\n`
   
   if(fractionPart > 0)
-  steps += `\n\nStep: Reading the Integer(s)\n--------------------------------\nDownwards (↓): ${fractionalDigits.join('')}\n`
+  steps += `\nStep: Reading the Integer(s)\n--------------------------------\nDownwards (↓): ${fractionalDigits.join('')}\n`
 
   steps += `\n--------------------------------\nAnswer: ${finalAnswer}\n--------------------------------`;
 
