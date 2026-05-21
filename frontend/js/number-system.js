@@ -660,6 +660,10 @@ function convertNumber(){
   const stepsDiv =
     document.getElementById('globalSteps');
 
+  resultDiv.innerHTML = "";
+    stepsDiv.innerHTML = "";
+
+  
   try{
 
     if(!isValidForBase(input, fromBase)){
