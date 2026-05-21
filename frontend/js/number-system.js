@@ -1139,12 +1139,14 @@ const sum =
 
     carryRow.unshift(carry);
 
-
-    let baseExplanation = '${sum}₁₀';
-
+let x=``;
+    let baseExplanation = `${sum}₁₀`;
+if(base===8)x=`₈`;
+    if(base===2)x=`₂`;
+    if(base===16)x=`₁₆`;
 if(base !== 10){
 
-  baseExplanation = `${sum}₁₀ = ${convertDecimalToBaseLocal(sum, base)} (in base ${base})`;
+  baseExplanation = `(${sum})₁₀ = (${convertDecimalToBaseLocal(sum, base)})${x}`;
 
 }
     
