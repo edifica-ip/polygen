@@ -1068,23 +1068,52 @@ ${carry}
 
   }
 
-  return {
+ const formattedA =
+  a.split('').join(' ');
 
-    result:
-      answer.join(''),
+const formattedB =
+  b.split('').join(' ');
 
-    visual: `
+const formattedAnswer =
+  answer.join(' ');
+
+const formattedCarry =
+  carryRow.join(' ');
+
+/* ================================
+ALIGN WIDTH
+================================ */
+
+const totalWidth =
+  Math.max(
+
+    formattedA.length,
+
+    formattedB.length + 2,
+
+    formattedAnswer.length,
+
+    formattedCarry.length
+
+  );
+
+return {
+
+  result:
+    answer.join(''),
+
+  visual: `
 
 Carry:
-${carryRow.join(' ')}
+${formattedCarry.padStart(totalWidth)}
 
-   ${a.split('').join(' ')}
+${formattedA.padStart(totalWidth)}
 
-+  ${b.split('').join(' ')}
++ ${formattedB.padStart(totalWidth - 1)}
 
-${'-'.repeat(maxLen*2+8)}
+${'-'.repeat(totalWidth)}
 
-   ${answer.join(' ')}
+${formattedAnswer.padStart(totalWidth)}
 
 ================================
 
@@ -1092,7 +1121,7 @@ ${steps}
 
 `
 
-  };
+};
 
 }
 
