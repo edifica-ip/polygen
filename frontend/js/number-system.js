@@ -1104,11 +1104,11 @@ return {
   visual: `
 
 Carry:
-${formattedCarry.padStart(totalWidth-1)}
+${formattedCarry.padStart(totalWidth-2)}
 
 ${formattedA.padStart(totalWidth-1)}
 
-+${formattedB.padStart(totalWidth - 1)}
++${formattedB.padStart(totalWidth - 2)}
 
 ${'-'.repeat(totalWidth)}
 
