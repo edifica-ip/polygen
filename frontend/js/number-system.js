@@ -1033,6 +1033,26 @@ let bInt =
 let bFrac =
   bParts[1] || '';
 
+  /* ================================
+SAVE ORIGINAL DISPLAY VALUES
+================================ */
+
+const displayA =
+
+  aFrac.length > 0
+
+  ? aInt + '.' + aFrac
+
+  : aInt;
+
+const displayB =
+
+  bFrac.length > 0
+
+  ? bInt + '.' + bFrac
+
+  : bInt;
+
 /* ================================
 EQUALIZE FRACTION LENGTH
 ================================ */
@@ -1151,9 +1171,9 @@ ${carry}
   RAW VALUES
   ================================ */
 
-  const rawA = a;
+  const rawA = displayA;
 
-  const rawB = b;
+  const rawB = displayB;
 
 let rawAnswer =
   answer.join('');
