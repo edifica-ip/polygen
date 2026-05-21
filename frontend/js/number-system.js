@@ -186,9 +186,9 @@ function generateBinaryGroupingSteps(
   steps +=
     toBase === 16
 
-    ? 'Binary to Hexadecimal (4 bit grouping)\n'
+    ? 'Step: Integer Part (4-bit grouping)\nRight to Left (←)\n--------------------------------\n'
 
-    : 'Binary to Octal (3 bit grouping)\n';
+    : 'Step: Integer Part (3-bit grouping)\nRight to Left (←)\n--------------------------------\n';
 
   // Split decimal part
   const parts =
@@ -218,12 +218,8 @@ function generateBinaryGroupingSteps(
       new RegExp(`.{1,${groupSize}}`,'g')
     );
 
-  steps += `
-Grouped Integer Part:
-
-${intGroups.join(' ')}
-
-\n`;
+  
+  steps += `${intGroups.join('  ')}\n`;
 
   let result = '';
 
@@ -258,12 +254,15 @@ ${intGroups.join(' ')}
         new RegExp(`.{1,${groupSize}}`,'g')
       );
 
-    steps += `--------------------------------
-Grouped Fractional Part:
+     steps +=
+    toBase === 16
 
-${fracGroups.join(' ')}
+    ? 'Step: Fractional Part (4-bit grouping)\nLeft to Right (→)\n--------------------------------\n'
 
-\n`;
+    : 'Step: Fractional Part (3-bit grouping)\nLeft to Right (→)\n--------------------------------\n';
+
+    
+    steps += `${fracGroups.join(' ')}\n`;
 
     result += '.';
 
@@ -272,8 +271,7 @@ ${fracGroups.join(' ')}
       const digit =
         parseInt(grp,2);
 
-      steps +=
-`${grp} → ${chars[digit]}\n`;
+      steps +=`${grp} → ${chars[digit]}\n`;
 
       result += chars[digit];
 
@@ -285,10 +283,7 @@ ${fracGroups.join(' ')}
   FINAL
   ================================ */
 
-  steps += `
-  --------------------------------
-Answer: ${result}
-`;
+  steps += `\n--------------------------------\nAnswer: ${result}\n--------------------------------`;
 
   return steps;
 
@@ -312,9 +307,9 @@ function generateGroupingSteps(value, fromBase){
   steps +=
     fromBase === 16
 
-    ? 'Step: Integer Part (4-bit grouping) Right to Left (←)\n--------------------------------\n'
+    ? 'Step: Integer Part (in 4-bit binary)\nLeft to Right (→)\n--------------------------------\n'
 
-    : 'Step: Integer Part (3-bit grouping) Right to Left (←)\n--------------------------------\n';
+    : 'Step: Integer Part (in 3-bit binary)\nLeft to Right (→)\n--------------------------------\n';
 
   for(let ch of value){
 
@@ -326,9 +321,9 @@ function generateGroupingSteps(value, fromBase){
        steps +=
     fromBase === 16
 
-    ? '\nStep: Fractional Part (4-bit grouping) Left to Right (→)\n--------------------------------\n'
+    ? '\nStep: Fractional Part (in 4-bit binary)\nLeft to Right (→)\n--------------------------------\n'
 
-    : '\nStep: Fractional Part (3-bit grouping) Left to Right (→)\n--------------------------------\n';
+    : '\nStep: Fractional Part (in 3-bit binary)\nLeft to Right (→)\n--------------------------------\n';
 
       continue;
 
@@ -349,8 +344,7 @@ function generateGroupingSteps(value, fromBase){
 
   }
 
-  steps += `
---------------------------------\nAnswer: ${result}\n--------------------------------`;
+  steps += `\n--------------------------------\nAnswer: ${result}\n--------------------------------`;
 
   return steps;
 
