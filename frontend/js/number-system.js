@@ -1206,6 +1206,36 @@ if(fracLen > 0){
   const rawCarry =
     carryRow.join('');
 
+
+  /* ================================
+INSERT DECIMAL IN CARRY ROW
+================================ */
+
+let formattedCarryRaw =
+  rawCarry;
+
+if(fracLen > 0){
+
+  formattedCarryRaw =
+
+    formattedCarryRaw.slice(
+      0,
+      formattedCarryRaw.length - fracLen
+    )
+
+    +
+
+    ' '
+
+    +
+
+    formattedCarryRaw.slice(
+      formattedCarryRaw.length - fracLen
+    );
+
+}
+
+  
   /* ================================
   WIDTH CALCULATION
   ================================ */
@@ -1234,7 +1264,7 @@ if(fracLen > 0){
 
 Carry:
 ${spaced(
-  rawCarry.padStart(totalDigits - 1)
+  formattedCarryRaw.padStart(totalDigits - 1)
 )}
 
 ${spaced(
