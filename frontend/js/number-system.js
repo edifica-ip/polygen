@@ -1132,16 +1132,7 @@ const sum =
     carryRow.unshift(carry);
 
    steps += `
-${a[i]} + ${b[i]}
-
-${
-incomingCarry > 0
-? `+ Carry(${incomingCarry})`
-: ''
-}
-
-= ${sum}
-
+${a[i]} + ${b[i]} ${incomingCarry > 0 ? `+ Carry(${incomingCarry})`: ''} = ${sum}
 Write: ${valueToChar(digit)}, Carry: ${carry}\n`;
 
   }
@@ -1261,7 +1252,7 @@ if(fracLen > 0){
     result:
       rawAnswer,
 
-    visual: ` ${spaced(rawA.padStart(totalDigits) )} + ${spaced(rawB.padStart(totalDigits - 1))} →
+    visual: `${rawA}  +  ${rawB} →
 
 Carry (↓)
 ${spaced(
@@ -1280,7 +1271,6 @@ ${spaced(
 )}
 ${'-'.repeat(totalDigits * 2 + 2 )}
 
-================================
 ${steps}
 
 `
