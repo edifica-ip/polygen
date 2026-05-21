@@ -1131,8 +1131,18 @@ const sum =
 
     carryRow.unshift(carry);
 
+
+    let baseExplanation = '';
+
+if(base !== 10){
+
+  baseExplanation = `${sum}₁₀ = ${convertDecimalToBaseLocal(sum, base)}₍base ${base}₎`;
+
+}
+    
+
    steps += `
-${a[i]} + ${b[i]} ${incomingCarry > 0 ? `+ Carry(${incomingCarry})`: ''} = ${sum}
+${a[i]} + ${b[i]} ${incomingCarry > 0 ? `+ Carry(${incomingCarry})`: ''} = ${baseExplanation}
 Write: ${valueToChar(digit)}, Carry: ${carry}\n`;
 
   }
@@ -1252,13 +1262,12 @@ if(fracLen > 0){
     result:
       rawAnswer,
 
-    visual: `${rawA}  +  ${rawB} →
+    visual: `Base ${base} Addition:\n${rawA}  +  ${rawB} →
 
 Carry (↓)
 ${spaced(
   formattedCarryRaw.padStart(totalDigits - 1)
 )}
-
 ${spaced(
   rawA.padStart(totalDigits)
 )}
