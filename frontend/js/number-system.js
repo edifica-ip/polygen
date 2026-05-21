@@ -1128,10 +1128,18 @@ b = b.padStart(maxLen,'0');
 
     carryRow.unshift(carry);
 
-    steps += `${a[i]} + ${b[i]} = ${sum}
-Write: ${valueToChar(digit)}, Carry: ${carry}
---------------------------------
-`;
+   steps += `
+${a[i]} + ${b[i]}
+
+${
+incomingCarry > 0
+? `+ Carry(${incomingCarry})`
+: ''
+}
+
+= ${sum}
+
+Write: ${valueToChar(digit)}, Carry: ${carry}\n`;
 
   }
 
