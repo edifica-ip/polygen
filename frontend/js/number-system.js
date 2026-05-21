@@ -1068,17 +1068,16 @@ ${carry}
 
   }
 
- const formattedA =
-  a.split('').join(' ');
+ const formattedA = a;
+  
 
-const formattedB =
-  b.split('').join(' ');
+const formattedB =b;
 
 const formattedAnswer =
-  answer.join(' ');
+  answer.join('');
 
 const formattedCarry =
-  carryRow.join(' ');
+  carryRow.join('');
 
 /* ================================
 ALIGN WIDTH
@@ -1212,17 +1211,15 @@ ${borrow}
 
   }
 
-  const formattedA =
-  a.split('').join(' ');
+  const formattedA =a;
 
-const formattedB =
-  b.split('').join(' ');
+const formattedB =b;
 
 const formattedAnswer =
-  answer.join(' ');
+  answer.join('');
 
 const formattedBorrow =
-  borrowRow.join(' ');
+  borrowRow.join('');
 
 const totalWidth =
   Math.max(
@@ -1378,18 +1375,16 @@ ${carry}
 
   }
 
-const formattedA =
-  a.split('').join(' ');
+const formattedA =a;
 
-const formattedB =
-  b.split('').join(' ');
+const formattedB =b;
 
 const formattedResult =
-  finalResult.split('').join(' ');
+  finalResult.split('').join('');
 
 const formattedPartials =
   partials.map(
-    x => x.split('').join(' ')
+    x => x.split('').join('')
   );
 
 const totalWidth =
