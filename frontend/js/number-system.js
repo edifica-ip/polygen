@@ -1104,7 +1104,7 @@ return {
   visual: `
 
 Carry:
-${formattedCarry.padStart(totalWidth)}
+${formattedCarry.padStart(totalWidth-1)}
 
 ${formattedA.padStart(totalWidth-1)}
 
@@ -1112,7 +1112,7 @@ ${formattedA.padStart(totalWidth-1)}
 
 ${'-'.repeat(totalWidth)}
 
-${formattedAnswer.padStart(totalWidth)}
+${formattedAnswer.padStart(totalWidth-1)}
 
 ================================
 
@@ -1753,7 +1753,7 @@ ${res.remainder}
     resultDiv.innerHTML =
       `✅ Result: ${finalAnswer}`;
 
-    stepsDiv.innerHTML =
+    stepsDiv.textContent  =
       visualSteps;
 
   }
