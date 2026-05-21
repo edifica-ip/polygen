@@ -1212,25 +1212,54 @@ ${borrow}
 
   }
 
-  return {
+  const formattedA =
+  a.split('').join(' ');
 
-    result:
-      (negative ? '-' : '')
-      + answer.join(''),
+const formattedB =
+  b.split('').join(' ');
 
-    visual: `
+const formattedAnswer =
+  answer.join(' ');
+
+const formattedBorrow =
+  borrowRow.join(' ');
+
+const totalWidth =
+  Math.max(
+
+    formattedA.length,
+
+    formattedB.length + 2,
+
+    formattedAnswer.length + 2,
+
+    formattedBorrow.length
+
+  );
+
+return {
+
+  result:
+    (negative ? '-' : '')
+    + answer.join(''),
+
+  visual: `
 
 Borrow:
-${borrowRow.join(' ')}
+${formattedBorrow.padStart(totalWidth)}
 
-   ${a.split('').join(' ')}
+${formattedA.padStart(totalWidth)}
 
--  ${b.split('').join(' ')}
+- ${formattedB.padStart(totalWidth - 1)}
 
-${'-'.repeat(maxLen*2+8)}
+${'-'.repeat(totalWidth)}
 
-   ${negative ? '-' : ''}
-${answer.join(' ')}
+${(
+  negative
+  ? '- '
+  : ''
+) + formattedAnswer}
+.padStart(totalWidth)
 
 ================================
 
@@ -1238,7 +1267,7 @@ ${steps}
 
 `
 
-  };
+};
 
 }
 
@@ -1353,25 +1382,55 @@ ${carry}
     result:
       finalResult,
 
-    visual: `
+const formattedA =
+  a.split('').join(' ');
+
+const formattedB =
+  b.split('').join(' ');
+
+const formattedResult =
+  finalResult.split('').join(' ');
+
+const formattedPartials =
+  partials.map(
+    x => x.split('').join(' ')
+  );
+
+const totalWidth =
+  Math.max(
+
+    formattedA.length,
+
+    formattedB.length + 2,
+
+    formattedResult.length,
+
+    ...formattedPartials.map(
+      x => x.length
+    )
+
+  );
+
+visual: `
 
 PROCESS 1:
 DIRECT BASE MULTIPLICATION
 
-      ${a.split('').join(' ')}
+${formattedA.padStart(totalWidth)}
 
-×     ${b.split('').join(' ')}
+× ${formattedB.padStart(totalWidth - 1)}
 
-================================
+${'-'.repeat(totalWidth)}
 
-${partials.map(
-x => x.split('').join(' ')
+${formattedPartials.map(
+x => x.padStart(totalWidth)
 ).join('\n')}
 
-================================
+${'-'.repeat(totalWidth)}
 
-Result:
-${finalResult.split('').join(' ')}
+${formattedResult.padStart(totalWidth)}
+
+================================
 
 ${workSteps}
 
@@ -1477,20 +1536,34 @@ ${current}
     remainder:
       current,
 
-    visual: `
+    const divisionLine =
+  `${b} ) ${a}`;
+
+const totalWidth =
+  Math.max(
+
+    divisionLine.length,
+
+    quotient.length,
+
+    current.length
+
+  );
+
+visual: `
 
 PROCESS 1:
 DIRECT BASE DIVISION
 
-        ${b} ) ${a}
+${divisionLine.padStart(totalWidth)}
 
-================================
+${'-'.repeat(totalWidth)}
 
 Quotient:
-${quotient}
+${quotient.padStart(totalWidth)}
 
 Remainder:
-${current}
+${current.padStart(totalWidth)}
 
 ================================
 
