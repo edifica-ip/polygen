@@ -1140,11 +1140,11 @@ ${spaced(
   rawA.padStart(totalDigits)
 )}
 
-+${spaced(
++ ${spaced(
   rawB.padStart(totalDigits - 1)
 )}
 
-${'-'.repeat(totalDigits * 2)}
+${'-'.repeat(totalDigits * 2 + 2 )}
 
 ${spaced(
   rawAnswer.padStart(totalDigits)
