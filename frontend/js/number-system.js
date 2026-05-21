@@ -1106,9 +1106,9 @@ return {
 Carry:
 ${formattedCarry.padStart(totalWidth)}
 
-${formattedA.padStart(totalWidth)}
+${formattedA.padStart(totalWidth-1)}
 
-+ ${formattedB.padStart(totalWidth - 1)}
++${formattedB.padStart(totalWidth - 1)}
 
 ${'-'.repeat(totalWidth)}
 
