@@ -422,8 +422,7 @@ function generateAnyToDecimalSteps(value, base){
 
   if(fracPart){
 
-    steps += `
-    Step 2: Fractional Part\n--------------------------------\n`;
+    steps += `\nStep 2: Fractional Part\n--------------------------------\n`;
 
     for(
       let i = 0;
@@ -459,12 +458,9 @@ function generateAnyToDecimalSteps(value, base){
   FINAL
   ================================ */
 
-  steps += `
-  Step 3: Expanded Form (Optional)\n--------------------------------\n
-${expansions.join('\n+ ')}
+  steps += `\nStep 3: Expanded Form (Optional)\n--------------------------------\n${expansions.join('\n+ ')}
 
-Step 4: Finding Sum\n--------------------------------\n
-${calculations.join(' + ')}
+Step 4: Finding Sum\n--------------------------------\n${calculations.join(' + ')}
 
 --------------------------------
 Answer: ${decimal}\n-------------------------------- `;
