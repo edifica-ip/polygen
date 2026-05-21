@@ -1377,11 +1377,6 @@ ${carry}
 
   }
 
-  return {
-
-    result:
-      finalResult,
-
 const formattedA =
   a.split('').join(' ');
 
@@ -1411,7 +1406,12 @@ const totalWidth =
 
   );
 
-visual: `
+return {
+
+  result:
+    finalResult,
+
+  visual: `
 
 PROCESS 1:
 DIRECT BASE MULTIPLICATION
@@ -1436,7 +1436,7 @@ ${workSteps}
 
 `
 
-  };
+};
 
 }
 
@@ -1528,15 +1528,7 @@ ${current}
     quotient.replace(/^0+/,'')
     || '0';
 
-  return {
-
-    result:
-      quotient,
-
-    remainder:
-      current,
-
-    const divisionLine =
+ const divisionLine =
   `${b} ) ${a}`;
 
 const totalWidth =
@@ -1550,7 +1542,15 @@ const totalWidth =
 
   );
 
-visual: `
+return {
+
+  result:
+    quotient,
+
+  remainder:
+    current,
+
+  visual: `
 
 PROCESS 1:
 DIRECT BASE DIVISION
@@ -1571,7 +1571,7 @@ ${steps}
 
 `
 
-  };
+};
 
 }
 
