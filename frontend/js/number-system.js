@@ -28,6 +28,15 @@ tabButtons.forEach(btn => {
 
   btn.addEventListener('click', () => {
 
+    document.getElementById(
+  'globalResult'
+).innerHTML = '';
+
+document.getElementById(
+  'globalSteps'
+).innerHTML = '';
+
+    
     if(window.innerWidth <= 900){
 
   tabsMenu.classList.remove(
