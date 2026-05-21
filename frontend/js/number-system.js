@@ -1255,11 +1255,12 @@ ${formattedA.padStart(totalWidth)}
 ${'-'.repeat(totalWidth)}
 
 ${(
-  negative
-  ? '- '
-  : ''
-) + formattedAnswer}
-.padStart(totalWidth)
+  (
+    negative
+    ? '- '
+    : ''
+  ) + formattedAnswer
+).padStart(totalWidth)}
 
 ================================
 
