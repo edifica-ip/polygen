@@ -552,7 +552,7 @@ function generateDecimalToAnySteps(num, base){
 
   if(fractionPart > 0){
 
-    steps += `\nStep: Fractional Part:\n--------------------------------\n`;
+    steps += `\nStep: Fractional Part\n--------------------------------\n`;
 
     let limit = 10;
 
@@ -611,7 +611,7 @@ steps +=
   steps += `\nStep: Reading the Remainder(s)\n--------------------------------\nUpwards (↑): ${remainders.join('')}`
   
   if(fractionPart > 0)
-  steps += `\nStep: Reading the Integer(s)\n--------------------------------\nDownwards (↓): ${fractionalDigits.join('')}\n`
+  steps += `\n\nStep: Reading the Integer(s)\n--------------------------------\nDownwards (↓): ${fractionalDigits.join('')}\n`
 
   steps += `\n--------------------------------\nAnswer: ${finalAnswer}\n--------------------------------`;
 
