@@ -1113,8 +1113,11 @@ b = b.padStart(maxLen,'0');
     const d2 =
       charToValue(b[i]);
 
-    const sum =
-      d1 + d2 + carry;
+    const incomingCarry =
+  carry;
+
+const sum =
+  d1 + d2 + incomingCarry;
 
     const digit =
       sum % base;
