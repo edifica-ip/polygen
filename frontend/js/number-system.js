@@ -923,7 +923,770 @@ function convertFromDecimal(decimal, base){
 ARITHMETIC
 ========================================= */
 
+
+
+/* =========================================
+BASE DIGIT HELPERS
+========================================= */
+
+function charToValue(ch){
+
+  return '0123456789ABCDEF'
+    .indexOf(ch.toUpperCase());
+
+}
+
+function valueToChar(val){
+
+  return '0123456789ABCDEF'[val];
+
+}
+
+/* =========================================
+COMPARE TWO BASE NUMBERS
+Returns:
+1  => a > b
+0  => equal
+-1 => a < b
+========================================= */
+
+function compareBaseNumbers(a,b){
+
+  a =
+    a.replace(/^0+/,'') || '0';
+
+  b =
+    b.replace(/^0+/,'') || '0';
+
+  if(a.length > b.length){
+
+    return 1;
+
+  }
+
+  if(a.length < b.length){
+
+    return -1;
+
+  }
+
+  for(let i=0;i<a.length;i++){
+
+    const d1 =
+      charToValue(a[i]);
+
+    const d2 =
+      charToValue(b[i]);
+
+    if(d1 > d2){
+
+      return 1;
+
+    }
+
+    if(d1 < d2){
+
+      return -1;
+
+    }
+
+  }
+
+  return 0;
+
+}
+
+
+/* =========================================
+TRUE BASE ADDITION
+========================================= */
+
+function addInBase(a,b,base){
+
+  a = a.toUpperCase();
+  b = b.toUpperCase();
+
+  const maxLen =
+    Math.max(a.length,b.length);
+
+  a = a.padStart(maxLen,'0');
+  b = b.padStart(maxLen,'0');
+
+  let carry = 0;
+
+  let answer = [];
+
+  let carryRow = [];
+
+  let steps = '';
+
+  for(let i=maxLen-1;i>=0;i--){
+
+    const d1 =
+      charToValue(a[i]);
+
+    const d2 =
+      charToValue(b[i]);
+
+    const sum =
+      d1 + d2 + carry;
+
+    const digit =
+      sum % base;
+
+    carry =
+      Math.floor(sum/base);
+
+    answer.unshift(
+      valueToChar(digit)
+    );
+
+    carryRow.unshift(carry);
+
+    steps += `
+${a[i]} + ${b[i]}
++ Carry
+
+= ${sum}
+
+Write:
+${valueToChar(digit)}
+
+Carry:
+${carry}
+
+--------------------------------
+`;
+
+  }
+
+  if(carry){
+
+    answer.unshift(
+      valueToChar(carry)
+    );
+
+  }
+
+  return {
+
+    result:
+      answer.join(''),
+
+    visual: `
+
+Carry:
+${carryRow.join(' ')}
+
+   ${a.split('').join(' ')}
+
++  ${b.split('').join(' ')}
+
+${'-'.repeat(maxLen*2+8)}
+
+   ${answer.join(' ')}
+
+================================
+
+${steps}
+
+`
+
+  };
+
+}
+
+
+/* =========================================
+TRUE BASE SUBTRACTION
+========================================= */
+
+function subtractInBase(a,b,base){
+
+  a = a.toUpperCase();
+  b = b.toUpperCase();
+
+  let negative = false;
+
+  if(compareBaseNumbers(a,b) < 0){
+
+    negative = true;
+
+    let temp = a;
+
+    a = b;
+    b = temp;
+
+  }
+
+  const maxLen =
+    Math.max(a.length,b.length);
+
+  a = a.padStart(maxLen,'0');
+  b = b.padStart(maxLen,'0');
+
+  let borrow = 0;
+
+  let answer = [];
+
+  let borrowRow = [];
+
+  let steps = '';
+
+  for(let i=maxLen-1;i>=0;i--){
+
+    let d1 =
+      charToValue(a[i]) - borrow;
+
+    const d2 =
+      charToValue(b[i]);
+
+    borrow = 0;
+
+    if(d1 < d2){
+
+      d1 += base;
+
+      borrow = 1;
+
+    }
+
+    const diff =
+      d1 - d2;
+
+    answer.unshift(
+      valueToChar(diff)
+    );
+
+    borrowRow.unshift(borrow);
+
+    steps += `
+${a[i]} - ${b[i]}
+
+Write:
+${valueToChar(diff)}
+
+Borrow:
+${borrow}
+
+--------------------------------
+`;
+
+  }
+
+  while(
+    answer.length > 1 &&
+    answer[0] === '0'
+  ){
+
+    answer.shift();
+
+  }
+
+  return {
+
+    result:
+      (negative ? '-' : '')
+      + answer.join(''),
+
+    visual: `
+
+Borrow:
+${borrowRow.join(' ')}
+
+   ${a.split('').join(' ')}
+
+-  ${b.split('').join(' ')}
+
+${'-'.repeat(maxLen*2+8)}
+
+   ${negative ? '-' : ''}
+${answer.join(' ')}
+
+================================
+
+${steps}
+
+`
+
+  };
+
+}
+
+/* =========================================
+TRUE BASE MULTIPLICATION
+NO DECIMAL CONVERSION
+========================================= */
+
+function multiplyInBase(a,b,base){
+
+  a = a.toUpperCase();
+  b = b.toUpperCase();
+
+  let partials = [];
+
+  let workSteps = '';
+
+  let shift = 0;
+
+  /* =====================================
+  PARTIAL PRODUCTS
+  ===================================== */
+
+  for(let i=b.length-1;i>=0;i--){
+
+    const digitB =
+      charToValue(b[i]);
+
+    let carry = 0;
+
+    let partial = [];
+
+    workSteps += `
+================================
+Multiplying by ${b[i]}
+================================
+`;
+
+    for(let j=a.length-1;j>=0;j--){
+
+      const digitA =
+        charToValue(a[j]);
+
+      const product =
+        digitA * digitB + carry;
+
+      const digit =
+        product % base;
+
+      carry =
+        Math.floor(product / base);
+
+      partial.unshift(
+        valueToChar(digit)
+      );
+
+      workSteps += `
+${a[j]} × ${b[i]}
+
+= ${product}
+
+Write:
+${valueToChar(digit)}
+
+Carry:
+${carry}
+
+--------------------------------
+`;
+
+    }
+
+    if(carry){
+
+      partial.unshift(
+        valueToChar(carry)
+      );
+
+    }
+
+    /* SHIFT */
+
+    partial =
+      partial.join('')
+      + '0'.repeat(shift);
+
+    partials.push(partial);
+
+    shift++;
+
+  }
+
+  /* =====================================
+  FINAL ADDITION
+  ===================================== */
+
+  let finalResult = '0';
+
+  for(let p of partials){
+
+    finalResult =
+      addInBase(
+        finalResult,
+        p,
+        base
+      ).result;
+
+  }
+
+  return {
+
+    result:
+      finalResult,
+
+    visual: `
+
+PROCESS 1:
+DIRECT BASE MULTIPLICATION
+
+      ${a.split('').join(' ')}
+
+×     ${b.split('').join(' ')}
+
+================================
+
+${partials.map(
+x => x.split('').join(' ')
+).join('\n')}
+
+================================
+
+Result:
+${finalResult.split('').join(' ')}
+
+${workSteps}
+
+`
+
+  };
+
+}
+
+
+/* =========================================
+TRUE BASE DIVISION
+LONG DIVISION
+NO DECIMAL CONVERSION
+========================================= */
+
+function divideInBase(a,b,base){
+
+  a = a.toUpperCase();
+  b = b.toUpperCase();
+
+  if(b === '0'){
+
+    return {
+
+      result: 'Undefined',
+
+      visual:
+        'Division By Zero'
+
+    };
+
+  }
+
+  let quotient = '';
+
+  let current = '';
+
+  let steps = '';
+
+  /* =====================================
+  LONG DIVISION
+  ===================================== */
+
+  for(let i=0;i<a.length;i++){
+
+    current += a[i];
+
+    current =
+      current.replace(/^0+/,'')
+      || '0';
+
+    let count = 0;
+
+    while(
+
+      compareBaseNumbers(
+        current,
+        b
+      ) >= 0
+
+    ){
+
+      current =
+        subtractInBase(
+          current,
+          b,
+          base
+        ).result
+        .replace('-','');
+
+      count++;
+
+    }
+
+    quotient +=
+      valueToChar(count);
+
+    steps += `
+Current Portion:
+${current}
+
+Quotient Digit:
+${valueToChar(count)}
+
+Remainder:
+${current}
+
+--------------------------------
+`;
+
+  }
+
+  quotient =
+    quotient.replace(/^0+/,'')
+    || '0';
+
+  return {
+
+    result:
+      quotient,
+
+    remainder:
+      current,
+
+    visual: `
+
+PROCESS 1:
+DIRECT BASE DIVISION
+
+        ${b} ) ${a}
+
+================================
+
+Quotient:
+${quotient}
+
+Remainder:
+${current}
+
+================================
+
+${steps}
+
+`
+
+  };
+
+}
+
+
+
+/* =========================================
+ARITHMETIC
+TRUE BASE ARITHMETIC
+NO DECIMAL CONVERSION
+========================================= */
+
 function calculateArithmetic(){
+
+  const num1 =
+    document.getElementById('num1')
+    .value
+    .trim()
+    .toUpperCase();
+
+  const num2 =
+    document.getElementById('num2')
+    .value
+    .trim()
+    .toUpperCase();
+
+  const base =
+    parseInt(
+      document.getElementById(
+        'arithBase'
+      ).value
+    );
+
+  const operation =
+    document.getElementById(
+      'operation'
+    ).value;
+
+  const resultDiv =
+    document.getElementById(
+      'globalResult'
+    );
+
+  const stepsDiv =
+    document.getElementById(
+      'globalSteps'
+    );
+
+  try{
+
+    /* ================================
+    VALIDATION
+    ================================ */
+
+    if(
+      !isValidForBase(num1, base)
+      ||
+      !isValidForBase(num2, base)
+    ){
+
+      throw new Error(
+        'Invalid Input'
+      );
+
+    }
+
+    let finalAnswer = '';
+
+    let visualSteps = '';
+
+    /* ================================
+    ADDITION
+    ================================ */
+
+    if(operation === '+'){
+
+      const res =
+        addInBase(
+          num1,
+          num2,
+          base
+        );
+
+      finalAnswer =
+        res.result;
+
+      visualSteps =
+        res.visual;
+
+    }
+
+    /* ================================
+    SUBTRACTION
+    ================================ */
+
+    else if(operation === '-'){
+
+      const res =
+        subtractInBase(
+          num1,
+          num2,
+          base
+        );
+
+      finalAnswer =
+        res.result;
+
+      visualSteps =
+        res.visual;
+
+    }
+
+    /* ================================
+    MULTIPLICATION
+    ================================ */
+
+    else if(operation === '*'){
+
+      const res =
+        multiplyInBase(
+          num1,
+          num2,
+          base
+        );
+
+      finalAnswer =
+        res.result;
+
+      visualSteps =
+        res.visual;
+
+    }
+
+    /* ================================
+    DIVISION
+    ================================ */
+
+    else if(operation === '/'){
+
+      const res =
+        divideInBase(
+          num1,
+          num2,
+          base
+        );
+
+      finalAnswer =
+        res.result;
+
+      visualSteps =
+        res.visual;
+
+      if(res.remainder !== undefined){
+
+        visualSteps += `
+
+================================
+
+FINAL ANSWER
+
+Quotient:
+${res.result}
+
+Remainder:
+${res.remainder}
+`;
+
+      }
+
+    }
+
+    else{
+
+      throw new Error(
+        'Unsupported Operation'
+      );
+
+    }
+
+    /* ================================
+    RESULT
+    ================================ */
+
+    resultDiv.innerHTML =
+      `✅ Result: ${finalAnswer}`;
+
+    stepsDiv.innerHTML =
+      visualSteps;
+
+  }
+
+  catch(err){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Input';
+
+    stepsDiv.innerHTML =
+      err.message;
+
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function calculateArithmetic2(){
 
   const num1 = document.getElementById('num1').value.trim();
   const num2 = document.getElementById('num2').value.trim();
