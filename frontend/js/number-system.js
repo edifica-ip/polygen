@@ -108,8 +108,7 @@ function generateCrossGroupingSteps(
   ================================ */
 
   steps +=
-`STEP 1:
-Convert to Binary\n\n`;
+`Step 1: Convert to Binary\n\n`;
 
   const binarySteps =
     generateGroupingSteps(
@@ -144,8 +143,7 @@ Convert to Binary\n\n`;
 
 ================================
 
-STEP 2:
-Convert Binary to ${
+Step 2: Convert Binary to ${
   toBase === 16
     ? 'Hexadecimal'
     : 'Octal'
