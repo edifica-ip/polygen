@@ -996,6 +996,11 @@ function compareBaseNumbers(a,b){
 
 }
 
+function spaced(str){
+
+  return str.split('').join(' ');
+
+}
 
 /* =========================================
 TRUE BASE ADDITION
@@ -1019,6 +1024,10 @@ function addInBase(a,b,base){
   let carryRow = [];
 
   let steps = '';
+
+  /* ================================
+  MAIN ADDITION LOOP
+  ================================ */
 
   for(let i=maxLen-1;i>=0;i--){
 
@@ -1060,6 +1069,10 @@ ${carry}
 
   }
 
+  /* ================================
+  FINAL CARRY
+  ================================ */
+
   if(carry){
 
     answer.unshift(
@@ -1068,51 +1081,74 @@ ${carry}
 
   }
 
- const formattedA = a;
-  
+  /* ================================
+  SPACING HELPER
+  ================================ */
 
-const formattedB =b;
+  function spaced(str){
 
-const formattedAnswer =
-  answer.join('');
+    return str.split('').join(' ');
 
-const formattedCarry =
-  carryRow.join('');
+  }
 
-/* ================================
-ALIGN WIDTH
-================================ */
+  /* ================================
+  RAW VALUES
+  ================================ */
 
-const totalWidth =
-  Math.max(
+  const rawA = a;
 
-    formattedA.length,
+  const rawB = b;
 
-    formattedB.length + 2,
+  const rawAnswer =
+    answer.join('');
 
-    formattedAnswer.length,
+  const rawCarry =
+    carryRow.join('');
 
-    formattedCarry.length
+  /* ================================
+  WIDTH CALCULATION
+  ================================ */
 
-  );
+  const totalDigits =
+    Math.max(
 
-return {
+      rawA.length,
 
-  result:
-    answer.join(''),
+      rawB.length + 1,
 
-  visual: `
+      rawAnswer.length
+
+    );
+
+  /* ================================
+  VISUAL OUTPUT
+  ================================ */
+
+  return {
+
+    result:
+      rawAnswer,
+
+    visual: `
 
 Carry:
-${formattedCarry.padStart(totalWidth-2)}
+${spaced(
+  rawCarry.padStart(totalDigits - 1)
+)}
 
-${formattedA.padStart(totalWidth-1)}
+${spaced(
+  rawA.padStart(totalDigits)
+)}
 
-+${formattedB.padStart(totalWidth - 2)}
++${spaced(
+  rawB.padStart(totalDigits - 1)
+)}
 
-${'-'.repeat(totalWidth)}
+${'-'.repeat(totalDigits * 2)}
 
-${formattedAnswer.padStart(totalWidth-1)}
+${spaced(
+  rawAnswer.padStart(totalDigits)
+)}
 
 ================================
 
@@ -1120,10 +1156,9 @@ ${steps}
 
 `
 
-};
+  };
 
 }
-
 
 /* =========================================
 TRUE BASE SUBTRACTION
