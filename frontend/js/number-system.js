@@ -258,9 +258,7 @@ ${intGroups.join(' ')}
         new RegExp(`.{1,${groupSize}}`,'g')
       );
 
-    steps += `
-    --------------------------------
-
+    steps += `--------------------------------
 Grouped Fractional Part:
 
 ${fracGroups.join(' ')}
@@ -424,9 +422,7 @@ function generateAnyToDecimalSteps(value, base){
 
   if(fracPart){
 
-    steps += `
---------------------------------
-
+    steps += `--------------------------------
 Fractional Part:\n\n`;
 
     for(
@@ -463,19 +459,14 @@ Fractional Part:\n\n`;
   FINAL
   ================================ */
 
-  steps += `
---------------------------------
-
+  steps += `--------------------------------
 Expanded Form:
 
 ${expansions.join('\n+ ')}
-
 --------------------------------
-
 Decimal Calculation:
 
 ${calculations.join(' + ')}
-
 --------------------------------
 Answer: ${decimal} `;
 
