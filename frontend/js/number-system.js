@@ -1449,6 +1449,293 @@ NO DECIMAL CONVERSION
 
 function multiplyInBase(a,b,base){
 
+a = a.toUpperCase();
+b = b.toUpperCase();
+
+/* ================================
+SPLIT DECIMAL PARTS
+================================ */
+
+let aParts =
+  a.split('.');
+
+let bParts =
+  b.split('.');
+
+let aInt =
+  aParts[0];
+
+let aFrac =
+  aParts[1] || '';
+
+let bInt =
+  bParts[0];
+
+let bFrac =
+  bParts[1] || '';
+
+/* ================================
+SAVE DISPLAY VALUES
+================================ */
+
+const displayA =
+
+  aFrac.length > 0
+
+  ? aInt + '.' + aFrac
+
+  : aInt;
+
+const displayB =
+
+  bFrac.length > 0
+
+  ? bInt + '.' + bFrac
+
+  : bInt;
+
+/* ================================
+TOTAL FRACTION LENGTH
+================================ */
+
+const totalFracLen =
+  aFrac.length + bFrac.length;
+
+/* ================================
+REMOVE DECIMAL POINTS
+================================ */
+
+a =
+  aInt + aFrac;
+
+b =
+  bInt + bFrac;
+
+/* ================================
+SPACING HELPER
+================================ */
+
+function spaced(str){
+
+  return str.split('').join(' ');
+
+}
+
+/* ================================
+EXPLANATION
+================================ */
+
+let steps =
+  'Explanation:\n';
+
+/* ================================
+PARTIAL PRODUCTS
+================================ */
+
+let partials = [];
+
+let shift = 0;
+
+for(let i=b.length-1;i>=0;i--){
+
+  const digitB =
+    charToValue(b[i]);
+
+  let carry = 0;
+
+  let partial = [];
+
+  steps += `
+================================
+Multiplying by ${b[i]}
+================================
+`;
+
+  for(let j=a.length-1;j>=0;j--){
+
+    const digitA =
+      charToValue(a[j]);
+
+    const product =
+      digitA * digitB + carry;
+
+    const digit =
+      product % base;
+
+    carry =
+      Math.floor(product/base);
+
+    partial.unshift(
+      valueToChar(digit)
+    );
+
+    let x = ``;
+
+    if(base===2)x=`₂`;
+    if(base===8)x=`₈`;
+    if(base===16)x=`₁₆`;
+
+    let baseExplanation =
+      `${product}₁₀`;
+
+    if(base !== 10){
+
+      baseExplanation =
+`(${product})₁₀ = (${convertDecimalToBaseLocal(product,base)})${x}`;
+
+    }
+
+    steps += `
+${a[j]} × ${b[i]}
+
+${carry > 0 ? `+ Carry(${carry})` : ''}
+
+= ${baseExplanation}
+
+Write:
+${valueToChar(digit)}
+
+Carry:
+${carry}
+
+--------------------------------
+`;
+
+  }
+
+  if(carry){
+
+    partial.unshift(
+      valueToChar(carry)
+    );
+
+  }
+
+  partial =
+    partial.join('')
+    + '0'.repeat(shift);
+
+  partials.push(partial);
+
+  shift++;
+
+}
+
+/* ================================
+FINAL ADDITION
+================================ */
+
+let finalAnswer = '0';
+
+for(let p of partials){
+
+  finalAnswer =
+    addInBase(
+      finalAnswer,
+      p,
+      base
+    ).result.replace('.','');
+
+}
+
+/* ================================
+REINSERT DECIMAL POINT
+================================ */
+
+if(totalFracLen > 0){
+
+  finalAnswer =
+
+    finalAnswer.slice(
+      0,
+      finalAnswer.length - totalFracLen
+    )
+
+    +
+
+    '.'
+
+    +
+
+    finalAnswer.slice(
+      finalAnswer.length - totalFracLen
+    );
+
+}
+
+/* ================================
+VISUAL ALIGNMENT
+================================ */
+
+const visualPartials =
+  partials.map(x=>x);
+
+const totalDigits =
+  Math.max(
+
+    displayA.length,
+
+    displayB.length + 1,
+
+    finalAnswer.length,
+
+    ...visualPartials.map(
+      x => x.length
+    )
+
+  );
+
+/* ================================
+FINAL VISUAL
+================================ */
+
+return {
+
+  result:
+    finalAnswer,
+
+  visual: `
+
+Base ${base} Multiplication:
+
+${spaced(
+  displayA.padStart(totalDigits)
+)}
+
+× ${spaced(
+  displayB.padStart(totalDigits - 1)
+)}
+
+${'-'.repeat(totalDigits * 2 + 2)}
+
+${visualPartials.map(
+
+x => spaced(
+  x.padStart(totalDigits)
+)
+
+).join('\n')}
+
+${'-'.repeat(totalDigits * 2 + 2)}
+
+ ${spaced(
+  finalAnswer.padStart(totalDigits)
+)}
+
+================================
+
+${steps}
+
+`
+
+};
+
+}
+
+
+
+function multiplyInBase2(a,b,base){
+
   a = a.toUpperCase();
   b = b.toUpperCase();
 
