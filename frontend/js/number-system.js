@@ -100,8 +100,7 @@ function generateCrossGroupingSteps(
   toBase
 ){
 
-  let steps =
-    'Steps of Calculation:\n\n';
+  let steps =    '';
 
   /* ================================
   STEP 1
