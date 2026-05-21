@@ -1220,7 +1220,7 @@ if(fracLen > 0){
 
     formattedCarryRaw.slice(
       0,
-      formattedCarryRaw.length - fracLen - 1
+      formattedCarryRaw.length - fracLen + 1
     )
 
     +
@@ -1230,7 +1230,7 @@ if(fracLen > 0){
     +
 
     formattedCarryRaw.slice(
-      formattedCarryRaw.length - fracLen - 1
+      formattedCarryRaw.length - fracLen + 1
     );
 
 }
