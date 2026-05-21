@@ -1008,14 +1008,70 @@ TRUE BASE ADDITION
 
 function addInBase(a,b,base){
 
-  a = a.toUpperCase();
-  b = b.toUpperCase();
+a = a.toUpperCase();
+b = b.toUpperCase();
 
-  const maxLen =
-    Math.max(a.length,b.length);
+/* ================================
+SPLIT DECIMAL PARTS
+================================ */
 
-  a = a.padStart(maxLen,'0');
-  b = b.padStart(maxLen,'0');
+let aParts =
+  a.split('.');
+
+let bParts =
+  b.split('.');
+
+let aInt =
+  aParts[0];
+
+let aFrac =
+  aParts[1] || '';
+
+let bInt =
+  bParts[0];
+
+let bFrac =
+  bParts[1] || '';
+
+/* ================================
+EQUALIZE FRACTION LENGTH
+================================ */
+
+const fracLen =
+  Math.max(
+    aFrac.length,
+    bFrac.length
+  );
+
+aFrac =
+  aFrac.padEnd(fracLen,'0');
+
+bFrac =
+  bFrac.padEnd(fracLen,'0');
+
+/* ================================
+REBUILD WITHOUT DOT
+================================ */
+
+a =
+  aInt + aFrac;
+
+b =
+  bInt + bFrac;
+
+/* ================================
+PAD INTEGERS
+================================ */
+
+const maxLen =
+  Math.max(
+    a.length,
+    b.length
+  );
+
+a = a.padStart(maxLen,'0');
+
+b = b.padStart(maxLen,'0');
 
   let carry = 0;
 
@@ -1099,8 +1155,33 @@ ${carry}
 
   const rawB = b;
 
-  const rawAnswer =
-    answer.join('');
+let rawAnswer =
+  answer.join('');
+
+/* ================================
+REINSERT DECIMAL POINT
+================================ */
+
+if(fracLen > 0){
+
+  rawAnswer =
+
+    rawAnswer.slice(
+      0,
+      rawAnswer.length - fracLen
+    )
+
+    +
+
+    '.'
+
+    +
+
+    rawAnswer.slice(
+      rawAnswer.length - fracLen
+    );
+
+}
 
   const rawCarry =
     carryRow.join('');
