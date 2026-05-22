@@ -2455,7 +2455,7 @@ if(qDigit > 0){
 
   divisionVisual += `${' '.repeat(offset)}${spaced(product)}
 ${' '.repeat(offset)}${'-'.repeat(spaced(product).length)}
-${' '.repeat(offset)}${spaced(remainder)}
+${' '.repeat(offset)}${spaced(i < a.length - 1  ? remainder + a[i + 1]  : remainder)}
 `;
 
 
