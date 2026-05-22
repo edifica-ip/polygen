@@ -1521,7 +1521,7 @@ const originalD1 =
 
   }
 
- steps += ` ${a[i]} - ${b[i]} ${incomingBorrow > 0? `- Borrow (${incomingBorrow})`: ''} ${borrowed? `Borrow from next digit (+${base})`: ''} = ${baseExplanation}
+ steps += `${a[i]} - ${b[i]} ${incomingBorrow > 0? `- Borrow (${incomingBorrow})`: ''} ${borrowed? `Borrow from next digit (+${base})`: ''} = ${baseExplanation}
 Write: ${valueToChar(diff)}, Borrow: ${borrow}
 
 `;
@@ -1662,9 +1662,8 @@ ${spaced(
   rawAnswer.padStart(totalDigits)
 )}
 ${'-'.repeat(totalDigits * 2 + 2)}
-
 ${
-negative? `Final Answer = ${finalDisplayAnswer} (-ve for the initial swap)`: `${finalDisplayAnswer}`}
+negative? `Final Answer = ${finalDisplayAnswer} (-ve for the initial swap)`: `Final Answer = ${finalDisplayAnswer}`}
 
 ${steps}
 
