@@ -1304,6 +1304,342 @@ TRUE BASE SUBTRACTION
 
 function subtractInBase(a,b,base){
 
+a = a.toUpperCase();
+b = b.toUpperCase();
+
+/* ================================
+SPLIT DECIMAL PARTS
+================================ */
+
+let aParts =
+  a.split('.');
+
+let bParts =
+  b.split('.');
+
+let aInt =
+  aParts[0];
+
+let aFrac =
+  aParts[1] || '';
+
+let bInt =
+  bParts[0];
+
+let bFrac =
+  bParts[1] || '';
+
+/* ================================
+SAVE DISPLAY VALUES
+================================ */
+
+const displayA =
+
+  aFrac.length > 0
+
+  ? aInt + '.' + aFrac
+
+  : aInt;
+
+const displayB =
+
+  bFrac.length > 0
+
+  ? bInt + '.' + bFrac
+
+  : bInt;
+
+/* ================================
+EQUALIZE FRACTIONS
+================================ */
+
+const fracLen =
+  Math.max(
+    aFrac.length,
+    bFrac.length
+  );
+
+aFrac =
+  aFrac.padEnd(fracLen,'0');
+
+bFrac =
+  bFrac.padEnd(fracLen,'0');
+
+/* ================================
+REMOVE DOT
+================================ */
+
+a =
+  aInt + aFrac;
+
+b =
+  bInt + bFrac;
+
+/* ================================
+NEGATIVE HANDLING
+================================ */
+
+let negative = false;
+
+if(
+  compareBaseNumbers(a,b) < 0
+){
+
+  negative = true;
+
+  let temp = a;
+  a = b;
+  b = temp;
+
+}
+
+/* ================================
+PAD
+================================ */
+
+const maxLen =
+  Math.max(
+    a.length,
+    b.length
+  );
+
+a =
+  a.padStart(maxLen,'0');
+
+b =
+  b.padStart(maxLen,'0');
+
+/* ================================
+SPACING HELPER
+================================ */
+
+function spaced(str){
+
+  return str.split('').join(' ');
+
+}
+
+/* ================================
+MAIN SUBTRACTION
+================================ */
+
+let borrow = 0;
+
+let answer = [];
+
+let borrowRow = [];
+
+let steps =
+  'Explanation:\n';
+
+for(let i=maxLen-1;i>=0;i--){
+
+  let d1 =
+    charToValue(a[i]);
+
+  const d2 =
+    charToValue(b[i]);
+
+  const incomingBorrow =
+    borrow;
+
+  d1 -= incomingBorrow;
+
+  borrow = 0;
+
+  let borrowed = false;
+
+  if(d1 < d2){
+
+    d1 += base;
+
+    borrow = 1;
+
+    borrowed = true;
+
+  }
+
+  const diff =
+    d1 - d2;
+
+  answer.unshift(
+    valueToChar(diff)
+  );
+
+  borrowRow.unshift(borrow);
+
+  let x = ``;
+
+  if(base===2)x=`₂`;
+  if(base===8)x=`₈`;
+  if(base===16)x=`₁₆`;
+
+  let baseExplanation =
+    `${diff}₁₀`;
+
+  if(base !== 10){
+
+    baseExplanation =
+`(${diff})₁₀ = (${convertDecimalToBaseLocal(diff,base)})${x}`;
+
+  }
+
+  steps += ` ${a[i]} - ${b[i]} ${incomingBorrow > 0? `- Borrow(${incomingBorrow})`: ''}${borrowed? `Borrow from next digit (+${base})`: ''}= ${baseExplanation}
+Write: ${valueToChar(diff)}, Borrow: ${borrow}
+
+`;
+
+}
+
+/* ================================
+REMOVE LEADING ZEROS
+================================ */
+
+while(
+
+  answer.length > 1
+  &&
+  answer[0] === '0'
+
+){
+
+  answer.shift();
+
+}
+
+/* ================================
+FINAL ANSWER
+================================ */
+
+let rawAnswer =
+  answer.join('');
+
+/* ================================
+REINSERT DOT
+================================ */
+
+if(fracLen > 0){
+
+  rawAnswer =
+
+    rawAnswer.slice(
+      0,
+      rawAnswer.length - fracLen
+    )
+
+    +
+
+    '.'
+
+    +
+
+    rawAnswer.slice(
+      rawAnswer.length - fracLen
+    );
+
+}
+
+/* ================================
+NEGATIVE
+================================ */
+
+if(negative){
+
+  rawAnswer =
+    '-' + rawAnswer;
+
+}
+
+/* ================================
+BORROW DISPLAY
+================================ */
+
+const rawBorrow =
+  borrowRow.join('');
+
+let formattedBorrowRaw =
+  rawBorrow;
+
+if(fracLen > 0){
+
+  formattedBorrowRaw =
+
+    formattedBorrowRaw.slice(
+      0,
+      formattedBorrowRaw.length - fracLen + 1
+    )
+
+    +
+
+    ' '
+
+    +
+
+    formattedBorrowRaw.slice(
+      formattedBorrowRaw.length - fracLen + 1
+    );
+
+}
+
+/* ================================
+VISUAL WIDTH
+================================ */
+
+const totalDigits =
+  Math.max(
+
+    displayA.length,
+
+    displayB.length + 1,
+
+    rawAnswer.length
+
+  ) + 1;
+
+/* ================================
+FINAL VISUAL
+================================ */
+
+return {
+
+  result:
+    rawAnswer,
+
+  visual: `Base ${base} Subtraction:\n${displayA}  -  ${displayB} →
+
+Borrow (↓)
+${spaced(
+  formattedBorrowRaw.padStart(totalDigits - 1)
+)}
+
+${spaced(
+  displayA.padStart(totalDigits)
+)}
+- ${spaced(
+  displayB.padStart(totalDigits - 1)
+)}
+${'-'.repeat(totalDigits * 2 + 2)}
+${spaced(
+  rawAnswer.padStart(totalDigits)
+)}
+${'-'.repeat(totalDigits * 2 + 2)}
+
+${steps}
+
+`
+
+};
+
+}
+
+
+
+
+
+
+
+function subtractInBase2(a,b,base){
+
   a = a.toUpperCase();
   b = b.toUpperCase();
 
