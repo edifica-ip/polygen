@@ -1457,9 +1457,7 @@ NEGATIVE EXPLANATION
 
 if(negative){
 
-  steps += `(${displayA} < ${displayB}, so we swap the numbers to find ${visualA} - ${visualB}
-Answer will be negative.
-)`;
+  steps += `Note: (${displayA} < ${displayB}, so we swap the numbers to find ${visualA} - ${visualB}. Answer will be negative.)\n\n`;
 
 }
   
@@ -1582,13 +1580,15 @@ if(fracLen > 0){
 NEGATIVE
 ================================ */
 
+let finalDisplayAnswer =
+  rawAnswer;
+
 if(negative){
 
-  rawAnswer =
+  finalDisplayAnswer =
     '-' + rawAnswer;
 
 }
-
 /* ================================
 BORROW DISPLAY
 ================================ */
@@ -1644,7 +1644,7 @@ return {
   result:
     rawAnswer,
 
-  visual: `Base ${base} Subtraction:\n${displayA}  -  ${displayB} → ${negative ? `- (${visualA} - ${visualB}) →` : ''}
+  visual: `Base ${base} Subtraction:\n${displayA}  -  ${displayB} = ${negative ? `- (${visualA} - ${visualB}) →` : ''}
 
 Borrow (↓)
 ${spaced(
@@ -1662,6 +1662,10 @@ ${spaced(
   rawAnswer.padStart(totalDigits)
 )}
 ${'-'.repeat(totalDigits * 2 + 2)}
+
+
+${
+negative? `Final Answer = ${finalDisplayAnswer} (-ve for the initial swap)`: ''}
 
 ${steps}
 
