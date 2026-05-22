@@ -2452,16 +2452,9 @@ if(qDigit > 0){
     + (i * 2);
 
   divisionVisual += `
-${' '.repeat(offset)}
-${spaced(product)}
-
-${' '.repeat(offset - 5)}
-${'_'.repeat(
-spaced(product).length + 6
-)}
-
-${' '.repeat(offset)}
-${spaced(remainder)}
+${' '.repeat(offset)}${spaced(product)}
+${' '.repeat(offset)}${'-'.repeat(spaced(product).length)}
+${' '.repeat(offset)}${spaced(remainder)}
 `;
 
 }
@@ -2521,7 +2514,11 @@ if(quotient === ''){
 
 
    divisionVisual = `
-${spaced(b)} ) ${spaced(a)} ( ${spaced(quotient)}
+${' '.repeat(
+spaced(b).length + spaced(a).length - spaced(quotient).length + 4
+)}${spaced(quotient)}
+
+${spaced(b)} ) ${spaced(a)}
 `
 + divisionVisual;
 
