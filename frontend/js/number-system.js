@@ -2512,7 +2512,7 @@ if(quotient === ''){
 
 
   divisionVisual = `${' '.repeat(  spaced(b).length  + spaced(a).length  - spaced(quotient).length  + 2)}${spaced(quotient)}
-${spaced(b)} ) ${spaced(a)}`
+${spaced(b)} ) ${spaced(a)}\n`
 + divisionVisual;
 
 
