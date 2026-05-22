@@ -2247,13 +2247,274 @@ ${workSteps}
 }
 
 
+
+
+
+
+
+
+
+function divideInBase(a,b,base){
+
+a = a.toUpperCase();
+b = b.toUpperCase();
+
+/* ================================
+DIVIDE BY ZERO
+================================ */
+
+if(
+  b === '0'
+  ||
+  b === '0.0'
+){
+
+  throw new Error(
+    'Division by zero not allowed'
+  );
+
+}
+
+/* ================================
+REMOVE DECIMALS
+================================ */
+
+let aParts =
+  a.split('.');
+
+let bParts =
+  b.split('.');
+
+let aFrac =
+  aParts[1] || '';
+
+let bFrac =
+  bParts[1] || '';
+
+const shift =
+  Math.max(
+    aFrac.length,
+    bFrac.length
+  );
+
+a =
+  a.replace('.','')
+  .padEnd(
+    a.replace('.','').length
+    + (shift - aFrac.length),
+    '0'
+  );
+
+b =
+  b.replace('.','')
+  .padEnd(
+    b.replace('.','').length
+    + (shift - bFrac.length),
+    '0'
+  );
+
+/* ================================
+SPACING HELPER
+================================ */
+
+function spaced(str){
+
+  return str.split('').join(' ');
+
+}
+
+/* ================================
+LONG DIVISION
+================================ */
+
+let quotient = '';
+
+let current = '';
+
+let steps =
+  'Explanation:\n\n';
+
+let stepVisuals = [];
+
+for(let i=0;i<a.length;i++){
+
+  current += a[i];
+
+  current =
+    removeLeadingZeros(current);
+
+  let qDigit = 0;
+
+  while(
+    compareBaseNumbers(
+      current,
+      b
+    ) >= 0
+  ){
+
+    current =
+      subtractInBase(
+        current,
+        b,
+        base
+      ).result.replace('-','');
+
+    qDigit++;
+
+  }
+
+  quotient +=
+    valueToChar(qDigit);
+
+  stepVisuals.push(`
+Current Dividend:
+${current || '0'}
+
+Quotient Digit:
+${valueToChar(qDigit)}
+
+--------------------------------
+`);
+
+  let x = ``;
+
+  if(base===2)x=`₂`;
+  if(base===8)x=`₈`;
+  if(base===16)x=`₁₆`;
+
+  let baseExplanation =
+    `${qDigit}₁₀`;
+
+  if(base !== 10){
+
+    baseExplanation =
+`(${qDigit})₁₀ = (${convertDecimalToBaseLocal(qDigit,base)})${x}`;
+
+  }
+
+  steps += `
+Bring down:
+${a[i]}
+
+Current:
+${current || '0'}
+
+Quotient digit:
+${baseExplanation}
+
+Remainder:
+${current || '0'}
+
+================================
+`;
+
+}
+
+/* ================================
+REMOVE LEADING ZEROS
+================================ */
+
+quotient =
+  removeLeadingZeros(
+    quotient
+  );
+
+if(quotient === ''){
+
+  quotient = '0';
+
+}
+
+/* ================================
+FINAL VISUAL WIDTH
+================================ */
+
+const totalDigits =
+  Math.max(
+    a.length,
+    b.length,
+    quotient.length
+  ) + 2;
+
+/* ================================
+FINAL VISUAL
+================================ */
+
+return {
+
+  result:
+    quotient,
+
+  visual: `Base ${base} Division:
+
+${a} ÷ ${b}
+
+${'-'.repeat(totalDigits * 2)}
+
+Quotient:
+${spaced(quotient)}
+
+Divisor:
+${spaced(b)}
+
+Dividend:
+${spaced(a)}
+
+Remainder:
+${spaced(current || '0')}
+
+${'-'.repeat(totalDigits * 2)}
+
+${steps}
+
+`
+
+};
+
+}
+
+/* ================================
+HELPER
+================================ */
+
+function removeLeadingZeros(str){
+
+  while(
+    str.length > 1
+    &&
+    str[0] === '0'
+  ){
+
+    str =
+      str.slice(1);
+
+  }
+
+  return str;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* =========================================
 TRUE BASE DIVISION
 LONG DIVISION
 NO DECIMAL CONVERSION
 ========================================= */
 
-function divideInBase(a,b,base){
+function divideInBase2(a,b,base){
 
   a = a.toUpperCase();
   b = b.toUpperCase();
