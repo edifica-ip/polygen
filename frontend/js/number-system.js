@@ -2250,11 +2250,302 @@ ${workSteps}
 
 
 
-
-
-
-
 function divideInBase(a,b,base){
+
+a = a.toUpperCase();
+b = b.toUpperCase();
+
+/* ================================
+DIVIDE BY ZERO
+================================ */
+
+if(
+  b === '0'
+  ||
+  b === '0.0'
+){
+
+  throw new Error(
+    'Division by zero not allowed'
+  );
+
+}
+
+/* ================================
+REMOVE DECIMAL
+================================ */
+
+let aParts =
+  a.split('.');
+
+let bParts =
+  b.split('.');
+
+let aFrac =
+  aParts[1] || '';
+
+let bFrac =
+  bParts[1] || '';
+
+const shift =
+  Math.max(
+    aFrac.length,
+    bFrac.length
+  );
+
+a =
+  a.replace('.','')
+  .padEnd(
+    a.replace('.','').length
+    + (shift - aFrac.length),
+    '0'
+  );
+
+b =
+  b.replace('.','')
+  .padEnd(
+    b.replace('.','').length
+    + (shift - bFrac.length),
+    '0'
+  );
+
+/* ================================
+HELPERS
+================================ */
+
+function spaced(str){
+
+  return str.split('').join(' ');
+
+}
+
+function removeLeadingZeros(str){
+
+  while(
+    str.length > 1
+    &&
+    str[0] === '0'
+  ){
+
+    str =
+      str.slice(1);
+
+  }
+
+  return str;
+
+}
+
+/* ================================
+LONG DIVISION
+================================ */
+
+let quotient = '';
+
+let current = '';
+
+let steps =
+  'Explanation:\n\n';
+
+let visualSteps = '';
+
+for(let i=0;i<a.length;i++){
+
+  current += a[i];
+
+  current =
+    removeLeadingZeros(current);
+
+  let qDigit = 0;
+
+  let subtractionSteps = '';
+
+  /* ================================
+  REPEATED SUBTRACTION
+  ================================ */
+
+  while(
+    compareBaseNumbers(
+      current,
+      b
+    ) >= 0
+  ){
+
+    subtractionSteps += `
+${current}
+- ${b}
+${'-'.repeat(
+Math.max(
+current.length,
+b.length
+) + 2
+)}
+`;
+
+    current =
+      subtractInBase(
+        current,
+        b,
+        base
+      )
+      .result
+      .replace('-','');
+
+    current =
+      removeLeadingZeros(current);
+
+    subtractionSteps += `
+${current}
+
+`;
+
+    qDigit++;
+
+  }
+
+  quotient +=
+    valueToChar(qDigit);
+
+  /* ================================
+  VISUAL STEP
+  ================================ */
+
+  visualSteps += `
+
+================================
+
+Step ${i + 1}
+
+Current Dividend:
+${spaced(current || '0')}
+
+${valueToChar(qDigit)} × ${b}
+
+Repeated Subtraction:
+
+${subtractionSteps}
+
+Quotient Digit:
+${valueToChar(qDigit)}
+
+Remainder:
+${current || '0'}
+
+`;
+
+  /* ================================
+  EXPLANATION
+  ================================ */
+
+  let x = ``;
+
+  if(base===2)x=`₂`;
+  if(base===8)x=`₈`;
+  if(base===16)x=`₁₆`;
+
+  let baseExplanation =
+    `${qDigit}₁₀`;
+
+  if(base !== 10){
+
+    baseExplanation =
+`(${qDigit})₁₀ = (${convertDecimalToBaseLocal(qDigit,base)})${x}`;
+
+  }
+
+  steps += `
+
+Bring down:
+${a[i]}
+
+Current Working Number:
+${current || '0'}
+
+${b} goes into current number
+
+${baseExplanation} times
+
+Remainder:
+${current || '0'}
+
+--------------------------------
+
+`;
+
+}
+
+/* ================================
+REMOVE LEADING ZEROS
+================================ */
+
+quotient =
+  removeLeadingZeros(
+    quotient
+  );
+
+if(quotient === ''){
+
+  quotient = '0';
+
+}
+
+/* ================================
+FINAL VISUAL WIDTH
+================================ */
+
+const totalDigits =
+  Math.max(
+    a.length,
+    b.length,
+    quotient.length
+  ) + 2;
+
+/* ================================
+FINAL VISUAL
+================================ */
+
+return {
+
+  result:
+    quotient,
+
+  visual: `
+
+Base ${base} Division:
+
+${a} ÷ ${b}
+
+${'='.repeat(totalDigits * 2)}
+
+Quotient:
+${spaced(quotient)}
+
+Divisor:
+${spaced(b)}
+
+Dividend:
+${spaced(a)}
+
+Final Remainder:
+${spaced(current || '0')}
+
+${'='.repeat(totalDigits * 2)}
+
+${visualSteps}
+
+${'='.repeat(totalDigits * 2)}
+
+${steps}
+
+`
+
+};
+
+}
+
+
+
+function divideInBase1(a,b,base){
 
 a = a.toUpperCase();
 b = b.toUpperCase();
