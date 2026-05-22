@@ -43,7 +43,7 @@ document.getElementById(
     'show'
   );
 
-}
+    }
     
     // Remove active state
     tabButtons.forEach(b => {
