@@ -2819,7 +2819,23 @@ if(qDigit > 0){
 
   divisionVisual += `${' '.repeat(offset)}${spaced(product)}
 ${' '.repeat(offset)}${'-'.repeat(spaced(product).length)}
-${' '.repeat(offset + 1)}${spaced(i < a.length - 1  ? remainder + a[i + 1]  : remainder)}
+${' '.repeat(
+  offset
+  +
+  (
+    spaced(product).length
+    -
+    spaced(
+      i < a.length - 1
+      ? remainder + a[i + 1]
+      : remainder
+    ).length
+  )
+)}${spaced(
+  i < a.length - 1
+  ? remainder + a[i + 1]
+  : remainder
+)}
 `;
 
 
