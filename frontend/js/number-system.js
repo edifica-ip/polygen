@@ -2248,9 +2248,311 @@ ${workSteps}
 
 
 
-
-
 function divideInBase(a,b,base){
+
+a = a.toUpperCase();
+b = b.toUpperCase();
+
+/* ================================
+DIVIDE BY ZERO
+================================ */
+
+if(
+  b === '0'
+  ||
+  b === '0.0'
+){
+
+  throw new Error(
+    'Division by zero not allowed'
+  );
+
+}
+
+/* ================================
+REMOVE DECIMAL
+================================ */
+
+let aParts =
+  a.split('.');
+
+let bParts =
+  b.split('.');
+
+let aFrac =
+  aParts[1] || '';
+
+let bFrac =
+  bParts[1] || '';
+
+const shift =
+  Math.max(
+    aFrac.length,
+    bFrac.length
+  );
+
+a =
+  a.replace('.','')
+  .padEnd(
+    a.replace('.','').length
+    + (shift - aFrac.length),
+    '0'
+  );
+
+b =
+  b.replace('.','')
+  .padEnd(
+    b.replace('.','').length
+    + (shift - bFrac.length),
+    '0'
+  );
+
+/* ================================
+HELPERS
+================================ */
+
+function spaced(str){
+
+  return str.split('').join(' ');
+
+}
+
+function removeLeadingZeros(str){
+
+  while(
+    str.length > 1
+    &&
+    str[0] === '0'
+  ){
+
+    str =
+      str.slice(1);
+
+  }
+
+  return str;
+
+}
+
+/* ================================
+LONG DIVISION
+================================ */
+
+let quotient = '';
+
+let current = '';
+
+let workRows = [];
+
+let explanation =
+  'Explanation:\n\n';
+
+for(let i=0;i<a.length;i++){
+
+  current += a[i];
+
+  current =
+    removeLeadingZeros(current);
+
+  let qDigit = 0;
+
+  let tempCurrent =
+    current;
+
+  /* ================================
+  FIND QUOTIENT DIGIT
+  ================================ */
+
+  while(
+    compareBaseNumbers(
+      tempCurrent,
+      b
+    ) >= 0
+  ){
+
+    tempCurrent =
+      subtractInBase(
+        tempCurrent,
+        b,
+        base
+      )
+      .result
+      .replace('-','');
+
+    tempCurrent =
+      removeLeadingZeros(
+        tempCurrent
+      );
+
+    qDigit++;
+
+  }
+
+  quotient +=
+    valueToChar(qDigit);
+
+  /* ================================
+  MULTIPLICATION ROW
+  ================================ */
+
+  let product =
+    multiplyInBase(
+      b,
+      valueToChar(qDigit),
+      base
+    )
+    .result
+    .replace('.','');
+
+  /* ================================
+  SUBTRACTION
+  ================================ */
+
+  let remainder =
+    subtractInBase(
+      current,
+      product,
+      base
+    )
+    .result
+    .replace('-','');
+
+  remainder =
+    removeLeadingZeros(
+      remainder
+    );
+
+  /* ================================
+  VISUAL ALIGNMENT
+  ================================ */
+
+  let offset =
+    i * 2 + 2;
+
+  workRows.push(
+`
+${' '.repeat(offset)}
+${spaced(product)}
+
+${' '.repeat(offset)}
+${'-'.repeat(
+spaced(product).length
+)}
+
+${' '.repeat(offset)}
+${spaced(remainder)}
+`
+  );
+
+  /* ================================
+  UPDATE CURRENT
+  ================================ */
+
+  current =
+    remainder;
+
+  /* ================================
+  EXPLANATION
+  ================================ */
+
+  explanation += `
+Step ${i + 1}
+
+Current Number:
+${current || '0'}
+
+${b} goes into current number
+
+${valueToChar(qDigit)} time(s)
+
+Subtract:
+${current} - ${product}
+
+Remainder:
+${remainder}
+
+================================
+
+`;
+
+}
+
+/* ================================
+REMOVE LEADING ZEROS
+================================ */
+
+quotient =
+  removeLeadingZeros(
+    quotient
+  );
+
+if(quotient === ''){
+
+  quotient = '0';
+
+}
+
+/* ================================
+FINAL WIDTH
+================================ */
+
+const width =
+  Math.max(
+    a.length,
+    b.length,
+    quotient.length
+  ) * 2 + 10;
+
+/* ================================
+FINAL VISUAL
+================================ */
+
+return {
+
+  result:
+    quotient,
+
+  visual: `
+
+Base ${base} Division:
+
+${spaced(
+  quotient.padStart(
+    Math.floor(
+      width / 2
+    )
+  )
+)}
+
+${' '.repeat(
+spaced(b).length
+)}${'-'.repeat(
+spaced(a).length + 6
+)}
+
+${spaced(b)} ) ${spaced(a)}
+
+${workRows.join('\n')}
+
+${'='.repeat(width)}
+
+Final Quotient:
+${spaced(quotient)}
+
+Final Remainder:
+${spaced(current || '0')}
+
+${'='.repeat(width)}
+
+${explanation}
+
+`
+
+};
+
+}
+
+function divideInBase3(a,b,base){
 
 a = a.toUpperCase();
 b = b.toUpperCase();
