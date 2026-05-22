@@ -2855,7 +2855,7 @@ VISUAL ALIGNMENT
 
 
   
-if(qDigit > 1){
+if(qDigit > 0){
 
   let offset =
     spaced(b).length
