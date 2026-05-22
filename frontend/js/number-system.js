@@ -1672,7 +1672,7 @@ const totalDigits =
       x => x.length
     )
 
-  );
+  ) + 1;
 
 /* ================================
 FINAL VISUAL
@@ -1695,7 +1695,7 @@ ${'-'.repeat(totalDigits * 2 + 2)}
 ${visualPartials.map(x => spaced(x.padStart(totalDigits))).join('\n')}
 ${'-'.repeat(totalDigits * 2 + 2)}
  ${spaced(
-  finalAnswer.padStart(totalDigits-2)
+  finalAnswer.padStart(totalDigits)
 )}
 ${'-'.repeat(totalDigits * 2 + 2)}
 
