@@ -2248,6 +2248,17 @@ ${workSteps}
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 function divideInBase(a,b,base){
 
 a = a.toUpperCase();
@@ -2426,6 +2437,12 @@ for(let i=0;i<a.length;i++){
   VISUAL ALIGNMENT
   ================================ */
 
+ /* ================================
+VISUAL ALIGNMENT
+================================ */
+
+if(qDigit > 0){
+
   let offset =
     i * 2 + 2;
 
@@ -2444,6 +2461,7 @@ ${spaced(remainder)}
 `
   );
 
+}
   /* ================================
   UPDATE CURRENT
   ================================ */
@@ -2512,9 +2530,7 @@ return {
   result:
     quotient,
 
-  visual: `
-
-Base ${base} Division:
+  visual: ` Base ${base} Division: 
 
 ${spaced(
   quotient.padStart(
