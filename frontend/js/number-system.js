@@ -1436,7 +1436,9 @@ for(let i=maxLen-1;i>=0;i--){
 
   let d1 =
     charToValue(a[i]);
-
+const originalD1 =
+  d1;
+  
   const d2 =
     charToValue(b[i]);
 
@@ -1484,7 +1486,7 @@ for(let i=maxLen-1;i>=0;i--){
 
   }
 
-  steps += ` ${a[i]} - ${b[i]} ${incomingBorrow > 0? `- Borrow(${incomingBorrow})`: ''}${borrowed? `Borrow from next digit (+${base})`: ''}= ${baseExplanation}
+ steps += ` ${a[i]} - ${b[i]} ${incomingBorrow > 0? `- Borrow (${incomingBorrow})`: ''} ${borrowed? `Borrow from next digit (+${base})`: ''} = ${baseExplanation}
 Write: ${valueToChar(diff)}, Borrow: ${borrow}
 
 `;
