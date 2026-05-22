@@ -2771,10 +2771,10 @@ let explanation =
 for(let i=0;i<a.length;i++){
 
   current += a[i];
-if(current !== '0'){
+
   current = 
     removeLeadingZeros(current);
-}
+
   let qDigit = 0;
 
   let tempCurrent =
