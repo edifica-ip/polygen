@@ -1683,7 +1683,7 @@ return {
   result:
     finalAnswer,
 
-  visual: `Base ${base} Multiplication:\n${displayA}  ×  ${displayA} →
+  visual: `Base ${base} Multiplication:\n${displayA}  ×  ${displayB} →
 
 ${spaced(
   displayA.padStart(totalDigits)
@@ -1695,7 +1695,7 @@ ${'-'.repeat(totalDigits * 2 + 2)}
 ${visualPartials.map(x => spaced(x.padStart(totalDigits))).join('\n')}
 ${'-'.repeat(totalDigits * 2 + 2)}
  ${spaced(
-  finalAnswer.padStart(totalDigits-1)
+  finalAnswer.padStart(totalDigits)
 )}
 ${'-'.repeat(totalDigits * 2 + 2)}
 
