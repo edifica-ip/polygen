@@ -2542,10 +2542,11 @@ return {
 
   
 visual: `Base ${base} Division:\n${a} ÷ ${b} →\n
-${divisionVisual}${'-'.repeat(width)}
+${divisionVisual}
+${'-'.repeat(width)}
 Quotient: ${spaced(quotient)}
 Remainder: ${spaced(current || '0')}
-${divisionVisual}${'-'.repeat(width)}
+${'-'.repeat(width)}
 `
 
 };
