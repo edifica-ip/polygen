@@ -1585,20 +1585,9 @@ Multiplying by ${b[i]}
 
     }
 
-    steps += `
-${a[j]} × ${b[i]}
+    steps += `${a[j]} × ${b[i]} ${carry > 0 ? `+ Carry(${carry})` : ''} = ${baseExplanation}
+Write: ${valueToChar(digit)}, Carry: ${carry}
 
-${carry > 0 ? `+ Carry(${carry})` : ''}
-
-= ${baseExplanation}
-
-Write:
-${valueToChar(digit)}
-
-Carry:
-${carry}
-
---------------------------------
 `;
 
   }
@@ -1694,39 +1683,23 @@ return {
   result:
     finalAnswer,
 
-  visual: `
-
-Base ${base} Multiplication:
+  visual: `Base ${base} Multiplication:\n${displayA}  ×  ${displayA} →
 
 ${spaced(
   displayA.padStart(totalDigits)
 )}
-
 × ${spaced(
   displayB.padStart(totalDigits - 1)
 )}
-
 ${'-'.repeat(totalDigits * 2 + 2)}
-
-${visualPartials.map(
-
-x => spaced(
-  x.padStart(totalDigits)
-)
-
-).join('\n')}
-
+${visualPartials.map(x => spaced(x.padStart(totalDigits))).join('\n')}
 ${'-'.repeat(totalDigits * 2 + 2)}
-
  ${spaced(
   finalAnswer.padStart(totalDigits)
 )}
+${'-'.repeat(totalDigits * 2 + 2)}
 
-================================
-
-${steps}
-
-`
+${steps}`
 
 };
 
