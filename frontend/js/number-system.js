@@ -2855,7 +2855,10 @@ VISUAL ALIGNMENT
 
 
   
-if(quotient.length > 1){
+if(compareBaseNumbers(
+    previousCurrent,
+    b
+  ) >= 0){
 
   let offset =
     spaced(b).length
