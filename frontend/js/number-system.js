@@ -2831,8 +2831,7 @@ ${' '.repeat(
       : remainder
     ).length
   )
-  + 1
-)}${spaced(
+  )}${spaced(
   i < a.length - 1
   ? remainder + a[i + 1]
   : remainder
