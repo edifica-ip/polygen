@@ -1349,6 +1349,17 @@ const displayB =
 
   : bInt;
 
+  /* ================================
+VISUAL DISPLAY VALUES
+================================ */
+
+let visualA =
+  displayA;
+
+let visualB =
+  displayB;
+
+  
 /* ================================
 EQUALIZE FRACTIONS
 ================================ */
@@ -1391,6 +1402,14 @@ if(
   a = b;
   b = temp;
 
+   let tempVisual =
+    visualA;
+
+  visualA =
+    visualB;
+
+  visualB =
+    tempVisual;
 }
 
 /* ================================
@@ -1430,7 +1449,25 @@ let answer = [];
 let borrowRow = [];
 
 let steps =
-  'Explanation:\n';
+  'Explanation:\n\n';
+
+  /* ================================
+NEGATIVE EXPLANATION
+================================ */
+
+if(negative){
+
+  steps += `(${displayA} < ${displayB}, so we swap the numbers to find ${visualA} - ${visualB}
+Answer will be negative.
+)`;
+
+}
+  
+  /* ================================
+NEGATIVE EXPLANATION
+================================ */
+
+}
 
 for(let i=maxLen-1;i>=0;i--){
 
@@ -1607,7 +1644,7 @@ return {
   result:
     rawAnswer,
 
-  visual: `Base ${base} Subtraction:\n${displayA}  -  ${displayB} →
+  visual: `Base ${base} Subtraction:\n${displayA}  -  ${displayB} → if(negative){ - (${displayB}  -  ${displayA}) → }
 
 Borrow (↓)
 ${spaced(
@@ -1615,10 +1652,10 @@ ${spaced(
 )}
 
 ${spaced(
-  displayA.padStart(totalDigits)
+  visualA.padStart(totalDigits)
 )}
 - ${spaced(
-  displayB.padStart(totalDigits - 1)
+  visualB.padStart(totalDigits - 1)
 )}
 ${'-'.repeat(totalDigits * 2 + 2)}
 ${spaced(
