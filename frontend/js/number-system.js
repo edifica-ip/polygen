@@ -2771,10 +2771,10 @@ let explanation =
 for(let i=0;i<a.length;i++){
 
   current += a[i];
-
-  current =
+if(current !== '0'){
+  current = 
     removeLeadingZeros(current);
-
+}
   let qDigit = 0;
 
   let tempCurrent =
@@ -2855,7 +2855,7 @@ VISUAL ALIGNMENT
 
 
   
-if(quotient.length > 1){
+if(quotient.length >= 1){
 
   let offset =
     spaced(b).length
