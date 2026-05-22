@@ -2358,6 +2358,9 @@ let workRows = [];
 let explanation =
   'Explanation:\n\n';
 
+   let divisionVisual = '';
+
+ 
 for(let i=0;i<a.length;i++){
 
   current += a[i];
@@ -2466,6 +2469,10 @@ ${spaced(remainder)}
   UPDATE CURRENT
   ================================ */
 
+  const previousCurrent =
+  current;
+
+  
   current =
     remainder;
 
@@ -2477,14 +2484,14 @@ ${spaced(remainder)}
 Step ${i + 1}
 
 Current Number:
-${current || '0'}
+${previousCurrent  || '0'}
 
 ${b} goes into current number
 
 ${valueToChar(qDigit)} time(s)
 
 Subtract:
-${current} - ${product}
+${previousCurrent} - ${product}
 
 Remainder:
 ${remainder}
@@ -2494,6 +2501,8 @@ ${remainder}
 `;
 
 }
+
+ 
 
 /* ================================
 REMOVE LEADING ZEROS
@@ -2510,6 +2519,14 @@ if(quotient === ''){
 
 }
 
+
+   divisionVisual = `
+${spaced(b)} ) ${spaced(a)} ( ${spaced(quotient)}
+`
++ divisionVisual;
+
+
+  
 /* ================================
 FINAL WIDTH
 ================================ */
@@ -2521,11 +2538,7 @@ const width =
     quotient.length
   ) * 2 + 10;
 
-  let divisionVisual = '';
-
-divisionVisual += `
-${spaced(b)} ) ${spaced(a)} ( ${spaced(quotient)}
-`;
+ 
 /* ================================
 FINAL VISUAL
 ================================ */
@@ -2559,6 +2572,19 @@ ${explanation}
 };
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function divideInBase3(a,b,base){
 
@@ -2799,6 +2825,10 @@ if(quotient === ''){
 
 }
 
+
+
+
+  
 /* ================================
 FINAL VISUAL WIDTH
 ================================ */
