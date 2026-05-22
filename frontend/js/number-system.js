@@ -2490,21 +2490,66 @@ while(
   VISUAL
   ================================ */
 
-  if(qDigit > 0){
+ if(quotient.replace('.','').length > 1){
 
-    let offset =
-      spaced(b).length
-      + 3
-      + (i * 2);
+  let offset =
+    spaced(b).length
+    + 3
+    + ((i - previousCurrent.length + 1) * 2);
 
-    divisionVisual += `
-${' '.repeat(offset)}${spaced(product)}
-${' '.repeat(offset)}${'-'.repeat(spaced(product).length)}
-${' '.repeat(offset + 1)}${spaced(remainder)}
+  divisionVisual += `
+${' '.repeat(offset)}${spaced(
+  product.padStart(
+    previousCurrent.length,
+    '0'
+  )
+)}
+${' '.repeat(offset)}${'-'.repeat(
+  Math.max(
+    3,
+    spaced(
+      product.padStart(
+        previousCurrent.length,
+        '0'
+      )
+    ).length
+  )
+)}
+${' '.repeat(
+  offset
+  +
+  (
+    spaced(
+      product.padStart(
+        previousCurrent.length,
+        '0'
+      )
+    ).length
+    -
+    spaced(
+      (
+        i < a.length - 1
+      )
+      ? remainder + a[i + 1]
+      : remainder
+    ).length
+  )
+  +
+  (
+    i < a.length - 1
+    ? 2
+    : 0
+  )
+)}${spaced(
+  (
+    i < a.length - 1
+  )
+  ? remainder + a[i + 1]
+  : remainder
+)}
 `;
 
-  }
-
+}
   /* ================================
   UPDATE CURRENT
   ================================ */
