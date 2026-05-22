@@ -1663,9 +1663,8 @@ ${spaced(
 )}
 ${'-'.repeat(totalDigits * 2 + 2)}
 
-
 ${
-negative? `Final Answer = ${finalDisplayAnswer} (-ve for the initial swap)`: ''}
+negative? `Final Answer = ${finalDisplayAnswer} (-ve for the initial swap)`: `${finalDisplayAnswer}`}
 
 ${steps}
 
