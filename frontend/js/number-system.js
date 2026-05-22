@@ -2539,7 +2539,7 @@ return {
     quotient,
 
   
-visual: `Base ${base} Division:\n
+visual: `Base ${base} Division:\n${a} ÷ ${b} →\n
 ${divisionVisual}
 ${'='.repeat(width)}
 
