@@ -1694,7 +1694,7 @@ ${spaced(
 ${'-'.repeat(totalDigits * 2 + 2)}
 ${visualPartials.map(x => spaced(x.padStart(totalDigits))).join('\n')}
 ${'-'.repeat(totalDigits * 2 + 2)}
- ${spaced(
+${spaced(
   finalAnswer.padStart(totalDigits)
 )}
 ${'-'.repeat(totalDigits * 2 + 2)}
