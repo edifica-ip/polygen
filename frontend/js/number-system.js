@@ -2872,7 +2872,7 @@ ${' '.repeat(
     -
     spaced(
       i < a.length - 1
-      ? removeLeadingZeros(remainder + a[i + 1])
+      ? remainder === '0'? remainder + a[i + 1]:removeLeadingZeros(remainder + a[i + 1])
       : remainder
     ).length
   )
@@ -2884,7 +2884,7 @@ ${' '.repeat(
   )
   )}${spaced(
   i < a.length - 1
-  ? removeLeadingZeros(remainder + a[i + 1])
+  ? remainder === '0' ? remainder + a[i + 1]:removeLeadingZeros(remainder + a[i + 1])
   : remainder
 )}
 `;
