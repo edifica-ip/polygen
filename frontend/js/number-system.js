@@ -2455,7 +2455,7 @@ if(qDigit > 0){
 
   divisionVisual += `${' '.repeat(offset)}${spaced(product)}
 ${' '.repeat(offset)}${'-'.repeat(spaced(product).length)}
-${' '.repeat(offset+1)}${spaced(i < a.length - 1  ? remainder + a[i + 1]  : remainder)}
+${' '.repeat(offset+2)}${spaced(i < a.length - 1  ? remainder + a[i + 1]  : remainder)}
 `;
 
 
@@ -2542,16 +2542,12 @@ return {
 
   
 visual: `Base ${base} Division:\n${a} ÷ ${b} →\n
-${divisionVisual}
-${'='.repeat(width)}
-
-Final Quotient:
+${divisionVisual}${'-'.repeat(width)}
+Quotient:
 ${spaced(quotient)}
-
-Final Remainder:
+Remainder:
 ${spaced(current || '0')}
-
-${'='.repeat(width)}`
+`
 
 };
 
