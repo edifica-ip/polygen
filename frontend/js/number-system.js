@@ -2074,9 +2074,7 @@ ${'-'.repeat(totalDigits * 2 + 2)}
 ${spaced(
   finalAnswer.padStart(totalDigits)
 )}
-${'-'.repeat(totalDigits * 2 + 2)}
-
-${steps}`
+${'-'.repeat(totalDigits * 2 + 2)}`
 
 };
 
