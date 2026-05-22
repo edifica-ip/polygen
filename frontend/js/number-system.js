@@ -2453,11 +2453,9 @@ if(qDigit > 0){
     + 3
     + ((i - previousCurrent.length + 1) * 2);
 
-  divisionVisual += `
-${' '.repeat(offset)}${spaced(product)}
+  divisionVisual += `${' '.repeat(offset)}${spaced(product)}
 ${' '.repeat(offset)}${'-'.repeat(spaced(product).length)}
-${' '.repeat(offset)}${spaced(remainder)}
-`;
+${' '.repeat(offset)}${spaced(remainder)}`;
 
 }
 
@@ -2512,16 +2510,8 @@ if(quotient === ''){
 }
 
 
-  divisionVisual = `
-${' '.repeat(
-  spaced(b).length
-  + spaced(a).length
-  - spaced(quotient).length
-  + 2
-)}${spaced(quotient)}
-
-${spaced(b)} ) ${spaced(a)}
-`
+  divisionVisual = `${' '.repeat(  spaced(b).length  + spaced(a).length  - spaced(quotient).length  + 2)}${spaced(quotient)}
+${spaced(b)} ) ${spaced(a)}`
 + divisionVisual;
 
 
@@ -2548,12 +2538,8 @@ return {
     quotient,
 
   
-visual: `
-
-Base ${base} Division:
-
+visual: `Base ${base} Division:\n
 ${divisionVisual}
-
 ${'='.repeat(width)}
 
 Final Quotient:
@@ -2562,11 +2548,7 @@ ${spaced(quotient)}
 Final Remainder:
 ${spaced(current || '0')}
 
-${'='.repeat(width)}
-
-${explanation}
-
-`
+${'='.repeat(width)}`
 
 };
 
