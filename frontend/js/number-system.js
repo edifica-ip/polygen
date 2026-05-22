@@ -1644,7 +1644,7 @@ return {
   result:
     rawAnswer,
 
-  visual: `Base ${base} Subtraction:\n${displayA}  -  ${displayB} → if(negative){ - (${displayB}  -  ${displayA}) → }
+  visual: `Base ${base} Subtraction:\n${displayA}  -  ${displayB} → ${negative ? `- (${visualA} - ${visualB}) →` : ''}
 
 Borrow (↓)
 ${spaced(
