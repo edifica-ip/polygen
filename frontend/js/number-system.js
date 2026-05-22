@@ -2450,13 +2450,15 @@ if(qDigit > 0){
 
   let offset =
     spaced(b).length
-    + 3
+    + 2
     + ((i - previousCurrent.length + 1) * 2);
 
-  divisionVisual =
-`${spaced(b)} ) ${spaced(a)} ( ${spaced(quotient)}\n`
-+ divisionVisual;
-  
+  divisionVisual += `
+${' '.repeat(offset)}${spaced(product)}
+${' '.repeat(offset)}${'-'.repeat(spaced(product).length)}
+${' '.repeat(offset)}${spaced(remainder)}
+`;
+
 
 
 }
@@ -2512,8 +2514,8 @@ if(quotient === ''){
 }
 
 
-  divisionVisual = `${' '.repeat(  spaced(b).length  + spaced(a).length  - spaced(quotient).length  + 2)}${spaced(quotient)}
-${spaced(b)} ) ${spaced(a)}\n`
+divisionVisual =
+`${spaced(b)} ) ${spaced(a)} ( ${spaced(quotient)}\n`
 + divisionVisual;
 
 
