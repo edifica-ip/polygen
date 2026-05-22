@@ -2353,7 +2353,7 @@ let quotient = '';
 
 let current = '';
 
-let workRows = [];
+
 
 let explanation =
   'Explanation:\n\n';
@@ -2443,13 +2443,17 @@ for(let i=0;i<a.length;i++){
  /* ================================
 VISUAL ALIGNMENT
 ================================ */
+ const previousCurrent =
+  current;
 
+
+  
 if(qDigit > 0){
 
   let offset =
     spaced(b).length
-    + 5
-    + (i * 2);
+    + 3
+    + ((i - previousCurrent.length + 1) * 2);
 
   divisionVisual += `
 ${' '.repeat(offset)}${spaced(product)}
@@ -2458,16 +2462,13 @@ ${' '.repeat(offset)}${spaced(remainder)}
 `;
 
 }
-  /* ================================
-  UPDATE CURRENT
-  ================================ */
 
-  const previousCurrent =
-  current;
+/* ================================
+UPDATE CURRENT
+================================ */
 
-  
-  current =
-    remainder;
+current =
+  remainder;
 
   /* ================================
   EXPLANATION
@@ -2513,9 +2514,12 @@ if(quotient === ''){
 }
 
 
-   divisionVisual = `
+  divisionVisual = `
 ${' '.repeat(
-spaced(b).length + spaced(a).length - spaced(quotient).length + 4
+  spaced(b).length
+  + spaced(a).length
+  - spaced(quotient).length
+  + 2
 )}${spaced(quotient)}
 
 ${spaced(b)} ) ${spaced(a)}
