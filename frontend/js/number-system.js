@@ -2444,22 +2444,22 @@ VISUAL ALIGNMENT
 if(qDigit > 0){
 
   let offset =
-    i * 2 + 2;
+    spaced(b).length
+    + 5
+    + (i * 2);
 
-  workRows.push(
-`
+  divisionVisual += `
 ${' '.repeat(offset)}
 ${spaced(product)}
 
-${' '.repeat(offset)}
-${'-'.repeat(
-spaced(product).length
+${' '.repeat(offset - 5)}
+${'_'.repeat(
+spaced(product).length + 6
 )}
 
 ${' '.repeat(offset)}
 ${spaced(remainder)}
-`
-  );
+`;
 
 }
   /* ================================
@@ -2521,6 +2521,11 @@ const width =
     quotient.length
   ) * 2 + 10;
 
+  let divisionVisual = '';
+
+divisionVisual += `
+${spaced(b)} ) ${spaced(a)} ( ${spaced(quotient)}
+`;
 /* ================================
 FINAL VISUAL
 ================================ */
@@ -2530,25 +2535,12 @@ return {
   result:
     quotient,
 
-  visual: ` Base ${base} Division: 
+  
+visual: `
 
-${spaced(
-  quotient.padStart(
-    Math.floor(
-      width / 2
-    )
-  )
-)}
+Base ${base} Division:
 
-${' '.repeat(
-spaced(b).length
-)}${'-'.repeat(
-spaced(a).length + 6
-)}
-
-${spaced(b)} ) ${spaced(a)}
-
-${workRows.join('\n')}
+${divisionVisual}
 
 ${'='.repeat(width)}
 
