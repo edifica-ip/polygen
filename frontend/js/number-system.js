@@ -2454,7 +2454,8 @@ if(qDigit > 0){
     + ((i - previousCurrent.length + 1) * 2);
 
   divisionVisual += `${' '.repeat(offset)}${spaced(product)}
-${' '.repeat(offset)}${'-'.repeat(spaced(product).length)}
+${' '.repeat(offset)}
+${'-'.repeat(spaced(product).length)}
 ${' '.repeat(offset)}${spaced(remainder)}`;
 
 }
