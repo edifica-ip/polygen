@@ -2878,7 +2878,7 @@ ${' '.repeat(
   )
   + 
    (
-    i < a.length - 1
+    i < a.length - 1 &&   remainder !== '0'
     ? 2
     : 0
   )
