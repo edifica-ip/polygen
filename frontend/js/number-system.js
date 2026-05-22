@@ -2855,7 +2855,7 @@ VISUAL ALIGNMENT
 
 
   
-if(quotient.length >= 1){
+if(quotient.length > 1){
 
   let offset =
     spaced(b).length
