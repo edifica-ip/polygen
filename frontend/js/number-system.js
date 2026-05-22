@@ -2817,13 +2817,13 @@ if(quotient.length > 1){
     + 3
     + ((i - previousCurrent.length + 1) * 2);
 
-  divisionVisual += `${' '.repeat(offset)}${spaced(product)}
-${' '.repeat(offset)}${'-'.repeat(Math.max(3,spaced(product).length))}
+  divisionVisual += `${' '.repeat(offset)}${spaced(product.padStart(previousCurrent.length,  '0'))}
+${' '.repeat(offset)}${'-'.repeat(Math.max(3,spaced(product.padStart(previousCurrent.length,'0')).length))}
 ${' '.repeat(
   offset
   +
   (
-    spaced(product).length
+    spaced(product.padStart(previousCurrent.length,'0')).length
     -
     spaced(
       i < a.length - 1
