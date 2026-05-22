@@ -2254,6 +2254,354 @@ ${workSteps}
 
 
 
+function divideInBaseDecimal(a,b,base){
+
+a = a.toUpperCase();
+b = b.toUpperCase();
+
+/* ================================
+DIVIDE BY ZERO
+================================ */
+
+if(
+  b === '0'
+  ||
+  b === '0.0'
+){
+
+  throw new Error(
+    'Division by zero not allowed'
+  );
+
+}
+
+/* ================================
+CONFIG
+================================ */
+
+const maxDecimalPlaces = 10;
+
+/* ================================
+HELPERS
+================================ */
+
+function spaced(str){
+
+  return str.split('').join(' ');
+
+}
+
+function removeLeadingZeros(str){
+
+  while(
+    str.length > 1
+    &&
+    str[0] === '0'
+  ){
+
+    str =
+      str.slice(1);
+
+  }
+
+  return str;
+
+}
+
+/* ================================
+NORMALIZE DECIMALS
+================================ */
+
+let aParts =
+  a.split('.');
+
+let bParts =
+  b.split('.');
+
+let aFrac =
+  aParts[1] || '';
+
+let bFrac =
+  bParts[1] || '';
+
+const shift =
+  Math.max(
+    aFrac.length,
+    bFrac.length
+  );
+
+a =
+  a.replace('.','')
+  .padEnd(
+    a.replace('.','').length
+    + (shift - aFrac.length),
+    '0'
+  );
+
+b =
+  b.replace('.','')
+  .padEnd(
+    b.replace('.','').length
+    + (shift - bFrac.length),
+    '0'
+  );
+
+a =
+  removeLeadingZeros(a);
+
+b =
+  removeLeadingZeros(b);
+
+/* ================================
+LONG DIVISION
+================================ */
+
+let quotient = '';
+
+let current = '';
+
+let divisionVisual = '';
+
+let explanation =
+  'Explanation:\n\n';
+
+let decimalInserted =
+  false;
+
+let decimalCount = 0;
+
+let i = 0;
+
+/* ================================
+MAIN DIVISION LOOP
+================================ */
+
+while(
+
+  i < a.length
+  ||
+  (
+    current !== '0'
+    &&
+    decimalCount < maxDecimalPlaces
+  )
+
+){
+
+  /* ================================
+  BRING DOWN DIGIT
+  ================================ */
+
+  if(i < a.length){
+
+    current += a[i];
+
+  }else{
+
+    if(!decimalInserted){
+
+      quotient += '.';
+
+      decimalInserted = true;
+
+    }
+
+    current += '0';
+
+    decimalCount++;
+
+  }
+
+  current =
+    removeLeadingZeros(current);
+
+  const previousCurrent =
+    current;
+
+  /* ================================
+  FIND QUOTIENT DIGIT
+  ================================ */
+
+  let qDigit = 0;
+
+  let tempCurrent =
+    current;
+
+  while(
+    compareBaseNumbers(
+      tempCurrent,
+      b
+    ) >= 0
+  ){
+
+    tempCurrent =
+      subtractInBase(
+        tempCurrent,
+        b,
+        base
+      )
+      .result
+      .replace('-','');
+
+    tempCurrent =
+      removeLeadingZeros(
+        tempCurrent
+      );
+
+    qDigit++;
+
+  }
+
+  quotient +=
+    valueToChar(qDigit);
+
+  /* ================================
+  PRODUCT
+  ================================ */
+
+  let product =
+    multiplyInBase(
+      b,
+      valueToChar(qDigit),
+      base
+    )
+    .result
+    .replace('.','');
+
+  /* ================================
+  REMAINDER
+  ================================ */
+
+  let remainder =
+    subtractInBase(
+      current,
+      product,
+      base
+    )
+    .result
+    .replace('-','');
+
+  remainder =
+    removeLeadingZeros(
+      remainder
+    );
+
+  /* ================================
+  VISUAL
+  ================================ */
+
+  if(qDigit > 0){
+
+    let offset =
+      spaced(b).length
+      + 3
+      + (i * 2);
+
+    divisionVisual += `
+${' '.repeat(offset)}${spaced(product)}
+${' '.repeat(offset)}${'-'.repeat(spaced(product).length)}
+${' '.repeat(offset + 1)}${spaced(remainder)}
+`;
+
+  }
+
+  /* ================================
+  UPDATE CURRENT
+  ================================ */
+
+  current =
+    remainder;
+
+  /* ================================
+  EXPLANATION
+  ================================ */
+
+  explanation += `
+Step ${i + 1}
+
+Current Number:
+${previousCurrent}
+
+${b} goes into current number
+
+${valueToChar(qDigit)} time(s)
+
+Subtract:
+${previousCurrent} - ${product}
+
+Remainder:
+${remainder}
+
+================================
+`;
+
+  i++;
+
+}
+
+/* ================================
+CLEANUP QUOTIENT
+================================ */
+
+quotient =
+  quotient.replace(/^0+(?!\.)/,'');
+
+if(
+  quotient.startsWith('.')
+){
+
+  quotient =
+    '0' + quotient;
+
+}
+
+if(quotient === ''){
+
+  quotient = '0';
+
+}
+
+/* ================================
+HEADER
+================================ */
+
+divisionVisual =
+`${spaced(b)} ) ${spaced(a)} ( ${spaced(quotient)}\n`
++ divisionVisual;
+
+/* ================================
+FINAL WIDTH
+================================ */
+
+const width =
+  Math.max(
+    a.length,
+    b.length,
+    quotient.length
+  ) * 2 + 10;
+
+/* ================================
+FINAL OUTPUT
+================================ */
+
+return {
+
+  result:
+    quotient,
+
+  visual: `Base ${base} Decimal Division:\n${a} ÷ ${b} →\n
+${divisionVisual}
+${'-'.repeat(width)}
+Quotient: ${spaced(quotient)}
+Remainder: ${spaced(current || '0')}
+${'-'.repeat(width)}
+`
+
+};
+
+}
+
+
 
 
 
@@ -2277,6 +2625,22 @@ if(
   );
 
 }
+
+  const hasDecimalInput =
+  a.includes('.')
+  ||
+  b.includes('.');
+
+if(hasDecimalInput){
+
+  return divideInBaseDecimal(
+    a,
+    b,
+    base
+  );
+
+}
+  
 
 /* ================================
 REMOVE DECIMAL
