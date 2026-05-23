@@ -2759,19 +2759,17 @@ LONG DIVISION
 let quotient = '';
 
 let current = '';
+let steps = [];
 
 
 
-let explanation =
-  'Explanation:\n\n';
-
-   let divisionVisual = '';
+   
 
  
 for(let i=0;i<a.length;i++){
 
   current += a[i];
-
+let rawCurrent = current;
   current = 
     removeLeadingZeros(current);
 
@@ -2843,59 +2841,34 @@ for(let i=0;i<a.length;i++){
       remainder
     );
 
-  /* ================================
-  VISUAL ALIGNMENT
-  ================================ */
+steps.push({
 
- /* ================================
-VISUAL ALIGNMENT
-================================ */
- const previousCurrent =
-  current;
+  rawCurrent,
+  displayCurrent: current,
 
+  current,
 
-  
-if(compareBaseNumbers(
-    previousCurrent,
-    b
-  ) >= 0){
+  qDigit: valueToChar(qDigit),
 
-  let offset =
-    spaced(b).length
-    + 3
-    + ((i - previousCurrent.length + 1) * 2);
+  currentStart:
+    i - current.length + 1,
 
-  divisionVisual += `${' '.repeat(offset)}${spaced( qDigit  === '0'? '0': product.padStart(current.length,  '0'))}
-${' '.repeat(offset)}${'-'.repeat(Math.max(3,spaced( qDigit  === '0'? '0': product.padStart(current.length,'0')).length))}
-${' '.repeat(
-  offset
-  +
-  (
-    spaced( qDigit  === '0'? '0': product.padStart(current.length,'0')).length
-    -
-    spaced(
-      i < a.length - 1
-      ? remainder === '0'? remainder + a[i + 1]: removeLeadingZeros(remainder + a[i + 1])
-      : remainder
-    ).length
-  )
-  + 
-   (
-    i < a.length - 1 &&   (remainder + a[i + 1]).length > 1
-    ? 2
-    : 0
-  )
-  )}${spaced(
-  i < a.length - 1
-  ? remainder === '0'? remainder + a[i + 1]: removeLeadingZeros(remainder + a[i + 1])
-  : remainder
-)}
-`;
+  displayProduct:
+    product.padStart(current.length, '0'),
 
+ displayRemainder:
+  remainder.padStart(current.length, '0'),
 
+nextCurrent:
+  removeLeadingZeros(remainder),
 
-}
+  product,
 
+  remainder
+
+});
+
+    
 /* ================================
 UPDATE CURRENT
 ================================ */
@@ -2903,31 +2876,7 @@ UPDATE CURRENT
 current =
   remainder;
 
-  /* ================================
-  EXPLANATION
-  ================================ */
-
-  explanation += `
-Step ${i + 1}
-
-Current Number:
-${previousCurrent  || '0'}
-
-${b} goes into current number
-
-${valueToChar(qDigit)} time(s)
-
-Subtract:
-${previousCurrent} - ${product}
-
-Remainder:
-${remainder}
-
-================================
-
-`;
-
-}
+ }
 
  
 
@@ -2936,21 +2885,213 @@ REMOVE LEADING ZEROS
 ================================ */
 
 quotient =
-  removeLeadingZeros(
-    quotient
-  );
+  removeLeadingZeros(quotient);
 
-if(quotient === ''){
+if (!quotient || /^0+$/.test(quotient)) {
 
   quotient = '0';
 
 }
 
 
-divisionVisual =
-`${spaced(b)} ) ${spaced(a)} ( ${spaced(quotient)}\n`
-+ divisionVisual;
+/* =========================================
+VISUAL LONG DIVISION
+========================================= */
 
+let divisionVisual = '';
+
+const header =
+  `${spaced(b)} ) ${spaced(a)} ( ${spaced(quotient)}`;
+
+divisionVisual += header + '\n';
+
+let started = false;
+
+for(let i = 0; i < steps.length; i++){
+
+  const step =
+    steps[i];
+
+ const currentText =
+  spaced(step.displayCurrent);
+
+  const qDigit =
+    charToValue(step.qDigit);
+
+const productText =
+  spaced(step.displayProduct);
+
+ let nextValue =
+     step.remainder || '0'
+  ;
+
+/*
+Bring down digits until
+value becomes >= divisor
+*/
+
+let nextIndex =
+  step.currentStart
+  + step.current.length;
+
+while(nextIndex < a.length){
+
+  if(nextValue === '0'){
+
+    nextValue =
+      '0' + a[nextIndex];
+
+  }else{
+
+    nextValue += a[nextIndex];
+
+  }
+
+  nextIndex++;
+
+  /*
+  Stop after first brought-down
+  digit for zero quotient step
+  */
+
+  break;
+
+}
+
+let visualNext =
+  step.nextCurrent || '0';
+
+let bringIndex =
+  step.currentStart
+  + step.current.length;
+
+if(bringIndex < a.length){
+
+  visualNext += a[bringIndex];
+
+}
+
+visualNext =
+  removeLeadingZeros(visualNext);
+
+const remainderText =
+  spaced(visualNext);
+  /*
+  Skip useless leading zero stages
+  */
+
+  /*
+Skip only leading useless zeros
+*/
+
+if(!started && qDigit === 0){
+
+  continue;
+
+}
+
+started = true;
+
+/*
+If quotient digit is 0,
+show ONLY the brought-down number
+without subtraction rows
+*/
+
+ const position =
+  spaced(a.slice(0, step.currentStart)).length;
+
+const baseOffset =
+  spaced(b).length + 3;
+
+const productIndent =
+  baseOffset
+  + position
+  + currentText.length
+  - productText.length;
+
+
+if(qDigit === 0){
+
+ const zeroText =
+  spaced(
+    step.displayRemainder +
+    a[
+      step.currentStart +
+      step.current.length
+    ]
+  );
+
+  const zeroIndent =
+    productIndent;
+
+  /*
+  Find next brought-down value
+  */
+
+let nextValue =
+  step.nextCurrent || '0';
+
+  let nextIndex =
+    step.currentStart
+    + step.current.length;
+
+  while(
+    nextIndex < a.length &&
+    compareBaseNumbers(
+      nextValue || '0',
+      b
+    ) < 0
+  ){
+
+    
+
+  nextValue += a[nextIndex];
+
+
+
+    nextIndex++;
+
+  }
+
+  divisionVisual +=
+`${' '.repeat(zeroIndent)}${zeroText}
+${' '.repeat(zeroIndent)}${'-'.repeat(
+  Math.max(
+    zeroText.length,
+    3
+  )
+)}
+${' '.repeat(
+  zeroIndent +
+  zeroText.length -
+  spaced(nextValue).length
+)}${spaced(nextValue)}
+`;
+
+  continue;
+
+}
+
+
+const lineLength =
+  Math.max(
+    productText.length,
+    3
+  );
+
+const remainderIndent =
+  productIndent +
+  currentText.length -
+  remainderText.length;
+
+divisionVisual +=
+`${' '.repeat(productIndent)}${productText}
+${' '.repeat(productIndent)}${'-'.repeat(lineLength)}
+${' '.repeat(remainderIndent)}${remainderText}
+`;
+
+}
 
   
 /* ================================
@@ -2959,10 +3100,14 @@ FINAL WIDTH
 
 const width =
   Math.max(
-    a.length,
-    b.length,
-    quotient.length
-  ) * 2 + 10;
+    divisionVisual
+      .split('\n')
+      .reduce(
+        (m,l)=>Math.max(m,l.length),
+        0
+      ),
+    30
+  );
 
  
 /* ================================
