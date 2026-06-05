@@ -1215,8 +1215,12 @@ if(fracLen > 0){
 
 }
 
-  const rawCarry =
-    carryRow.join('');
+const rawCarry =
+  carryRow
+    .slice(
+      carryRow[0] === 0 ? 1 : 0
+    )
+    .join('');
 
 
   /* ================================
@@ -1272,7 +1276,7 @@ if(fracLen > 0){
     result:
       rawAnswer,
 
-    visual: `Base ${base} Addition:\n${rawA}  +  ${rawB} →
+    visual: `${rawA}  +  ${rawB} →
 
 Carry (↓)
 ${spaced(
@@ -1290,9 +1294,7 @@ ${spaced(
 )}
 ${'-'.repeat(totalDigits * 2 + 2 )}
 
-${steps}
-
-`
+${steps}`
 
   };
 
@@ -6948,3 +6950,2933 @@ if(
   );
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+DECIMAL TAB TOGGLE
+========================================= */
+
+function toggleDecimalMode(mode){
+
+  const conversion =
+    document.getElementById(
+      'decimalConversionGroup'
+    );
+
+  const arithmetic =
+    document.getElementById(
+      'decimalArithmeticGroup'
+    );
+
+  if(mode === 'conversion'){
+
+    conversion.style.display =
+      'block';
+
+    arithmetic.style.display =
+      'none';
+
+  }
+
+  else{
+
+    conversion.style.display =
+      'none';
+
+    arithmetic.style.display =
+      'block';
+
+  }
+
+}
+
+
+
+
+
+function isDecimalNumber(value){
+
+  return /^-?[0-9]+(\.[0-9]+)?$/.test(value);
+
+}
+
+function isIntegerNumber(value){
+
+  return /^-?[0-9]+$/.test(value);
+
+}
+
+function findDecimalConversion(){
+
+  const value =
+    document.getElementById(
+      'decimalConvertInput'
+    ).value.trim();
+
+  const type =
+    document.getElementById(
+      'decimalConvertType'
+    ).value;
+
+  const resultDiv =
+    document.getElementById(
+      'globalResult'
+    );
+
+  const stepsDiv =
+    document.getElementById(
+      'globalSteps'
+    );
+
+  if(!isDecimalNumber(value)){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Decimal Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+  let result = '';
+  let steps = '';
+
+  const isNegative =
+  value.startsWith('-');
+
+const absValue =
+  value.replace(/^[-]/,'');
+
+
+
+
+  switch(type){
+
+    case 'Binary':
+
+      result =
+        convertFromDecimal(
+          parseFloat(absValue),
+          2
+        );
+        if(isNegative)
+  result = '-' + result;
+
+      steps =
+        generateDecimalToAnySteps(
+          absValue,
+          2
+        );
+
+
+        if(isNegative){
+
+  steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} and prefix '-' to the result)
+
+${steps}
+
+Final Answer = -${result.replace('-','')}`;
+
+}
+      break;
+
+    case 'Octal':
+
+      result =
+        convertFromDecimal(
+          parseFloat(absValue),
+          8
+        );
+        if(isNegative)
+  result = '-' + result;
+
+      steps =
+        generateDecimalToAnySteps(
+          absValue,
+          8
+        );
+
+        if(isNegative){
+
+  steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} and prefix '-' to the result)
+
+${steps}
+
+Final Answer = -${result.replace('-','')}`;
+
+}
+
+      break;
+
+    case 'Hexadecimal':
+
+      result =
+        convertFromDecimal(
+          parseFloat(absValue),
+          16
+        );
+        if(isNegative)
+  result = '-' + result;
+
+      steps =
+        generateDecimalToAnySteps(
+          absValue,
+          16
+        );
+
+        if(isNegative){
+
+  steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} and prefix '-' to the result)
+
+${steps}
+
+Final Answer = -${result.replace('-','')}`;
+
+}
+      break;
+
+    case '9s complement':
+if(isNegative){
+
+  resultDiv.innerHTML =
+    '❌ Negative values not supported';
+
+  stepsDiv.innerHTML =
+    "Use positive decimal values only.";
+
+  return;
+
+}
+  result =
+    value
+      .split('')
+      .map(
+        d => d === '.'
+          ? '.'
+          : 9 - parseInt(d)
+      )
+      .join('');
+
+  const nines =
+    value.replace(/[0-9]/g,'9');
+
+  steps =
+`Finding 9's Complement of ${value} →
+
+Step 1: Subtract all digits from 9
+----------------------------------
+
+  ${nines.split('').join(' ')}
+- ${value.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+  ${result.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+`;
+
+  break;
+
+case '10s complement':
+
+if(isNegative){
+
+  resultDiv.innerHTML =
+    '❌ Negative values not supported';
+
+  stepsDiv.innerHTML =
+    "Use positive decimal values only.";
+
+  return;
+
+}
+  const nineCompResult =
+    value
+      .split('')
+      .map(
+        d => d === '.'
+          ? '.'
+          : 9 - parseInt(d)
+      )
+      .join('');
+
+  const increment =
+    value.includes('.')
+      ? '0.' +
+        '0'.repeat(
+          value.split('.')[1].length - 1
+        ) +
+        '1'
+      : '1';
+
+  const addRes =
+    addInBase(
+      nineCompResult,
+      increment,
+      10
+    );
+
+  result =
+    addRes.result;
+
+  const nines2 =
+    value.replace(/[0-9]/g,'9');
+
+  const displayIncrement =
+    increment.padStart(
+      nineCompResult.length,
+      ' '
+    );
+
+  steps =
+`Finding 10's Complement of ${value} →
+
+Step 1: Subtract all digits from 9
+----------------------------------
+
+  ${nines2.split('').join(' ')}
+- ${value.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+  ${nineCompResult.split('').join(' ')}
+
+Step 2: Add 1 to the LSD (Least Significant Digit)
+--------------------------------------------------
+
+  ${nineCompResult.split('').join(' ')}
++ ${displayIncrement.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+  ${result.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+`;
+
+  break;
+
+case 'BCD (Binary Coded Decimal)':
+
+if(isNegative){
+
+  resultDiv.innerHTML =
+    '❌ Negative values not supported';
+
+  stepsDiv.innerHTML =
+    'BCD supports only non-negative numbers.';
+
+  return;
+
+}
+
+  let bcd = '';
+  let bcdSteps =
+`BCD Representation of ${value} → 
+
+Step 1: Separate each digit from left to right
+----------------------------------------------
+`;
+
+let arr = [];
+for(let d of value){
+  if(d === '.')
+    continue;
+
+  arr.push(d);}
+
+bcdSteps += arr.join(', ');
+
+
+
+bcdSteps += 
+`
+
+Step 2: Find 4-bit binary code (nibble) of each digit
+-----------------------------------------------------
+`;
+
+  for(let d of value){
+
+    if(d === '.'){
+
+      bcd += '. ';
+
+      bcdSteps +=
+`Decimal Point(.)\n`;
+
+      continue;
+
+    }
+
+    const code =
+      parseInt(d)
+      .toString(2)
+      .padStart(4,'0');
+
+    bcd += code + ' ';
+
+    bcdSteps +=
+`Digit ${d} → ${code}
+`;
+  }
+  result =
+    bcd.trim();
+
+  steps =`${bcdSteps}
+Step 3: Combine all the 4-bit nibbles side-by-side
+--------------------------------------------------
+${result}
+--------------------------------------------------
+
+`;
+
+  break;
+
+case 'Excess 3':
+
+if(isNegative){
+
+  resultDiv.innerHTML =
+    '❌ Negative values not supported';
+
+  stepsDiv.innerHTML =
+    'BCD supports only non-negative numbers.';
+
+  return;
+
+}
+
+
+  let excess3 = '';
+
+  let excessSteps =
+`Excess-3 Representation of ${value} →
+
+Step 1: Separate each digit from left to right
+----------------------------------------------
+`;
+
+  let digits = [];
+
+  for(let d of value){
+
+    if(d === '.')
+      continue;
+
+    digits.push(d);
+
+  }
+
+  excessSteps += digits.join(', ');
+
+excessSteps +=
+`
+
+Step 2: Add 3 to each digit (Excess-3 form)
+--------------------------------------------------
+`;
+  digits = [];
+
+  for(let d of value){
+
+    if(d === '.')
+      continue;
+
+    digits.push(parseInt(d)+3);
+
+    const digit =
+      parseInt(d);
+
+    const digitPlus3 =
+      digit + 3;
+
+    const code =
+      digitPlus3
+      .toString(2)
+      .padStart(4,'0');
+
+     excessSteps +=
+`Digit ${digit} in Excess-3 form → ${digit} + 3 = ${digitPlus3}\n`
+
+  }
+
+  excessSteps += `\nExcess-3 digits are:\n` + digits.join(', ');
+
+
+  excessSteps +=
+`
+
+Step 3: Find 4-bit binary code (nibble) of each Excess-3 digit
+--------------------------------------------------------------
+`;
+
+  for(let d of value){
+
+    if(d === '.'){
+
+      excess3 += '. ';
+
+      excessSteps +=
+`Decimal Point(.)\n`;
+
+      continue;
+
+    }
+
+    const digit =
+      parseInt(d);
+
+    const digitPlus3 =
+      digit + 3;
+
+    const code =
+      digitPlus3
+      .toString(2)
+      .padStart(4,'0');
+
+    excess3 += code + ' ';
+
+    excessSteps +=
+`Digit ${digitPlus3} → ${code}\n`;
+  }
+
+  result =
+    excess3.trim();
+
+  steps =
+`${excessSteps}
+Step 4: Combine all the 4-bit nibbles side-by-side
+--------------------------------------------------
+${result}
+--------------------------------------------------
+
+`;
+
+  break;
+
+case 'Gray':
+
+if(isNegative){
+
+  resultDiv.innerHTML =
+    '❌ Negative values not supported';
+
+  stepsDiv.innerHTML =
+    'BCD supports only non-negative numbers.';
+
+  return;
+
+}
+
+
+  if(!isIntegerNumber(value)){
+
+    resultDiv.innerHTML =
+      '❌ Error!';
+
+    stepsDiv.innerHTML =
+      'Gray Code supports integer input only.';
+
+    return;
+
+  }
+
+  const binary =
+    parseInt(value)
+      .toString(2);
+
+  let gray =
+    binary[0];
+
+  let graySteps =
+`Decimal to Gray Conversion of ${value} →
+
+Step 1: Convert Decimal to Binary
+---------------------------------
+
+${value}₁₀ = ${binary}₂
+
+Step 2: Copy the MSB directly
+-----------------------------
+
+Gray Bit 1 = Binary Bit 1 = ${binary[0]}
+
+Step 3: XOR adjacent binary bits
+--------------------------------
+
+`;
+
+  for(let i = 1; i < binary.length; i++){
+
+    const g =
+      binary[i - 1] === binary[i]
+        ? '0'
+        : '1';
+
+    gray += g;
+
+    graySteps +=
+`${binary[i - 1]} XOR ${binary[i]} = ${g}
+`;
+  }
+
+  result = gray;
+
+  steps =
+`${graySteps}
+Step 4: Combine all Gray bits
+-----------------------------
+
+${gray.split('').join(' ')}
+Gray Code = ${gray}
+-----------------------------
+`;
+
+  break;
+
+
+
+
+  case 'Sign Magnitude':{
+
+  if(!isDecimalNumber(value)){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Decimal Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+  const num =
+    parseFloat(value);
+
+  const signBit =
+    num < 0 ? '1' : '0';
+
+  const magnitude =
+    Math.abs(num);
+
+  const isReal =
+    value.includes('.');
+
+  const intPart =
+    Math.floor(magnitude);
+
+  const fracPart =
+    magnitude - intPart;
+
+  function fracToBinary(
+    frac,
+    bits
+  ){
+
+    let result = '';
+
+    let f = frac;
+
+    for(
+      let i=0;
+      i<bits;
+      i++
+    ){
+
+      f *= 2;
+
+      if(f >= 1){
+
+        result += '1';
+
+        f -= 1;
+
+      }
+
+      else{
+
+        result += '0';
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  function signMagnitude(
+    totalBits
+  ){
+
+    if(!isReal){
+
+      const magBits =
+        totalBits - 1;
+
+      const binary =
+        magnitude
+          .toString(2);
+
+      if(
+        binary.length >
+        magBits
+      ){
+
+        return 'Overflow';
+
+      }
+
+      return (
+        signBit +
+        binary.padStart(
+          magBits,
+          '0'
+        )
+      );
+
+    }
+
+    const intBits =
+      Math.floor(
+        (totalBits - 1) / 2
+      );
+
+    const fracBits =
+      totalBits - 1 - intBits;
+
+    const intBinary =
+      intPart.toString(2);
+
+    if(
+      intBinary.length >
+      intBits
+    ){
+
+      return 'Overflow';
+
+    }
+
+    const fracBinary =
+      fracToBinary(
+        fracPart,
+        fracBits
+      );
+
+    return (
+      signBit
+      + ' '
+      + intBinary.padStart(
+          intBits,
+          '0'
+        )
+      + ' '
+      + fracBinary
+    );
+
+  }
+
+  const sm8 =
+    signMagnitude(8);
+
+  const sm16 =
+    signMagnitude(16);
+
+  const sm32 =
+    signMagnitude(32);
+
+  const sm64 =
+    signMagnitude(64);
+
+  result =
+`<br>8-bit  : ${sm8}<br>
+16-bit : ${sm16}<br>
+32-bit : ${sm32}<br>`;
+
+  steps =
+`Sign Magnitude Representation of ${value}
+Step 1: Determine Sign Bit
+--------------------------
+${num < 0  ? 'Negative Number → Sign Bit = 1'  : 'Positive Number → Sign Bit = 0'}
+
+Step 2: Find Magnitude
+----------------------
+|${value}| = ${magnitude}
+
+Step 3: Convert Magnitude to Binary
+-----------------------------------
+Integer Part:
+${intPart}₁₀ = ${intPart.toString(2)}₂
+${
+  isReal
+  ?
+`Fractional Part:${fracPart}`  :''
+}
+
+Step 4: Sign Magnitude Representation
+-------------------------------------
+8-bit  : ${sm8}
+16-bit : ${sm16}
+32-bit : ${sm32}
+${  isReal  ?`
+  Please Note:
+8-bit  = 1 Sign + 3 Integer + 4 Fraction
+16-bit = 1 Sign + 7 Integer + 8 Fraction
+32-bit = 1 Sign + 15 Integer + 16 Fraction`
+  :`
+  Please Note:
+8-bit  = 1 Sign + 7 Magnitude
+16-bit = 1 Sign + 15 Magnitude
+32-bit = 1 Sign + 31 Magnitude`
+}
+`;
+
+  break;
+
+}
+
+
+
+
+
+
+
+
+case 'Mantissa Exponent':{
+
+  const num =
+    parseFloat(value);
+
+  if(num === 0){
+
+    result = '0 × 2^0';
+
+    steps =
+`Mantissa-Exponent Form
+
+0 has no normalization.
+
+Answer = 0 × 2^0`;
+
+    break;
+
+  }
+
+  const sign =
+    num < 0 ? '-' : '';
+
+  const absNum =
+    Math.abs(num);
+
+  const binary =
+    convertFromDecimal(
+      absNum,
+      2
+    );
+
+  let exponent = 0;
+  let mantissa = '';
+
+  if(binary.includes('.')){
+
+    const parts =
+      binary.split('.');
+
+    if(parts[0] !== '0'){
+
+      exponent =
+        parts[0].length - 1;
+
+      mantissa =
+        '1.' +
+        parts[0].slice(1) +
+        parts[1];
+
+    }
+
+    else{
+
+      const firstOne =
+        parts[1].indexOf('1');
+
+      exponent =
+        -(firstOne + 1);
+
+      mantissa =
+        '1.' +
+        parts[1].slice(firstOne + 1);
+
+    }
+
+  }
+
+  else{
+
+    exponent =
+      binary.length - 1;
+
+    mantissa =
+      '1.' +
+      binary.slice(1);
+
+  }
+
+  result =
+`${sign}${mantissa} × 2^${exponent}`;
+
+  steps =
+`Mantissa-Exponent Form of ${value}
+
+Step 1: Convert to Binary
+-------------------------
+${binary}
+
+Step 2: Normalize Binary Number
+-------------------------------
+${result}
+
+Mantissa = ${sign}${mantissa}
+Exponent = ${exponent}`;
+
+  break;
+
+}
+
+
+
+
+
+
+case 'IEEE-754 Floating Point (32-bit)':{
+
+  const num =
+    parseFloat(value);
+
+  const buffer =
+    new ArrayBuffer(4);
+
+  const view =
+    new DataView(buffer);
+
+  view.setFloat32(
+    0,
+    num
+  );
+
+  let bits = '';
+
+  for(let i=0;i<4;i++){
+
+    bits +=
+      view
+        .getUint8(i)
+        .toString(2)
+        .padStart(8,'0');
+
+  }
+
+  const sign =
+    bits[0];
+
+  const exponent =
+    bits.slice(1,9);
+
+  const mantissa =
+    bits.slice(9);
+
+  result =
+`${sign} ${exponent} ${mantissa}`;
+
+  steps =
+`IEEE-754 Single Precision (32-bit)
+
+Input = ${value}
+
+Sign Bit
+--------
+${sign}
+
+Exponent
+--------
+${exponent}
+
+Mantissa
+--------
+${mantissa}
+
+Final Representation
+--------------------
+${result}`;
+
+  break;
+
+}
+
+
+
+case 'IEEE-754 Floating Point (64-bit)':{
+
+  const num =
+    parseFloat(value);
+
+  const buffer =
+    new ArrayBuffer(8);
+
+  const view =
+    new DataView(buffer);
+
+  view.setFloat64(
+    0,
+    num
+  );
+
+  let bits = '';
+
+  for(let i=0;i<8;i++){
+
+    bits +=
+      view
+        .getUint8(i)
+        .toString(2)
+        .padStart(8,'0');
+
+  }
+
+  const sign =
+    bits[0];
+
+  const exponent =
+    bits.slice(1,12);
+
+  const mantissa =
+    bits.slice(12);
+
+  result =
+`${sign} ${exponent} ${mantissa}`;
+
+  steps =
+`IEEE-754 Double Precision (64-bit)
+
+Input = ${value}
+
+Sign Bit
+--------
+${sign}
+
+Exponent
+--------
+${exponent}
+
+Mantissa
+--------
+${mantissa}
+
+Final Representation
+--------------------
+${result}`;
+
+  break;
+
+}
+
+
+
+
+case 'Fixed Point':{
+
+  const num =
+    parseFloat(value);
+
+  const negative =
+    num < 0;
+
+  const absNum =
+    Math.abs(num);
+
+  const intPart =
+    Math.floor(absNum);
+
+  const fracPart =
+    absNum - intPart;
+
+  function fracToBinary(
+    frac,
+    bits
+  ){
+
+    let result = '';
+
+    let f = frac;
+
+    for(
+      let i=0;
+      i<bits;
+      i++
+    ){
+
+      f *= 2;
+
+      if(f >= 1){
+
+        result += '1';
+
+        f -= 1;
+
+      }
+
+      else{
+
+        result += '0';
+
+      }
+
+    }
+
+    return result;
+
+  }
+
+  function fixedPoint(
+    intBits,
+    fracBits
+  ){
+
+    const intBinary =
+      intPart
+        .toString(2)
+        .padStart(
+          intBits,
+          '0'
+        );
+
+    const fracBinary =
+      fracToBinary(
+        fracPart,
+        fracBits
+      );
+
+    return (
+      (negative ? '-' : '')
+      +
+      intBinary
+      +
+      '.'
+      +
+      fracBinary
+    );
+
+  }
+
+  const fp8 =
+    fixedPoint(4,4);
+
+  const fp16 =
+    fixedPoint(8,8);
+
+  const fp32 =
+    fixedPoint(16,16);
+
+  result =
+`<br>8-bit  : ${fp8}<br>
+16-bit : ${fp16}<br>
+32-bit : ${fp32}<br>`;
+
+  steps =
+`Fixed Point Representation of ${value}
+
+Step 1: Separate Integer and Fraction Parts
+-------------------------------------------
+Integer Part  = ${intPart}
+Fraction Part = ${fracPart}
+
+Step 2: Convert Integer Part to Binary
+--------------------------------------
+${intPart}₁₀ = ${intPart.toString(2)}₂
+
+Step 3: Convert Fraction Part to Binary
+---------------------------------------
+${fracPart}₁₀ → ${fracToBinary(fracPart,16)}...
+
+Step 4: Fixed Point Representations
+-----------------------------------
+8-bit  (4 Integer + 4 Fraction)
+${fp8}
+
+16-bit (8 Integer + 8 Fraction)
+${fp16}
+
+32-bit (16 Integer + 16 Fraction)
+${fp32}
+
+Please Note:
+-------------
+Fixed Point uses a fixed location for the radix point.
+Unlike IEEE Floating Point, the radix point never moves.
+`;
+
+  break;
+
+}
+  }
+
+  resultDiv.innerHTML =
+    `Answer: ${result}`;
+
+  stepsDiv.textContent =
+    steps;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function findDecimalArithmetic(){
+
+  const num1 =
+    document.getElementById(
+      'decimalNum1'
+    ).value.trim();
+
+  const num2 =
+    document.getElementById(
+      'decimalNum2'
+    ).value.trim();
+
+  const operation =
+    document.getElementById(
+      'decimalOperation'
+    ).value;
+
+  const resultDiv =
+    document.getElementById(
+      'globalResult'
+    );
+
+  const stepsDiv =
+    document.getElementById(
+      'globalSteps'
+    );
+
+  if(
+    !isDecimalNumber(num1)
+    ||
+    !isDecimalNumber(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Decimal Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+  let result = '';
+  let steps = '';
+
+  switch(operation){
+
+    case 'Addition':{
+
+  const n1 =
+    parseFloat(num1);
+
+  const n2 =
+    parseFloat(num2);
+
+  const abs1 =
+    String(Math.abs(n1));
+
+  const abs2 =
+    String(Math.abs(n2));
+
+  const neg1 =
+    n1 < 0;
+
+  const neg2 =
+    n2 < 0;
+
+  if(
+    neg1 === neg2
+  ){
+
+    const add =
+      addInBase(
+        abs1,
+        abs2,
+        10
+      );
+
+    result =
+      neg1
+        ? '-' + add.result
+        : add.result;
+
+    steps =
+`Both numbers have the same sign.
+Therefore, we find: ${abs1} + ${abs2}
+${add.visual}
+${
+  neg1  ? 'Apply negative sign.'  : 'Result remains positive.'
+}
+Answer = ${result}
+`;
+
+  }
+
+  else{
+
+    let big =
+      abs1;
+
+    let small =
+      abs2;
+
+    let resultNegative =
+      neg1;
+
+    if(
+      Math.abs(n2)
+      >
+      Math.abs(n1)
+    ){
+
+      big =
+        abs2;
+
+      small =
+        abs1;
+
+      resultNegative =
+        neg2;
+
+    }
+
+    const sub =
+      subtractInBase(
+        big,
+        small,
+        10
+      );
+
+    result =
+      resultNegative
+        ? '-' + sub.result
+        : sub.result;
+
+    steps =
+`Numbers have different signs.
+Convert addition into subtraction.
+Therefore, we find: ${big} - ${small}
+${sub.visual}
+and apply sign of larger magnitude.
+
+Answer = ${result}`;
+
+  }
+
+  break;
+
+}
+
+case 'Subtraction':{
+
+  const n1 =
+    parseFloat(num1);
+
+  const n2 =
+    parseFloat(num2);
+
+  const abs1 =
+    String(Math.abs(n1));
+
+  const abs2 =
+    String(Math.abs(n2));
+
+  const neg1 =
+    n1 < 0;
+
+  const neg2 =
+    n2 < 0;
+
+  /*
+   * A - B
+   * =
+   * A + (-B)
+   */
+
+  if(
+    neg1 !== neg2
+  ){
+
+    const add =
+      addInBase(
+        abs1,
+        abs2,
+        10
+      );
+
+    result =
+      neg1
+        ? '-' + add.result
+        : add.result;
+
+    steps =
+`
+Convert subtraction into addition:
+
+${num1} - (${num2})
+
+Numbers now have the same sign.
+
+Find:
+
+${abs1} + ${abs2}
+
+${add.visual}
+
+${
+  neg1
+  ? 'Apply negative sign.'
+  : 'Result remains positive.'
+}
+
+Answer = ${result}
+`;
+
+  }
+
+  else{
+
+    let big =
+      abs1;
+
+    let small =
+      abs2;
+
+    let resultNegative =
+      false;
+
+    if(
+      Math.abs(n1)
+      >=
+      Math.abs(n2)
+    ){
+
+      resultNegative =
+        neg1;
+
+    }
+
+    else{
+
+      big =
+        abs2;
+
+      small =
+        abs1;
+
+      resultNegative =
+        !neg1;
+
+    }
+
+    const sub =
+      subtractInBase(
+        big,
+        small,
+        10
+      );
+
+    result =
+      resultNegative
+        ? '-' + sub.result
+        : sub.result;
+
+    steps =
+`
+Both numbers have the same sign.
+
+Find:
+
+${big} - ${small}
+
+${sub.visual}
+
+Apply sign of larger magnitude.
+
+Answer = ${result}
+`;
+
+  }
+
+  break;
+
+}
+
+case 'Multiplication':{
+
+  const n1 =
+    parseFloat(num1);
+
+  const n2 =
+    parseFloat(num2);
+
+  const abs1 =
+    String(
+      Math.abs(n1)
+    );
+
+  const abs2 =
+    String(
+      Math.abs(n2)
+    );
+
+  const negative =
+    (n1 < 0)
+    !==
+    (n2 < 0);
+
+  const mul =
+    multiplyInBase(
+      abs1,
+      abs2,
+      10
+    );
+
+  result =
+    negative
+      ? '-' + mul.result
+      : mul.result;
+
+  steps =
+`
+Step 1: Determine Sign of Result
+--------------------------------
+
+Number 1:
+${n1 < 0 ? 'Negative' : 'Positive'}
+
+Number 2:
+${n2 < 0 ? 'Negative' : 'Positive'}
+
+${
+  negative
+  ? 'Signs are different → Result will be Negative'
+  : 'Signs are same → Result will be Positive'
+}
+
+Step 2: Multiply Magnitudes
+---------------------------
+
+${abs1} × ${abs2}
+
+${mul.visual}
+
+Step 3: Apply Sign
+------------------
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+
+
+
+
+
+
+
+
+
+
+case 'Subtraction (9s Complement)':{
+
+  if(
+    !isDecimalNumber(num1)
+    ||
+    !isDecimalNumber(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Decimal Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+  if(
+  num1.startsWith('-')
+  ||
+  num2.startsWith('-')
+){
+
+  resultDiv.innerHTML =
+    '❌ Positive numbers only';
+
+  stepsDiv.innerHTML =
+    "9's Complement subtraction currently supports positive numbers only.";
+
+  return;
+
+}
+
+  const fracLen =
+    Math.max(
+      (num1.split('.')[1] || '').length,
+      (num2.split('.')[1] || '').length
+    );
+
+  const n1 =
+    fracLen
+      ? Number(num1).toFixed(fracLen)
+      : num1;
+
+  const n2 =
+    fracLen
+      ? Number(num2).toFixed(fracLen)
+      : num2;
+
+  const intDigits =
+    Math.max(
+      n1.split('.')[0].length,
+      n2.split('.')[0].length
+    );
+
+  let paddedN2;
+
+  if(fracLen){
+
+    const parts =
+      n2.split('.');
+
+    paddedN2 =
+      parts[0]
+        .padStart(
+          intDigits,
+          '0'
+        )
+      +
+      '.'
+      +
+      parts[1];
+
+  }
+
+  else{
+
+    paddedN2 =
+      n2.padStart(
+        intDigits,
+        '0'
+      );
+
+  }
+
+  const nineComp =
+    paddedN2
+      .split('')
+      .map(
+        ch =>
+          ch === '.'
+            ? '.'
+            : (
+                9 -
+                parseInt(ch)
+              )
+      )
+      .join('');
+
+  const addRes =
+    addInBase(
+      n1,
+      nineComp,
+      10
+    );
+
+  const sum9 =
+    addRes.result;
+
+  result = '';
+
+  let finalStep = '';
+
+  const carry =
+    sum9.split('.')[0].length >
+    intDigits;
+
+  if(carry){
+
+    let withoutCarry;
+
+    if(sum9.includes('.')){
+
+      const parts =
+        sum9.split('.');
+
+      withoutCarry =
+        parts[0].slice(1)
+        +
+        '.'
+        +
+        parts[1];
+
+    }
+
+    else{
+
+      withoutCarry =
+        sum9.slice(1);
+
+    }
+
+    const increment =
+      fracLen
+        ? (
+            '0.' +
+            '0'.repeat(
+              fracLen - 1
+            ) +
+            '1'
+          )
+        : '1';
+
+    const finalAdd =
+      addInBase(
+        withoutCarry,
+        increment,
+        10
+      );
+
+    result =
+      String(
+        parseFloat(
+          finalAdd.result
+        )
+      );
+
+    finalStep =
+`
+Step 3: D has End-around Carry? Yes
+-----------------------------------
+a) Discard the End-around Carry from D
+${withoutCarry}
+
+b) Find E = Add 1 to LSD of D
+${finalAdd.visual}
+`;
+
+  }
+
+  else{
+
+    const comp =
+      sum9
+        .split('')
+        .map(
+          ch =>
+            ch === '.'
+              ? '.'
+              : (
+                  9 -
+                  parseInt(ch)
+                )
+        )
+        .join('');
+
+    const ninesForSum =
+      sum9.replace(
+        /[0-9]/g,
+        '9'
+      );
+
+    const magnitude =
+      parseFloat(comp);
+
+    result =
+      magnitude === 0
+        ? '0'
+        : '-' + magnitude;
+
+    finalStep =
+`
+Step 3: D has End-around Carry? No
+----------------------------------
+a) Find E = 9's Complement of D
+  ${ninesForSum
+      .split('')
+      .join(' ')}
+- ${sum9
+      .split('')
+      .join(' ')}
+${'-'.repeat(
+  sum9.length * 2 + 2
+)}
+  ${comp
+      .split('')
+      .join(' ')}
+b) Add a negative sign to E: ${result}`;
+
+  }
+
+  steps =
+`Finding ${n1} - ${n2} using 9's Complement →
+
+Let A = ${n1}
+Let B = ${n2}
+
+Step 1: Find C = 9's Complement of B
+------------------------------------
+  ${paddedN2
+      .replace(/[0-9]/g,'9')
+      .split('')
+      .join(' ')}
+- ${paddedN2
+      .split('')
+      .join(' ')}
+${'-'.repeat(
+  paddedN2.length * 2 + 2
+)}
+  ${nineComp
+      .split('')
+      .join(' ')}
+
+Step 2: Find D = A + C
+----------------------
+${addRes.visual}
+${finalStep}
+
+Answer = ${result}
+
+`;
+
+  break;
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+case 'Subtraction (10s Complement)':{
+
+  if(
+    !isDecimalNumber(num1)
+    ||
+    !isDecimalNumber(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Decimal Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+  if(
+  num1.startsWith('-')
+  ||
+  num2.startsWith('-')
+){
+
+  resultDiv.innerHTML =
+    '❌ Positive numbers only';
+
+  stepsDiv.innerHTML =
+    "9's Complement subtraction currently supports positive numbers only.";
+
+  return;
+
+}
+
+  const fracLen =
+    Math.max(
+      (num1.split('.')[1] || '').length,
+      (num2.split('.')[1] || '').length
+    );
+
+  const n1 =
+    fracLen
+      ? Number(num1).toFixed(fracLen)
+      : num1;
+
+  const n2 =
+    fracLen
+      ? Number(num2).toFixed(fracLen)
+      : num2;
+
+  const intDigits =
+    Math.max(
+      n1.split('.')[0].length,
+      n2.split('.')[0].length
+    );
+
+  let paddedN2;
+
+  if(fracLen){
+
+    const parts =
+      n2.split('.');
+
+    paddedN2 =
+      parts[0]
+        .padStart(
+          intDigits,
+          '0'
+        )
+      +
+      '.'
+      +
+      parts[1];
+
+  }
+
+  else{
+
+    paddedN2 =
+      n2.padStart(
+        intDigits,
+        '0'
+      );
+
+  }
+
+  const nineComp =
+    paddedN2
+      .split('')
+      .map(
+        ch =>
+          ch === '.'
+            ? '.'
+            : (
+                9 -
+                parseInt(ch)
+              )
+      )
+      .join('');
+
+  const increment =
+    fracLen
+      ? (
+          '0.' +
+          '0'.repeat(
+            fracLen - 1
+          ) +
+          '1'
+        )
+      : '1';
+
+  const tenCompAdd =
+    addInBase(
+      nineComp,
+      increment,
+      10
+    );
+
+  const tenComp =
+    tenCompAdd.result;
+
+  const addRes =
+    addInBase(
+      n1,
+      tenComp,
+      10
+    );
+
+  const sum10 =
+    addRes.result;
+
+  result = '';
+
+  let finalStep = '';
+
+  const carry =
+    sum10.split('.')[0].length >
+    intDigits;
+
+  if(carry){
+
+    let withoutCarry;
+
+    if(sum10.includes('.')){
+
+      const parts =
+        sum10.split('.');
+
+      withoutCarry =
+        parts[0].slice(1)
+        +
+        '.'
+        +
+        parts[1];
+
+    }
+
+    else{
+
+      withoutCarry =
+        sum10.slice(1);
+
+    }
+
+    result =
+      String(
+        parseFloat(
+          withoutCarry
+        )
+      );
+
+    finalStep =
+`
+Step 3: D has End-around Carry? Yes
+-----------------------------------
+a) Discard the End-around Carry from D: ${withoutCarry}
+b) Result is positive`;
+
+  }
+
+  else{
+
+    const ninesForSum =
+      sum10.replace(
+        /[0-9]/g,
+        '9'
+      );
+
+    const comp =
+      sum10
+        .split('')
+        .map(
+          ch =>
+            ch === '.'
+              ? '.'
+              : (
+                  9 -
+                  parseInt(ch)
+                )
+        )
+        .join('');
+
+    const tenCompResult =
+      addInBase(
+        comp,
+        increment,
+        10
+      );
+
+    const magnitude =
+      parseFloat(
+        tenCompResult.result
+      );
+
+    result =
+      magnitude === 0
+        ? '0'
+        : '-' + magnitude;
+
+    finalStep =
+`
+Step 3: D has End-around Carry? No
+----------------------------------
+a) Find E = 10's Complement of D
+  ${ninesForSum
+      .split('')
+      .join(' ')}
+- ${sum10
+      .split('')
+      .join(' ')}
+${'-'.repeat(
+  sum10.length * 2 + 2
+)}
+  ${comp
+      .split('')
+      .join(' ')}
++ ${increment
+      .padStart(comp.length,' ')
+      .split('')
+      .join(' ')}
+${'-'.repeat(comp.length * 2 + 2)}
+  ${tenCompResult.result
+      .padStart(comp.length,'0')
+      .split('')
+      .join(' ')}
+b) Add a negative sign to E: ${result}`;
+
+  }
+
+  steps =
+`Finding ${n1} - ${n2} using 10's Complement →
+
+Let A = ${n1}
+Let B = ${n2}
+
+Step 1: Find C = 10's Complement of B
+-------------------------------------
+a) Find 9's Complement of B
+
+  ${paddedN2
+      .replace(/[0-9]/g,'9')
+      .split('')
+      .join(' ')}
+- ${paddedN2
+      .split('')
+      .join(' ')}
+${'-'.repeat(
+  paddedN2.length * 2 + 2
+)}
+  ${nineComp
+      .split('')
+      .join(' ')}
+
+b) Add 1 to LSD
+${tenCompAdd.visual}
+C = ${tenComp}
+Step 2: Find D = A + C
+----------------------
+${addRes.visual}
+
+D = ${sum10}
+${finalStep}
+
+Answer = ${result}
+`;
+
+  break;
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+  case 'Bitwise NAND':{
+
+  if(
+    !isIntegerNumber(num1)
+    ||
+    !isIntegerNumber(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise NAND supports integers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    parseInt(num1);
+
+  const n2 =
+    parseInt(num2);
+
+  const andResult =
+    n1 & n2;
+
+  const resultNum =
+    ~andResult;
+
+  result =
+    resultNum;
+
+  steps =
+`Bitwise NAND
+
+Step 1: Find AND
+----------------
+${n1} & ${n2} = ${andResult}
+
+Step 2: Apply NOT
+-----------------
+~${andResult} = ${resultNum}
+
+Answer = ${resultNum}
+`;
+
+  break;
+
+}
+
+
+
+
+case 'Bitwise NOR':{
+
+  if(
+    !isIntegerNumber(num1)
+    ||
+    !isIntegerNumber(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise NOR supports integers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    parseInt(num1);
+
+  const n2 =
+    parseInt(num2);
+
+  const orResult =
+    n1 | n2;
+
+  const resultNum =
+    ~orResult;
+
+  result =
+    resultNum;
+
+  steps =
+`Bitwise NOR
+
+Step 1: Find OR
+----------------
+${n1} | ${n2} = ${orResult}
+
+Step 2: Apply NOT
+-----------------
+~${orResult} = ${resultNum}
+
+Answer = ${resultNum}
+`;
+
+  break;
+
+}
+
+
+
+case 'Bitwise XNOR':{
+
+  if(
+    !isIntegerNumber(num1)
+    ||
+    !isIntegerNumber(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise XNOR supports integers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    parseInt(num1);
+
+  const n2 =
+    parseInt(num2);
+
+  const xorResult =
+    n1 ^ n2;
+
+  const resultNum =
+    ~xorResult;
+
+  result =
+    resultNum;
+
+  steps =
+`Bitwise XNOR
+
+Step 1: Find XOR
+----------------
+${n1} ^ ${n2} = ${xorResult}
+
+Step 2: Apply NOT
+-----------------
+~${xorResult} = ${resultNum}
+
+Answer = ${resultNum}
+`;
+
+  break;
+
+}
+
+
+
+case 'Bitwise NOT (~)':{
+
+  if(
+    !isIntegerNumber(num1)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise NOT supports integers only.';
+
+    return;
+
+  }
+
+  const n =
+    parseInt(num1);
+
+  const resultNum =
+    ~n;
+
+  const binary =
+    (n >>> 0)
+      .toString(2)
+      .padStart(32,'0');
+
+  let complement = '';
+
+  for(let bit of binary){
+
+    complement +=
+      bit === '0'
+        ? '1'
+        : '0';
+
+  }
+
+  const formulaResult =
+    -(n + 1);
+
+  result =
+    resultNum;
+
+  steps =
+`Bitwise NOT (~)
+
+Input Number
+------------
+${n}
+
+32-bit Binary Representation
+----------------------------
+${binary}
+
+Step 1: Flip every bit
+----------------------
+${binary} → ${complement}
+
+Step 2: Interpret Result as Signed Integer
+------------------------------------------
+~${n} = -( ${n} + 1 ) = ${formulaResult}
+
+Result
+------
+${resultNum}
+
+Verification
+------------
+~${n} = ${resultNum}
+`;
+
+  break;
+
+}
+
+
+
+case 'Bitwise XOR (^)':{
+
+  if(
+  !isIntegerNumber(num1)
+  ||
+  !isIntegerNumber(num2)
+){
+
+  resultDiv.innerHTML =
+    '❌ Integer Only';
+
+  stepsDiv.innerHTML =
+    'Bitwise operations support integers only.';
+
+  return;
+
+}
+  const n1 =
+    parseInt(num1);
+
+  const n2 =
+    parseInt(num2);
+
+  const resultNum =
+    n1 ^ n2;
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(width,'0');
+
+  const p2 =
+    b2.padStart(width,'0');
+
+  const p3 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  result =
+    resultNum;
+
+  steps =
+`${n1} ^ ${n2} →
+
+Step 1: Decimal to Binary Conversion
+------------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 2: Perform Bitwise XOR (^)
+-------------------------------
+  ${p1}
+^ ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 3: Convert Result back to Decimal
+--------------------------------------
+(${p3})₂ = (${resultNum})₁₀
+
+Answer = ${resultNum}
+`;
+
+  break;
+
+}
+
+
+
+
+case 'Bitwise OR (|)':{
+
+  if(
+  !isIntegerNumber(num1)
+  ||
+  !isIntegerNumber(num2)
+){
+
+  resultDiv.innerHTML =
+    '❌ Integer Only';
+
+  stepsDiv.innerHTML =
+    'Bitwise operations support integers only.';
+
+  return;
+
+}
+
+  const n1 =
+    parseInt(num1);
+
+  const n2 =
+    parseInt(num2);
+
+  const resultNum =
+    n1 | n2;
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(width,'0');
+
+  const p2 =
+    b2.padStart(width,'0');
+
+  const p3 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  result =
+    resultNum;
+
+  steps =
+`${n1} | ${n2} →
+
+Step 1: Decimal to Binary Conversion
+------------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 2: Perform Bitwise OR (|)
+-------------------------------
+  ${p1}
+| ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 3: Convert Result back to Decimal
+--------------------------------------
+(${p3})₂ = (${resultNum})₁₀
+
+Answer = ${resultNum}
+`;
+
+  break;
+
+}
+
+
+case 'Bitwise AND (&)':{
+
+  if(
+  !isIntegerNumber(num1)
+  ||
+  !isIntegerNumber(num2)
+){
+
+  resultDiv.innerHTML =
+    '❌ Integer Only';
+
+  stepsDiv.innerHTML =
+    'Bitwise operations support integers only.';
+
+  return;
+
+}
+
+  const n1 =
+    parseInt(num1);
+
+  const n2 =
+    parseInt(num2);
+
+  const resultNum =
+    n1 & n2;
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(width,'0');
+
+  const p2 =
+    b2.padStart(width,'0');
+
+  const p3 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  result =
+    resultNum;
+
+  steps =
+`${n1} & ${n2} →
+
+Step 1: Decimal to Binary Conversion
+------------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 2: Perform Bitwise AND (&)
+-------------------------------
+  ${p1}
+& ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 3: Convert Result back to Decimal
+--------------------------------------
+(${p3})₂ = (${resultNum})₁₀
+
+Answer = ${resultNum}
+`;
+
+
+  break;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+case 'Zero Fill Right Shift (>>>)':{
+
+  if(
+  !isIntegerNumber(num1)
+  ||
+  !isIntegerNumber(num2)
+){
+
+  resultDiv.innerHTML =
+    '❌ Integer Only';
+
+  stepsDiv.innerHTML =
+    'Shift operations support integers only.';
+
+  return;
+
+}
+
+  const n =
+    parseInt(num1);
+
+  const shift =
+    parseInt(num2);
+
+  const resultNum =
+    n >>> shift;
+
+  result =
+    resultNum;
+
+  steps =
+`${n} >>> ${shift} →
+
+Step 1: Find 32-bit Binary
+--------------------------
+
+(${n})₁₀ = (${(n >>> 0)
+    .toString(2)
+    .padStart(32,'0')})₂
+
+Step 2: Shift Right
+-------------------
+By ${shift} positions → ${resultNum
+    .toString(2)
+    .padStart(32,'0')}
+
+(Vacated positions are filled with 0)
+
+Step 3: Convert back to Decimal
+--------------------------------------
+${resultNum}
+
+Answer: ${resultNum}`;
+
+  break;
+
+}
+
+
+
+
+
+case 'Right Shift (>>)':{
+
+  if(
+  !isIntegerNumber(num1)
+  ||
+  !isIntegerNumber(num2)
+){
+
+  resultDiv.innerHTML =
+    '❌ Integer Only';
+
+  stepsDiv.innerHTML =
+    'Shift operations support integers only.';
+
+  return;
+
+}
+
+
+  const n =
+    parseInt(num1);
+
+  const shift =
+    parseInt(num2);
+
+  const resultNum =
+    n >> shift;
+
+  result =
+    resultNum;
+
+  steps =
+`${n} >> ${shift} → 
+
+Step 1: Find Binary Code
+------------------------
+(${n})₁₀ = (${(n >>> 0).toString(2)})₂
+
+Step 2: Shift Right
+------------------
+By ${shift} positions → ${(resultNum >>> 0).toString(2)}
+
+Step 3: Convert back to Decimal
+-------------------------------
+${resultNum}
+
+Answer: ${resultNum}`;
+  break;
+
+}
+
+
+
+case 'Left Shift (<<)':{
+
+
+  if(
+  !isIntegerNumber(num1)
+  ||
+  !isIntegerNumber(num2)
+){
+
+  resultDiv.innerHTML =
+    '❌ Integer Only';
+
+  stepsDiv.innerHTML =
+    'Shift operations support integers only.';
+
+  return;
+
+}
+  const n =
+    parseInt(num1);
+
+  const shift =
+    parseInt(num2);
+
+  const resultNum =
+    n << shift;
+
+  result =
+    resultNum;
+
+  steps =
+`${n} << ${shift} →
+
+Step 1: Find Binary Code
+------------------------
+(${n})₁₀ = (${(n >>> 0).toString(2)})₂
+
+Step 2: Shift Left
+------------------
+By ${shift} positions → ${(resultNum >>> 0).toString(2)}
+
+Step 3: Convert back to Decimal
+-------------------------------
+${resultNum}
+
+Answer: ${resultNum}`;
+  break;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+  resultDiv.innerHTML =
+    `Answer: ${result}`;
+
+  stepsDiv.textContent =
+    steps;
+
+}
+
+
+
+
+
+
+
+
+
+
+
