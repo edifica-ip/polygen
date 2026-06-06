@@ -76,18 +76,6 @@ setTimeout(() => {
 
   switch(btn.dataset.tab){
 
-    case 'convert':
-      document.getElementById(
-        'convertInput'
-      )?.focus();
-      break;
-
-    case 'arithmetic':
-      document.getElementById(
-        'num1'
-      )?.focus();
-      break;
-
     case 'decimal':{
 
       const arithmeticVisible =
@@ -140,59 +128,7 @@ setTimeout(() => {
       break;
     }
 
-    case 'complement':
-      document.getElementById(
-        'compInput'
-      )?.focus();
-      break;
 
-    case 'signed':
-      document.getElementById(
-        'signedInput'
-      )?.focus();
-      break;
-
-    case 'shift':
-      document.getElementById(
-        'shiftInput'
-      )?.focus();
-      break;
-
-    case 'bitwise':
-      document.getElementById(
-        'bit1'
-      )?.focus();
-      break;
-
-    case 'float':
-      document.getElementById(
-        'floatInput'
-      )?.focus();
-      break;
-
-    case 'ascii':
-      document.getElementById(
-        'asciiInput'
-      )?.focus();
-      break;
-
-    case 'overflow':
-      document.getElementById(
-        'overflowNum1'
-      )?.focus();
-      break;
-
-    case 'visual':
-      document.getElementById(
-        'visualNum1'
-      )?.focus();
-      break;
-
-    case 'digitalcodes':
-      document.getElementById(
-        'digitalInput'
-      )?.focus();
-      break;
 
   }
 
@@ -202,9 +138,6 @@ setTimeout(() => {
 
 });
 
-/* =========================================
-NUMBER CONVERSION
-========================================= */
 
 /* =========================================
 VALIDATE NUMBER FOR BASE
@@ -1847,145 +1780,6 @@ ${steps}
 
 
 
-function subtractInBase2(a,b,base){
-
-  a = a.toUpperCase();
-  b = b.toUpperCase();
-
-  let negative = false;
-
-  if(compareBaseNumbers(a,b) < 0){
-
-    negative = true;
-
-    let temp = a;
-
-    a = b;
-    b = temp;
-
-  }
-
-  const maxLen =
-    Math.max(a.length,b.length);
-
-  a = a.padStart(maxLen,'0');
-  b = b.padStart(maxLen,'0');
-
-  let borrow = 0;
-
-  let answer = [];
-
-  let borrowRow = [];
-
-  let steps = '';
-
-  for(let i=maxLen-1;i>=0;i--){
-
-    let d1 =
-      charToValue(a[i]) - borrow;
-
-    const d2 =
-      charToValue(b[i]);
-
-    borrow = 0;
-
-    if(d1 < d2){
-
-      d1 += base;
-
-      borrow = 1;
-
-    }
-
-    const diff =
-      d1 - d2;
-
-    answer.unshift(
-      valueToChar(diff)
-    );
-
-    borrowRow.unshift(borrow);
-
-    steps += `
-${a[i]} - ${b[i]}
-
-Write:
-${valueToChar(diff)}
-
-Borrow:
-${borrow}
-
---------------------------------
-`;
-
-  }
-
-  while(
-    answer.length > 1 &&
-    answer[0] === '0'
-  ){
-
-    answer.shift();
-
-  }
-
-  const formattedA =a;
-
-const formattedB =b;
-
-const formattedAnswer =
-  answer.join('');
-
-const formattedBorrow =
-  borrowRow.join('');
-
-const totalWidth =
-  Math.max(
-
-    formattedA.length,
-
-    formattedB.length + 2,
-
-    formattedAnswer.length + 2,
-
-    formattedBorrow.length
-
-  );
-
-return {
-
-  result:
-    (negative ? '-' : '')
-    + answer.join(''),
-
-  visual: `
-
-Borrow:
-${formattedBorrow.padStart(totalWidth)}
-
-${formattedA.padStart(totalWidth)}
-
-- ${formattedB.padStart(totalWidth - 1)}
-
-${'-'.repeat(totalWidth)}
-
-${(
-  (
-    negative
-    ? '- '
-    : ''
-  ) + formattedAnswer
-).padStart(totalWidth)}
-
-================================
-
-${steps}
-
-`
-
-};
-
-}
 
 /* =========================================
 TRUE BASE MULTIPLICATION
@@ -2247,180 +2041,6 @@ ${'-'.repeat(totalDigits * 2 + 2)}`
 };
 
 }
-
-
-
-function multiplyInBase2(a,b,base){
-
-  a = a.toUpperCase();
-  b = b.toUpperCase();
-
-  let partials = [];
-
-  let workSteps = '';
-
-  let shift = 0;
-
-  /* =====================================
-  PARTIAL PRODUCTS
-  ===================================== */
-
-  for(let i=b.length-1;i>=0;i--){
-
-    const digitB =
-      charToValue(b[i]);
-
-    let carry = 0;
-
-    let partial = [];
-
-    workSteps += `
-================================
-Multiplying by ${b[i]}
-================================
-`;
-
-    for(let j=a.length-1;j>=0;j--){
-
-      const digitA =
-        charToValue(a[j]);
-
-      const product =
-        digitA * digitB + carry;
-
-      const digit =
-        product % base;
-
-      carry =
-        Math.floor(product / base);
-
-      partial.unshift(
-        valueToChar(digit)
-      );
-
-      workSteps += `
-${a[j]} × ${b[i]}
-
-= ${product}
-
-Write:
-${valueToChar(digit)}
-
-Carry:
-${carry}
-
---------------------------------
-`;
-
-    }
-
-    if(carry){
-
-      partial.unshift(
-        valueToChar(carry)
-      );
-
-    }
-
-    /* SHIFT */
-
-    partial =
-      partial.join('')
-      + '0'.repeat(shift);
-
-    partials.push(partial);
-
-    shift++;
-
-  }
-
-  /* =====================================
-  FINAL ADDITION
-  ===================================== */
-
-  let finalResult = '0';
-
-  for(let p of partials){
-
-    finalResult =
-      addInBase(
-        finalResult,
-        p,
-        base
-      ).result;
-
-  }
-
-const formattedA =a;
-
-const formattedB =b;
-
-const formattedResult =
-  finalResult.split('').join('');
-
-const formattedPartials =
-  partials.map(
-    x => x.split('').join('')
-  );
-
-const totalWidth =
-  Math.max(
-
-    formattedA.length,
-
-    formattedB.length + 2,
-
-    formattedResult.length,
-
-    ...formattedPartials.map(
-      x => x.length
-    )
-
-  );
-
-return {
-
-  result:
-    finalResult,
-
-  visual: `
-
-PROCESS 1:
-DIRECT BASE MULTIPLICATION
-
-${formattedA.padStart(totalWidth)}
-
-× ${formattedB.padStart(totalWidth - 1)}
-
-${'-'.repeat(totalWidth)}
-
-${formattedPartials.map(
-x => x.padStart(totalWidth)
-).join('\n')}
-
-${'-'.repeat(totalWidth)}
-
-${formattedResult.padStart(totalWidth)}
-
-================================
-
-${workSteps}
-
-`
-
-};
-
-}
-
-
-
-
-
-
-
-
-
-
 
 function divideInBaseDecimal(a,b,base){
 
@@ -2814,10 +2434,6 @@ ${'-'.repeat(width)}
 
 }
 
-
-
-
-
 function divideInBase(a,b,base){
 
 a = a.toUpperCase();
@@ -2903,22 +2519,7 @@ function spaced(str){
 
 }
 
-function removeLeadingZeros(str){
 
-  while(
-    str.length > 1
-    &&
-    str[0] === '0'
-  ){
-
-    str =
-      str.slice(1);
-
-  }
-
-  return str;
-
-}
 
 /* ================================
 LONG DIVISION
@@ -3300,2222 +2901,6 @@ ${'-'.repeat(width)}
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-function divideInBase3(a,b,base){
-
-a = a.toUpperCase();
-b = b.toUpperCase();
-
-/* ================================
-DIVIDE BY ZERO
-================================ */
-
-if(
-  b === '0'
-  ||
-  b === '0.0'
-){
-
-  throw new Error(
-    'Division by zero not allowed'
-  );
-
-}
-
-/* ================================
-REMOVE DECIMAL
-================================ */
-
-let aParts =
-  a.split('.');
-
-let bParts =
-  b.split('.');
-
-let aFrac =
-  aParts[1] || '';
-
-let bFrac =
-  bParts[1] || '';
-
-const shift =
-  Math.max(
-    aFrac.length,
-    bFrac.length
-  );
-
-a =
-  a.replace('.','')
-  .padEnd(
-    a.replace('.','').length
-    + (shift - aFrac.length),
-    '0'
-  );
-
-b =
-  b.replace('.','')
-  .padEnd(
-    b.replace('.','').length
-    + (shift - bFrac.length),
-    '0'
-  );
-
-/* ================================
-HELPERS
-================================ */
-
-function spaced(str){
-
-  return str.split('').join(' ');
-
-}
-
-function removeLeadingZeros(str){
-
-  while(
-    str.length > 1
-    &&
-    str[0] === '0'
-  ){
-
-    str =
-      str.slice(1);
-
-  }
-
-  return str;
-
-}
-
-/* ================================
-LONG DIVISION
-================================ */
-
-let quotient = '';
-
-let current = '';
-
-let steps =
-  'Explanation:\n\n';
-
-let visualSteps = '';
-
-for(let i=0;i<a.length;i++){
-
-  current += a[i];
-
-  current =
-    removeLeadingZeros(current);
-
-  let qDigit = 0;
-
-  let subtractionSteps = '';
-
-  /* ================================
-  REPEATED SUBTRACTION
-  ================================ */
-
-  while(
-    compareBaseNumbers(
-      current,
-      b
-    ) >= 0
-  ){
-
-    subtractionSteps += `
-${current}
-- ${b}
-${'-'.repeat(
-Math.max(
-current.length,
-b.length
-) + 2
-)}
-`;
-
-    current =
-      subtractInBase(
-        current,
-        b,
-        base
-      )
-      .result
-      .replace('-','');
-
-    current =
-      removeLeadingZeros(current);
-
-    subtractionSteps += `
-${current}
-
-`;
-
-    qDigit++;
-
-  }
-
-  quotient +=
-    valueToChar(qDigit);
-
-  /* ================================
-  VISUAL STEP
-  ================================ */
-
-  visualSteps += `
-
-================================
-
-Step ${i + 1}
-
-Current Dividend:
-${spaced(current || '0')}
-
-${valueToChar(qDigit)} × ${b}
-
-Repeated Subtraction:
-
-${subtractionSteps}
-
-Quotient Digit:
-${valueToChar(qDigit)}
-
-Remainder:
-${current || '0'}
-
-`;
-
-  /* ================================
-  EXPLANATION
-  ================================ */
-
-  let x = ``;
-
-  if(base===2)x=`₂`;
-  if(base===8)x=`₈`;
-  if(base===16)x=`₁₆`;
-
-  let baseExplanation =
-    `${qDigit}₁₀`;
-
-  if(base !== 10){
-
-    baseExplanation =
-`(${qDigit})₁₀ = (${convertDecimalToBaseLocal(qDigit,base)})${x}`;
-
-  }
-
-  steps += `
-
-Bring down:
-${a[i]}
-
-Current Working Number:
-${current || '0'}
-
-${b} goes into current number
-
-${baseExplanation} times
-
-Remainder:
-${current || '0'}
-
---------------------------------
-
-`;
-
-}
-
-/* ================================
-REMOVE LEADING ZEROS
-================================ */
-
-quotient =
-  removeLeadingZeros(
-    quotient
-  );
-
-if(quotient === ''){
-
-  quotient = '0';
-
-}
-
-
-
-
-  
-/* ================================
-FINAL VISUAL WIDTH
-================================ */
-
-const totalDigits =
-  Math.max(
-    a.length,
-    b.length,
-    quotient.length
-  ) + 2;
-
-/* ================================
-FINAL VISUAL
-================================ */
-
-return {
-
-  result:
-    quotient,
-
-  visual: `
-
-Base ${base} Division:
-
-${a} ÷ ${b}
-
-${'='.repeat(totalDigits * 2)}
-
-Quotient:
-${spaced(quotient)}
-
-Divisor:
-${spaced(b)}
-
-Dividend:
-${spaced(a)}
-
-Final Remainder:
-${spaced(current || '0')}
-
-${'='.repeat(totalDigits * 2)}
-
-${visualSteps}
-
-${'='.repeat(totalDigits * 2)}
-
-${steps}
-
-`
-
-};
-
-}
-
-
-
-function divideInBase1(a,b,base){
-
-a = a.toUpperCase();
-b = b.toUpperCase();
-
-/* ================================
-DIVIDE BY ZERO
-================================ */
-
-if(
-  b === '0'
-  ||
-  b === '0.0'
-){
-
-  throw new Error(
-    'Division by zero not allowed'
-  );
-
-}
-
-/* ================================
-REMOVE DECIMALS
-================================ */
-
-let aParts =
-  a.split('.');
-
-let bParts =
-  b.split('.');
-
-let aFrac =
-  aParts[1] || '';
-
-let bFrac =
-  bParts[1] || '';
-
-const shift =
-  Math.max(
-    aFrac.length,
-    bFrac.length
-  );
-
-a =
-  a.replace('.','')
-  .padEnd(
-    a.replace('.','').length
-    + (shift - aFrac.length),
-    '0'
-  );
-
-b =
-  b.replace('.','')
-  .padEnd(
-    b.replace('.','').length
-    + (shift - bFrac.length),
-    '0'
-  );
-
-/* ================================
-SPACING HELPER
-================================ */
-
-function spaced(str){
-
-  return str.split('').join(' ');
-
-}
-
-/* ================================
-LONG DIVISION
-================================ */
-
-let quotient = '';
-
-let current = '';
-
-let steps =
-  'Explanation:\n\n';
-
-let stepVisuals = [];
-
-for(let i=0;i<a.length;i++){
-
-  current += a[i];
-
-  current =
-    removeLeadingZeros(current);
-
-  let qDigit = 0;
-
-  while(
-    compareBaseNumbers(
-      current,
-      b
-    ) >= 0
-  ){
-
-    current =
-      subtractInBase(
-        current,
-        b,
-        base
-      ).result.replace('-','');
-
-    qDigit++;
-
-  }
-
-  quotient +=
-    valueToChar(qDigit);
-
-  stepVisuals.push(`
-Current Dividend:
-${current || '0'}
-
-Quotient Digit:
-${valueToChar(qDigit)}
-
---------------------------------
-`);
-
-  let x = ``;
-
-  if(base===2)x=`₂`;
-  if(base===8)x=`₈`;
-  if(base===16)x=`₁₆`;
-
-  let baseExplanation =
-    `${qDigit}₁₀`;
-
-  if(base !== 10){
-
-    baseExplanation =
-`(${qDigit})₁₀ = (${convertDecimalToBaseLocal(qDigit,base)})${x}`;
-
-  }
-
-  steps += `
-Bring down:
-${a[i]}
-
-Current:
-${current || '0'}
-
-Quotient digit:
-${baseExplanation}
-
-Remainder:
-${current || '0'}
-
-================================
-`;
-
-}
-
-/* ================================
-REMOVE LEADING ZEROS
-================================ */
-
-quotient =
-  removeLeadingZeros(
-    quotient
-  );
-
-if(quotient === ''){
-
-  quotient = '0';
-
-}
-
-/* ================================
-FINAL VISUAL WIDTH
-================================ */
-
-const totalDigits =
-  Math.max(
-    a.length,
-    b.length,
-    quotient.length
-  ) + 2;
-
-/* ================================
-FINAL VISUAL
-================================ */
-
-return {
-
-  result:
-    quotient,
-
-  visual: `Base ${base} Division:
-
-${a} ÷ ${b}
-
-${'-'.repeat(totalDigits * 2)}
-
-Quotient:
-${spaced(quotient)}
-
-Divisor:
-${spaced(b)}
-
-Dividend:
-${spaced(a)}
-
-Remainder:
-${spaced(current || '0')}
-
-${'-'.repeat(totalDigits * 2)}
-
-${steps}
-
-`
-
-};
-
-}
-
-/* ================================
-HELPER
-================================ */
-
-function removeLeadingZeros(str){
-
-  while(
-    str.length > 1
-    &&
-    str[0] === '0'
-  ){
-
-    str =
-      str.slice(1);
-
-  }
-
-  return str;
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =========================================
-TRUE BASE DIVISION
-LONG DIVISION
-NO DECIMAL CONVERSION
-========================================= */
-
-function divideInBase2(a,b,base){
-
-  a = a.toUpperCase();
-  b = b.toUpperCase();
-
-  if(b === '0'){
-
-    return {
-
-      result: 'Undefined',
-
-      visual:
-        'Division By Zero'
-
-    };
-
-  }
-
-  let quotient = '';
-
-  let current = '';
-
-  let steps = '';
-
-  /* =====================================
-  LONG DIVISION
-  ===================================== */
-
-  for(let i=0;i<a.length;i++){
-
-    current += a[i];
-
-    current =
-      current.replace(/^0+/,'')
-      || '0';
-
-    let count = 0;
-
-    while(
-
-      compareBaseNumbers(
-        current,
-        b
-      ) >= 0
-
-    ){
-
-      current =
-        subtractInBase(
-          current,
-          b,
-          base
-        ).result
-        .replace('-','');
-
-      count++;
-
-    }
-
-    quotient +=
-      valueToChar(count);
-
-    steps += `
-Current Portion:
-${current}
-
-Quotient Digit:
-${valueToChar(count)}
-
-Remainder:
-${current}
-
---------------------------------
-`;
-
-  }
-
-  quotient =
-    quotient.replace(/^0+/,'')
-    || '0';
-
- const divisionLine =
-  `${b} ) ${a}`;
-
-const totalWidth =
-  Math.max(
-
-    divisionLine.length,
-
-    quotient.length,
-
-    current.length
-
-  );
-
-return {
-
-  result:
-    quotient,
-
-  remainder:
-    current,
-
-  visual: `
-
-PROCESS 1:
-DIRECT BASE DIVISION
-
-${divisionLine.padStart(totalWidth)}
-
-${'-'.repeat(totalWidth)}
-
-Quotient:
-${quotient.padStart(totalWidth)}
-
-Remainder:
-${current.padStart(totalWidth)}
-
-================================
-
-${steps}
-
-`
-
-};
-
-}
-
-
-
-/* =========================================
-ARITHMETIC
-TRUE BASE ARITHMETIC
-NO DECIMAL CONVERSION
-========================================= */
-
-function calculateArithmetic(){
-
-  const num1 =
-    document.getElementById('num1')
-    .value
-    .trim()
-    .toUpperCase();
-
-  const num2 =
-    document.getElementById('num2')
-    .value
-    .trim()
-    .toUpperCase();
-
-  const base =
-    parseInt(
-      document.getElementById(
-        'arithBase'
-      ).value
-    );
-
-  const operation =
-    document.getElementById(
-      'operation'
-    ).value;
-
-  const resultDiv =
-    document.getElementById(
-      'globalResult'
-    );
-
-  const stepsDiv =
-    document.getElementById(
-      'globalSteps'
-    );
-
-  try{
-
-    /* ================================
-    VALIDATION
-    ================================ */
-
-    if(
-      !isValidForBase(num1, base)
-      ||
-      !isValidForBase(num2, base)
-    ){
-
-      throw new Error(
-        'Invalid Input'
-      );
-
-    }
-
-    let finalAnswer = '';
-
-    let visualSteps = '';
-
-    /* ================================
-    ADDITION
-    ================================ */
-
-    if(operation === '+'){
-
-      const res =
-        addInBase(
-          num1,
-          num2,
-          base
-        );
-
-      finalAnswer =
-        res.result;
-
-      visualSteps =
-        res.visual;
-
-    }
-
-    /* ================================
-    SUBTRACTION
-    ================================ */
-
-    else if(operation === '-'){
-
-      const res =
-        subtractInBase(
-          num1,
-          num2,
-          base
-        );
-
-      finalAnswer =
-        res.result;
-
-      visualSteps =
-        res.visual;
-
-    }
-
-    /* ================================
-    MULTIPLICATION
-    ================================ */
-
-    else if(operation === '*'){
-
-      const res =
-        multiplyInBase(
-          num1,
-          num2,
-          base
-        );
-
-      finalAnswer =
-        res.result;
-
-      visualSteps =
-        res.visual;
-
-    }
-
-    /* ================================
-    DIVISION
-    ================================ */
-
-    else if(operation === '/'){
-
-      const res =
-        divideInBase(
-          num1,
-          num2,
-          base
-        );
-
-      finalAnswer =
-        res.result;
-
-      visualSteps =
-        res.visual;
-
-      if(res.remainder !== undefined){
-
-        visualSteps += `
-
-================================
-
-FINAL ANSWER
-
-Quotient:
-${res.result}
-
-Remainder:
-${res.remainder}
-`;
-
-      }
-
-    }
-
-    else{
-
-      throw new Error(
-        'Unsupported Operation'
-      );
-
-    }
-
-    /* ================================
-    RESULT
-    ================================ */
-
-    resultDiv.innerHTML =
-      `✅ Result: ${finalAnswer}`;
-
-    stepsDiv.textContent  =
-      visualSteps;
-
-  }
-
-  catch(err){
-
-    resultDiv.innerHTML =
-      '❌ Invalid Input';
-
-    stepsDiv.innerHTML =
-      err.message;
-
-  }
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function calculateArithmetic2(){
-
-  const num1 = document.getElementById('num1').value.trim();
-  const num2 = document.getElementById('num2').value.trim();
-
-  const base = parseInt(document.getElementById('arithBase').value);
-  const operation = document.getElementById('operation').value;
-
-  const resultDiv = document.getElementById('globalResult');
-  const stepsDiv = document.getElementById('globalSteps');
-
-  try{
-
-    if(
-  !isValidForBase(num1, base) ||
-  !isValidForBase(num2, base)
-){
-  throw new Error("Invalid number for selected base");
-}
-
-const dec1 =
-  convertToDecimal(num1, base);
-
-const dec2 =
-  convertToDecimal(num2, base);
-
-    if(isNaN(dec1) || isNaN(dec2)){
-      throw new Error("Invalid");
-    }
-
-    let answer;
-
-    switch(operation){
-
-      case '+':
-        answer = dec1 + dec2;
-        break;
-
-      case '-':
-        answer = dec1 - dec2;
-        break;
-
-      case '*':
-        answer = dec1 * dec2;
-        break;
-
-      case '/':
-        if(dec2 === 0){
-  throw new Error(
-    "Division By Zero"
-  );
-}
-        answer = dec1 / dec2;
-        break;
-
-    }
-
-   let finalAnswer =
-  convertFromDecimal(answer, base);
-
-    resultDiv.innerHTML = `✅ Result: ${finalAnswer}`;
-
-    stepsDiv.innerHTML = `
-Number 1 = ${num1} (Base ${base})
-= ${dec1} in Decimal
-
-Number 2 = ${num2} (Base ${base})
-= ${dec2} in Decimal
-
-Operation:
-${dec1} ${operation} ${dec2}
-
-Decimal Result:
-${answer}
-
-Converted back to Base ${base}:
-${finalAnswer}
-`;
-
-  }
-
-  catch(err){
-
-    resultDiv.innerHTML = "❌ Invalid Input";
-    stepsDiv.innerHTML = "";
-
-  }
-
-}
-
-
-/* =========================================
-COMPLEMENTS
-========================================= */
-
-function findComplements(){
-
-  const input = document.getElementById('compInput').value.trim();
-
-  const resultDiv = document.getElementById('globalResult');
-  const stepsDiv = document.getElementById('globalSteps');
-
-  try{
-
-    if(!/^[01]+$/.test(input)){
-      throw new Error("Binary only");
-    }
-
-    let ones = '';
-
-    for(let bit of input){
-
-      ones += bit === '0' ? '1' : '0';
-
-    }
-
-    let twosDecimal = parseInt(ones, 2) + 1;
-
-    let twos = twosDecimal
-      .toString(2)
-      .padStart(input.length, '0');
-
-    resultDiv.innerHTML = `✅ Complement Generated`;
-
-    stepsDiv.innerHTML = `
-Original Binary:
-${input}
-
---------------------------------
-
-1's Complement:
-Invert all bits
-
-${ones}
-
---------------------------------
-
-2's Complement:
-Add 1 to 1's complement
-
-${ones}
-+ 1
-----------------
-${twos}
-`;
-
-  }
-
-  catch(err){
-
-    resultDiv.innerHTML = "❌ Invalid Binary Input";
-    stepsDiv.innerHTML = "";
-
-  }
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =========================================
-SIGNED NUMBER REPRESENTATION
-========================================= */
-
-function generateSignedBinary(){
-
-  const num =
-    parseInt(
-      document.getElementById('signedInput').value
-    );
-
-  const bits =
-    parseInt(
-      document.getElementById('signedBits').value
-    );
-
-  const result =
-    document.getElementById('globalResult');
-
-  const steps =
-    document.getElementById('globalSteps');
-
-  if(isNaN(num)){
-
-    result.innerHTML = "❌ Invalid";
-
-    return;
-  }
-
-  // Positive magnitude binary
-  let positiveBinary =
-    Math.abs(num)
-    .toString(2)
-    .padStart(bits,'0');
-
-  // Signed magnitude
-  let signedMagnitude =
-    (num < 0 ? '1' : '0') +
-    positiveBinary.substring(1);
-
-  // 1's complement
-  let ones = '';
-
-  for(let bit of positiveBinary){
-
-    ones += bit === '0'
-      ? '1'
-      : '0';
-  }
-
-  // 2's complement
-  let twos =
-    (parseInt(ones,2)+1)
-    .toString(2)
-    .padStart(bits,'0');
-
-  result.innerHTML =
-    `✅ ${num} Representation`;
-
-  steps.innerHTML = `
-Signed Magnitude:
-${signedMagnitude}
-
-1's Complement:
-${ones}
-
-2's Complement:
-${twos}
-`;
-
-}
-
-/* =========================================
-SHIFT OPERATIONS
-========================================= */
-
-function performShift(){
-
-  const input =
-    document.getElementById('shiftInput')
-    .value.trim();
-
-  const type =
-    document.getElementById('shiftType')
-    .value;
-
-  const count =
-    parseInt(
-      document.getElementById('shiftCount')
-      .value
-    );
-
-  const result =
-    document.getElementById('globalResult');
-
-  const steps =
-    document.getElementById('globalSteps');
-
-  if(!/^[01]+$/.test(input)){
-
-    result.innerHTML =
-      "❌ Invalid Binary";
-
-    return;
-  }
-
-  const decimal =
-    parseInt(input, 2);
-
-  let shiftedDecimal;
-
-  if(type === 'left'){
-
-    shiftedDecimal =
-      decimal << count;
-
-  }
-  else{
-
-    shiftedDecimal =
-      decimal >> count;
-
-  }
-
-  const shiftedBinary =
-    shiftedDecimal.toString(2);
-
-  result.innerHTML =
-    `✅ Shifted Result: ${shiftedBinary}`;
-
-  steps.innerHTML = `
-Original Binary:
-${input}
-
-Decimal Value:
-${decimal}
-
-Shift Type:
-${type}
-
-Shift Count:
-${count}
-
-Operation:
-
-${decimal}
-${type === 'left' ? '<<' : '>>'}
-${count}
-
-Shifted Decimal:
-${shiftedDecimal}
-
-Final Binary:
-${shiftedBinary}
-`;
-
-}
-
-/* =========================================
-BITWISE OPERATIONS
-========================================= */
-
-function performBitwise(){
-
-  const a =
-    document.getElementById('bit1')
-    .value.trim();
-
-  const b =
-    document.getElementById('bit2')
-    .value.trim();
-
-  const op =
-    document.getElementById('bitOp')
-    .value;
-
-  const result =
-    document.getElementById('globalResult');
-
-  const steps =
-    document.getElementById('globalSteps');
-
-  if(
-    !/^[01]+$/.test(a) ||
-    !/^[01]+$/.test(b)
-  ){
-    result.innerHTML = "❌ Invalid Binary";
-    return;
-  }
-
-  let x = parseInt(a,2);
-  let y = parseInt(b,2);
-
-  let ans;
-
-  switch(op){
-
-    case 'AND':
-      ans = x & y;
-      break;
-
-    case 'OR':
-      ans = x | y;
-      break;
-
-    case 'XOR':
-      ans = x ^ y;
-      break;
-
-  }
-
-  let finalAns =
-    ans.toString(2);
-
-  result.innerHTML =
-    `✅ Result: ${finalAns}`;
-
-  steps.innerHTML = `
-${a}
-${op}
-${b}
-
-Result:
-${finalAns}
-`;
-
-}
-
-/* =========================================
-IEEE754
-========================================= */
-
-function convertIEEE754(){
-
-  const num =
-    parseFloat(
-      document.getElementById('floatInput')
-      .value
-    );
-
-  const result =
-    document.getElementById('globalResult');
-
-  const steps =
-    document.getElementById('globalSteps');
-
-  if(isNaN(num)){
-    result.innerHTML = "❌ Invalid";
-    return;
-  }
-
-  const buffer = new ArrayBuffer(4);
-
-  const floatView =
-    new Float32Array(buffer);
-
-  const intView =
-    new Uint32Array(buffer);
-
-  floatView[0] = num;
-
-  const binary =
-    intView[0]
-    .toString(2)
-    .padStart(32,'0');
-
-  result.innerHTML =
-    `✅ IEEE754 Generated`;
-
-  steps.innerHTML = `
-Binary Representation:
-
-${binary}
-
-Sign Bit:
-${binary[0]}
-
-Exponent:
-${binary.substring(1,9)}
-
-Mantissa:
-${binary.substring(9)}
-`;
-
-}
-
-/* =========================================
-ASCII HEX CONVERTER
-========================================= */
-
-function convertAsciiHex(){
-
-  const text =
-    document.getElementById('asciiInput')
-    .value;
-
-  const result =
-    document.getElementById('globalResult');
-
-  const steps =
-    document.getElementById('globalSteps');
-
-  if(!text){
-
-    result.innerHTML =
-      "❌ Enter Text";
-
-    steps.innerHTML = "";
-
-    return;
-  }
-
-  let hexOutput = '';
-  let binaryOutput = '';
-  let decimalOutput = '';
-
-  for(let ch of text){
-
-    const decimal =
-      ch.charCodeAt(0);
-
-    const hex =
-      decimal
-      .toString(16)
-      .toUpperCase();
-
-    const binary =
-      decimal
-      .toString(2)
-      .padStart(8,'0');
-
-    hexOutput += hex + ' ';
-    binaryOutput += binary + ' ';
-    decimalOutput += decimal + ' ';
-
-  }
-
-  result.innerHTML =
-    `✅ Conversion Generated`;
-
-  steps.innerHTML = `
-Original Text:
-${text}
-
---------------------------------
-
-ASCII Decimal:
-${decimalOutput}
-
---------------------------------
-
-HEX:
-${hexOutput}
-
---------------------------------
-
-Binary:
-${binaryOutput}
-`;
-
-}
-
-
-
-
-
-/* =========================================
-OVERFLOW DETECTION
-========================================= */
-
-function detectOverflow(){
-
-  const a =
-    document.getElementById('overflowNum1')
-    .value.trim();
-
-  const b =
-    document.getElementById('overflowNum2')
-    .value.trim();
-
-  const bits =
-    parseInt(
-      document.getElementById('overflowBits')
-      .value
-    );
-
-  const result =
-    document.getElementById('globalResult');
-
-  const steps =
-    document.getElementById('globalSteps');
-
-  if(
-    !/^[01]+$/.test(a) ||
-    !/^[01]+$/.test(b)
-  ){
-
-    result.innerHTML =
-      "❌ Invalid Binary";
-
-    return;
-  }
-
-  const decA =
-    parseInt(a,2);
-
-  const decB =
-    parseInt(b,2);
-
-  const sum =
-    decA + decB;
-
-  const max =
-    Math.pow(2,bits)-1;
-
-  const overflow =
-    sum > max;
-
-  const binarySum =
-    sum.toString(2);
-
-  const trimmed =
-    binarySum.slice(-bits);
-
-  result.innerHTML =
-    overflow
-      ? "⚠️ Overflow Detected"
-      : "✅ No Overflow";
-
-  steps.innerHTML = `
-First Number:
-${a}
-
-Second Number:
-${b}
-
---------------------------------
-
-Decimal Calculation:
-
-${decA} + ${decB} = ${sum}
-
---------------------------------
-
-Binary Addition:
-
-  ${a.padStart(bits,'0')}
-+ ${b.padStart(bits,'0')}
-
-= ${binarySum}
-
-Stored ${bits}-bit Result:
-${trimmed}
-
---------------------------------
-
-Maximum ${bits}-bit Value:
-${max}
-
-Overflow:
-${overflow ? 'YES' : 'NO'}
-`;
-
-}
-
-
-
-
-
-
-
-
-/* =========================================
-BINARY ADDITION VISUALIZER
-========================================= */
-
-function visualizeBinaryOperation(){
-
-  let a =
-    document.getElementById('visualNum1')
-    .value.trim();
-
-  let b =
-    document.getElementById('visualNum2')
-    .value.trim();
-
-  const operation =
-  document.getElementById(
-    'visualOperation'
-  ).value;
-
-  
-
-  const result =
-    document.getElementById('globalResult');
-
-  const steps =
-    document.getElementById('globalSteps');
-
-  if(
-    !/^[01]+$/.test(a) ||
-    !/^[01]+$/.test(b)
-  ){
-
-    result.innerHTML =
-      "❌ Invalid Binary";
-
-    return;
-  }
-
-  if(operation === 'multiply'){
-
-  return visualizeBinaryMultiplication(a,b);
-
-}
-
-if(operation === 'sub1'){
-
-  return visualizeOnesComplementSubtraction(a,b);
-
-}
-
-if(operation === 'sub2'){
-
-  return visualizeTwosComplementSubtraction(a,b);
-
-}
-
-  
-  const maxLen =
-    Math.max(a.length, b.length);
-
-  a = a.padStart(maxLen,'0');
-  b = b.padStart(maxLen,'0');
-
-  let carry = 0;
-
-  let carryRow = '';
-  let answer = '';
-
-  for(let i=maxLen-1; i>=0; i--){
-
-    const bitA = parseInt(a[i]);
-    const bitB = parseInt(b[i]);
-
-    const sum =
-      bitA + bitB + carry;
-
-    answer =
-      (sum % 2) + answer;
-
-    carryRow =
-      carry + carryRow;
-
-    carry =
-      Math.floor(sum / 2);
-
-  }
-
-  if(carry){
-
-    answer = carry + answer;
-    carryRow = carry + carryRow;
-
-  }
-  else{
-    carryRow = ' ' + carryRow;
-  }
-
-  result.innerHTML =
-    `✅ Binary Addition Complete`;
-
-  steps.innerHTML = `
-Carry:
-${carryRow}
-
-  ${a}
-+ ${b}
-${'-'.repeat(maxLen + 2)}
-
- ${answer}
-
---------------------------------
-
-Decimal Verification:
-
-${parseInt(a,2)}
-+
-${parseInt(b,2)}
-
-=
-
-${parseInt(answer,2)}
-`;
-
-}
-
-
-/* =========================================
-BINARY MULTIPLICATION VISUALIZER
-========================================= */
-
-function visualizeBinaryMultiplication(a,b){
-
-  const result =
-    document.getElementById('globalResult');
-
-  const steps =
-    document.getElementById('globalSteps');
-
-  const decA =
-    parseInt(a,2);
-
-  const decB =
-    parseInt(b,2);
-
-  const final =
-    decA * decB;
-
-  const binaryFinal =
-    final.toString(2);
-
-  let work = '';
-
-  let shift = 0;
-
-  for(let i=b.length-1; i>=0; i--){
-
-    const bit = b[i];
-
-    if(bit === '1'){
-
-      const partial =
-        a + '0'.repeat(shift);
-
-      work +=
-        partial + '\n';
-
-    }
-    else{
-
-      work +=
-        '0'.repeat(a.length + shift)
-        + '\n';
-
-    }
-
-    shift++;
-
-  }
-
-  result.innerHTML =
-    `✅ Binary Multiplication Complete`;
-
-  steps.innerHTML = `
-       ${a}
-×      ${b}
-----------------
-
-${work}
-
-----------------
-
-Result:
-${binaryFinal}
-
---------------------------------
-
-Decimal Verification:
-
-${decA}
-×
-${decB}
-
-=
-
-${final}
-`;
-
-}
-
-
-
-
-/* =========================================
-1's COMPLEMENT SUBTRACTION
-========================================= */
-
-function visualizeOnesComplementSubtraction(a,b){
-
-  const result =
-    document.getElementById('globalResult');
-
-  const steps =
-    document.getElementById('globalSteps');
-
-  const bits =
-    Math.max(a.length,b.length);
-
-  a = a.padStart(bits,'0');
-  b = b.padStart(bits,'0');
-
-  let ones = '';
-
-  for(let bit of b){
-
-    ones += bit === '0'
-      ? '1'
-      : '0';
-
-  }
-
-  const sum =
-    parseInt(a,2)
-    +
-    parseInt(ones,2);
-
-  let binary =
-    sum.toString(2);
-
-  let carry = false;
-
-  // End-around carry exists
-  if(binary.length > bits){
-
-    carry = true;
-
-    binary =
-      binary.slice(1);
-
-    binary =
-      (
-        parseInt(binary,2) + 1
-      )
-      .toString(2)
-      .padStart(bits,'0');
-
-  }
-
-  // No carry → negative answer
-  else{
-
-    let corrected = '';
-
-    for(let bit of binary.padStart(bits,'0')){
-
-      corrected +=
-        bit === '0'
-        ? '1'
-        : '0';
-
-    }
-
-    binary = corrected;
-
-  }
-
-  result.innerHTML =
-    `✅ 1's Complement Subtraction`;
-
-  steps.innerHTML = `
-Minuend:
-${a}
-
-Subtrahend:
-${b}
-
---------------------------------
-
-1's Complement of Subtrahend:
-${ones}
-
---------------------------------
-
-Binary Sum:
-${sum.toString(2)}
-
---------------------------------
-
-Carry Generated:
-${carry ? 'YES' : 'NO'}
-
-${
-carry
-? `
-Positive Result:
-${binary}
-`
-: `
-Negative Result
-
-1's Complement of Sum:
-${binary}
-
-Final Answer:
--${binary}
-`
-}
-`;
-
-}
-
-
-
-
-
-/* =========================================
-2's COMPLEMENT SUBTRACTION
-========================================= */
-
-function visualizeTwosComplementSubtraction(a,b){
-
-  const result =
-    document.getElementById('globalResult');
-
-  const steps =
-    document.getElementById('globalSteps');
-
-  const bits =
-    Math.max(a.length,b.length);
-
-  a = a.padStart(bits,'0');
-  b = b.padStart(bits,'0');
-
-  let ones = '';
-
-  for(let bit of b){
-
-    ones += bit === '0'
-      ? '1'
-      : '0';
-
-  }
-
-  let twos =
-    (
-      parseInt(ones,2) + 1
-    )
-    .toString(2)
-    .padStart(bits,'0');
-
-  const sum =
-    parseInt(a,2)
-    +
-    parseInt(twos,2);
-
-  let binary =
-    sum.toString(2);
-
-  let carry = false;
-
-  // Carry exists
-  if(binary.length > bits){
-
-    carry = true;
-
-    binary =
-      binary.slice(1);
-
-  }
-
-  // No carry → negative
-  else{
-
-    let inverted = '';
-
-    for(let bit of binary.padStart(bits,'0')){
-
-      inverted +=
-        bit === '0'
-        ? '1'
-        : '0';
-
-    }
-
-    binary =
-      (
-        parseInt(inverted,2) + 1
-      )
-      .toString(2)
-      .padStart(bits,'0');
-
-  }
-
-  result.innerHTML =
-    `✅ 2's Complement Subtraction`;
-
-  steps.innerHTML = `
-Minuend:
-${a}
-
-Subtrahend:
-${b}
-
---------------------------------
-
-1's Complement:
-${ones}
-
-2's Complement:
-${twos}
-
---------------------------------
-
-Binary Sum:
-${sum.toString(2)}
-
---------------------------------
-
-Carry Generated:
-${carry ? 'YES' : 'NO'}
-
-${
-carry
-? `
-Positive Result:
-${binary}
-`
-: `
-Negative Result
-
-2's Complement of Sum:
-${binary}
-
-Final Answer:
--${binary}
-`
-}
-`;
-
-}
-
-
-
-
-/* =========================================
-DIGITAL CODES
-========================================= */
-
-function convertDigitalCodes(){
-
-  const input =
-    document.getElementById('digitalInput')
-    .value.trim();
-
-  const type =
-    document.getElementById('digitalType')
-    .value;
-
-  const result =
-    document.getElementById('globalResult');
-
-  const steps =
-    document.getElementById('globalSteps');
-
-  let output = '';
-
-  /* =====================================
-  BINARY → GRAY
-  ===================================== */
-
-  if(type === 'binaryToGray'){
-
-    if(!/^[01]+$/.test(input)){
-
-      result.innerHTML =
-        "❌ Invalid Binary";
-
-      steps.innerHTML = "";
-
-      return;
-    }
-
-    output += input[0];
-
-    for(let i=1;i<input.length;i++){
-
-      output +=
-        input[i-1] === input[i]
-        ? '0'
-        : '1';
-
-    }
-
-    result.innerHTML =
-      `✅ Gray Code: ${output}`;
-
-    steps.innerHTML = `
-Binary:
-${input}
-
---------------------------------
-
-Gray Code:
-${output}
-`;
-
-  }
-
-  /* =====================================
-  GRAY → BINARY
-  ===================================== */
-
-  else if(type === 'grayToBinary'){
-
-    if(!/^[01]+$/.test(input)){
-
-      result.innerHTML =
-        "❌ Invalid Gray Code";
-
-      steps.innerHTML = "";
-
-      return;
-    }
-
-    output += input[0];
-
-    for(let i=1;i<input.length;i++){
-
-      output +=
-        output[i-1] === input[i]
-        ? '0'
-        : '1';
-
-    }
-
-    result.innerHTML =
-      `✅ Binary Code: ${output}`;
-
-    steps.innerHTML = `
-Gray Code:
-${input}
-
---------------------------------
-
-Recovered Binary:
-${output}
-`;
-
-  }
-
-  /* =====================================
-  DECIMAL → BCD
-  ===================================== */
-
-  else if(type === 'decimalToBCD'){
-
-    if(!/^[0-9]+$/.test(input)){
-
-      result.innerHTML =
-        "❌ Decimal Only";
-
-      steps.innerHTML = "";
-
-      return;
-    }
-
-    let bcd = '';
-
-    for(let digit of input){
-
-      bcd +=
-        parseInt(digit)
-        .toString(2)
-        .padStart(4,'0')
-        + ' ';
-
-    }
-
-    result.innerHTML =
-      `✅ BCD Generated`;
-
-    steps.innerHTML = `
-Decimal Number:
-${input}
-
---------------------------------
-
-BCD Representation:
-${bcd}
-`;
-
-  }
-
-  /* =====================================
-  DECIMAL → EXCESS-3
-  ===================================== */
-
-  else if(type === 'decimalToExcess3'){
-
-    if(!/^[0-9]+$/.test(input)){
-
-      result.innerHTML =
-        "❌ Decimal Only";
-
-      steps.innerHTML = "";
-
-      return;
-    }
-
-    let excess3 = '';
-
-    for(let digit of input){
-
-      const val =
-        parseInt(digit) + 3;
-
-      excess3 +=
-        val.toString(2)
-        .padStart(4,'0')
-        + ' ';
-
-    }
-
-    result.innerHTML =
-      `✅ Excess-3 Generated`;
-
-    steps.innerHTML = `
-Decimal Number:
-${input}
-
---------------------------------
-
-Excess-3 Representation:
-${excess3}
-`;
-
-  }
-
-}
 
 
 
@@ -7232,7 +4617,9 @@ function toggleDecimalMode(mode){
 
     arithmetic.style.display =
       'none';
-
+document
+    .getElementById('decimalConvertInput')
+    .focus();
   }
 
   else{
@@ -7243,14 +4630,14 @@ function toggleDecimalMode(mode){
     arithmetic.style.display =
       'block';
 
-  }
-
-  document
-    .getElementById('decimalConvertInput')
-    .focus();
- document
+      document
     .getElementById('decimalNum1')
     .focus();
+
+  }
+
+  
+ 
 }
 
 
@@ -7275,7 +4662,41 @@ function toggleDecimalMode(mode){
 
 
 
+function onesComplementBinary(value){
 
+  return value
+    .split('')
+    .map(
+      ch =>
+        ch === '.'
+          ? '.'
+          : (1 - parseInt(ch))
+    )
+    .join('');
+
+}
+
+function twosComplementBinary(value){
+
+  const oneComp =
+    onesComplementBinary(value);
+
+  const increment =
+    value.includes('.')
+      ? '0.' +
+        '0'.repeat(
+          value.split('.')[1].length - 1
+        ) +
+        '1'
+      : '1';
+
+  return addInBase(
+    oneComp,
+    increment,
+    2
+  ).result;
+
+}
 
 
 
@@ -8490,6 +5911,1266 @@ ${result}`;
 }
 
 
+function findBinaryArithmetic(){
+
+  const num1 =
+    document.getElementById(
+      'binaryNum1'
+    ).value.trim();
+
+  const num2 =
+    document.getElementById(
+      'binaryNum2'
+    ).value.trim();
+
+  const operation =
+    document.getElementById(
+      'binaryOperation'
+    ).value;
+
+  const resultDiv =
+    document.getElementById(
+      'globalResult'
+    );
+
+  const stepsDiv =
+    document.getElementById(
+      'globalSteps'
+    );
+
+
+
+
+    const unaryOps = [
+  'Bitwise NOT (~)'
+];
+
+if(
+  unaryOps.includes(operation)
+){
+
+  if(!isBinaryNumber(num1)){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Binary Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+}
+else{
+
+  if(!isBinaryNumber(num1)){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Binary Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+  /*
+  Shift operations use decimal count
+  */
+
+  const shiftOps = [
+
+    'Left Shift (<<)',
+
+    'Right Shift (>>)',
+
+    'Zero Fill Right Shift (>>>)'
+
+  ];
+
+  if(
+    shiftOps.includes(operation)
+  ){
+
+    if(!isDecimalNumber(num2)){
+
+      resultDiv.innerHTML =
+        '❌ Invalid Shift Count';
+
+      stepsDiv.innerHTML = '';
+
+      return;
+
+    }
+
+  }
+  else{
+
+    if(!isBinaryNumber(num2)){
+
+      resultDiv.innerHTML =
+        '❌ Invalid Binary Number';
+
+      stepsDiv.innerHTML = '';
+
+      return;
+
+    }
+
+  }
+
+}
+
+  let result = '';
+  let steps = '';
+
+  switch(operation){
+
+    /* ============================
+       ADDITION
+    ============================ */
+
+    case 'Addition':{
+
+      const neg1 =
+        num1.startsWith('-');
+
+      const neg2 =
+        num2.startsWith('-');
+
+      const abs1 =
+        num1.replace('-','');
+
+      const abs2 =
+        num2.replace('-','');
+
+      if(neg1 === neg2){
+
+        const add =
+          addInBase(
+            abs1,
+            abs2,
+            2
+          );
+
+        result =
+          neg1
+            ? '-' + add.result
+            : add.result;
+
+        steps =
+`Both numbers have the same sign.
+
+Therefore find:
+
+${abs1} + ${abs2}
+
+${add.visual}
+
+${neg1
+ ? 'Apply negative sign.'
+ : 'Result remains positive.'
+}
+
+Answer = ${result}`;
+      }
+
+      else{
+
+        const d1 =
+          convertToDecimal(
+            abs1,
+            2
+          );
+
+        const d2 =
+          convertToDecimal(
+            abs2,
+            2
+          );
+
+        let big =
+          abs1;
+
+        let small =
+          abs2;
+
+        let resultNegative =
+          neg1;
+
+        if(d2 > d1){
+
+          big =
+            abs2;
+
+          small =
+            abs1;
+
+          resultNegative =
+            neg2;
+
+        }
+
+        const sub =
+          subtractInBase(
+            big,
+            small,
+            2
+          );
+
+        result =
+          resultNegative
+            ? '-' + sub.result
+            : sub.result;
+
+        steps =
+`Numbers have different signs.
+
+Convert addition into subtraction.
+
+Find:
+
+${big} - ${small}
+
+${sub.visual}
+
+Apply sign of larger magnitude.
+
+Answer = ${result}`;
+      }
+
+      break;
+    }
+
+    /* ============================
+       SUBTRACTION
+    ============================ */
+
+    case 'Subtraction':{
+
+      const neg1 =
+        num1.startsWith('-');
+
+      const neg2 =
+        num2.startsWith('-');
+
+      const abs1 =
+        num1.replace('-','');
+
+      const abs2 =
+        num2.replace('-','');
+
+      if(neg1 !== neg2){
+
+        const add =
+          addInBase(
+            abs1,
+            abs2,
+            2
+          );
+
+        result =
+          neg1
+            ? '-' + add.result
+            : add.result;
+
+        steps =
+`Convert subtraction into addition.
+
+${num1} - (${num2})
+
+Find:
+
+${abs1} + ${abs2}
+
+${add.visual}
+
+Answer = ${result}`;
+      }
+
+      else{
+
+        const d1 =
+          convertToDecimal(
+            abs1,
+            2
+          );
+
+        const d2 =
+          convertToDecimal(
+            abs2,
+            2
+          );
+
+        let big =
+          abs1;
+
+        let small =
+          abs2;
+
+        let resultNegative =
+          false;
+
+        if(d1 >= d2){
+
+          resultNegative =
+            neg1;
+
+        }
+
+        else{
+
+          big =
+            abs2;
+
+          small =
+            abs1;
+
+          resultNegative =
+            !neg1;
+        }
+
+        const sub =
+          subtractInBase(
+            big,
+            small,
+            2
+          );
+
+        result =
+          resultNegative
+            ? '-' + sub.result
+            : sub.result;
+
+        steps =
+`Both numbers have same sign.
+
+Find:
+
+${big} - ${small}
+
+${sub.visual}
+
+Apply sign of larger magnitude.
+
+Answer = ${result}`;
+      }
+
+      break;
+    }
+
+    /* ============================
+       MULTIPLICATION
+    ============================ */
+
+    case 'Multiplication':{
+
+      const neg1 =
+        num1.startsWith('-');
+
+      const neg2 =
+        num2.startsWith('-');
+
+      const abs1 =
+        num1.replace('-','');
+
+      const abs2 =
+        num2.replace('-','');
+
+      const negative =
+        neg1 !== neg2;
+
+      const mul =
+        multiplyInBase(
+          abs1,
+          abs2,
+          2
+        );
+
+      result =
+        negative
+          ? '-' + mul.result
+          : mul.result;
+
+      steps =
+`Step 1: Determine Sign
+
+${negative
+ ? 'Different signs → Negative'
+ : 'Same signs → Positive'}
+
+Step 2: Multiply Magnitudes
+
+${mul.visual}
+
+Step 3: Apply Sign
+
+Answer = ${result}`;
+      break;
+    }
+
+
+    
+
+
+
+
+
+
+
+
+
+
+case 'Bitwise AND (&)':{
+
+  let a =
+    num1.replace('-','');
+
+  let b =
+    num2.replace('-','');
+
+  const width =
+    Math.max(
+      a.length,
+      b.length
+    );
+
+  a = a.padStart(width,'0');
+  b = b.padStart(width,'0');
+
+  let resultBits = '';
+
+  for(let i=0;i<width;i++){
+
+    resultBits +=
+      (
+        a[i] === '1'
+        &&
+        b[i] === '1'
+      )
+      ? '1'
+      : '0';
+
+  }
+
+  result = resultBits;
+
+  steps =
+`${a}
+& ${b}
+${'-'.repeat(width + 2)}
+  ${resultBits}
+
+Rule:
+1 AND 1 = 1
+otherwise 0
+
+Answer = ${result}`;
+
+  break;
+}
+
+
+case 'Bitwise OR (|)':{
+
+  let a =
+    num1.replace('-','');
+
+  let b =
+    num2.replace('-','');
+
+  const width =
+    Math.max(
+      a.length,
+      b.length
+    );
+
+  a = a.padStart(width,'0');
+  b = b.padStart(width,'0');
+
+  let resultBits = '';
+
+  for(let i=0;i<width;i++){
+
+    resultBits +=
+      (
+        a[i] === '1'
+        ||
+        b[i] === '1'
+      )
+      ? '1'
+      : '0';
+
+  }
+
+  result = resultBits;
+
+  steps =
+`${a}
+| ${b}
+${'-'.repeat(width + 2)}
+  ${resultBits}
+
+Answer = ${result}`;
+
+  break;
+}
+
+
+case 'Bitwise XOR (^)':{
+
+  let a =
+    num1.replace('-','');
+
+  let b =
+    num2.replace('-','');
+
+  const width =
+    Math.max(
+      a.length,
+      b.length
+    );
+
+  a = a.padStart(width,'0');
+  b = b.padStart(width,'0');
+
+  let resultBits = '';
+
+  for(let i=0;i<width;i++){
+
+    resultBits +=
+      a[i] === b[i]
+      ? '0'
+      : '1';
+
+  }
+
+  result = resultBits;
+
+  steps =
+`${a}
+^ ${b}
+${'-'.repeat(width + 2)}
+  ${resultBits}
+
+Answer = ${result}`;
+
+  break;
+}
+
+
+  case 'Bitwise XNOR':{
+
+  let a =
+    num1.replace('-','');
+
+  let b =
+    num2.replace('-','');
+
+  const width =
+    Math.max(
+      a.length,
+      b.length
+    );
+
+  a = a.padStart(width,'0');
+  b = b.padStart(width,'0');
+
+  let resultBits = '';
+
+  for(let i=0;i<width;i++){
+
+    resultBits +=
+      a[i] === b[i]
+      ? '1'
+      : '0';
+
+  }
+
+  result = resultBits;
+
+  steps =
+`${a}
+XNOR
+${b}
+${'-'.repeat(width + 2)}
+${resultBits}
+
+Answer = ${result}`;
+
+  break;
+}
+
+
+
+case 'Bitwise NAND':{
+
+  let a =
+    num1.replace('-','');
+
+  let b =
+    num2.replace('-','');
+
+  const width =
+    Math.max(
+      a.length,
+      b.length
+    );
+
+  a = a.padStart(width,'0');
+  b = b.padStart(width,'0');
+
+  let resultBits = '';
+
+  for(let i=0;i<width;i++){
+
+    const andBit =
+      (
+        a[i] === '1'
+        &&
+        b[i] === '1'
+      )
+      ? '1'
+      : '0';
+
+    resultBits +=
+      andBit === '1'
+      ? '0'
+      : '1';
+
+  }
+
+  result = resultBits;
+
+  steps =
+`NAND = NOT(AND)
+
+${a}
+NAND
+${b}
+${'-'.repeat(width + 2)}
+${resultBits}
+
+Answer = ${result}`;
+
+  break;
+}
+
+
+
+case 'Bitwise NOR':{
+
+  let a =
+    num1.replace('-','');
+
+  let b =
+    num2.replace('-','');
+
+  const width =
+    Math.max(
+      a.length,
+      b.length
+    );
+
+  a = a.padStart(width,'0');
+  b = b.padStart(width,'0');
+
+  let resultBits = '';
+
+  for(let i=0;i<width;i++){
+
+    const orBit =
+      (
+        a[i] === '1'
+        ||
+        b[i] === '1'
+      )
+      ? '1'
+      : '0';
+
+    resultBits +=
+      orBit === '1'
+      ? '0'
+      : '1';
+
+  }
+
+  result = resultBits;
+
+  steps =
+`NOR = NOT(OR)
+
+${a}
+NOR
+${b}
+${'-'.repeat(width + 2)}
+${resultBits}
+
+Answer = ${result}`;
+
+  break;
+}
+
+
+
+case 'Bitwise NOT (~)':{
+
+ if(
+    !isBinaryNumber(num1)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise NOT supports integers only.';
+
+    return;
+
+  }
+
+  
+  let a =
+    num1.replace('-','');
+
+  let resultBits = '';
+
+  for(let bit of a){
+
+    resultBits +=
+      bit === '0'
+      ? '1'
+      : '0';
+
+  }
+
+  result = resultBits;
+
+  steps =
+`${a}
+↓ NOT
+${'-'.repeat(a.length)}
+${resultBits}
+
+0 → 1
+1 → 0
+
+Answer = ${result}`;
+
+  break;
+}
+
+
+case 'Left Shift (<<)':{
+
+  if(!isIntegerNumber(num2)){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be Integer';
+
+    return;
+
+  }
+
+  const shift =
+    parseInt(num2);
+
+  const negative =
+    num1.startsWith('-');
+
+  const binary =
+    num1.replace('-','');
+
+  result =
+    binary + '0'.repeat(shift);
+
+  if(negative)
+    result = '-' + result;
+
+  steps =
+`Binary Left Shift
+
+Input:
+${num1}
+
+Shift Count:
+${shift}
+
+${binary}
+${' '.repeat(shift)}←
+
+Append ${shift} zero(s) at LSB
+
+Result:
+${result}
+`;
+
+  break;
+}
+
+
+
+case 'Right Shift (>>)':{
+
+  if(!isIntegerNumber(num2)){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be Integer';
+
+    return;
+
+  }
+
+  const shift =
+    parseInt(num2);
+
+  const negative =
+    num1.startsWith('-');
+
+  let binary =
+    num1.replace('-','');
+
+  const signBit =
+    negative ? '1' : '0';
+
+  for(
+    let i=0;
+    i<shift;
+    i++
+  ){
+
+    binary =
+      signBit +
+      binary.slice(0,-1);
+
+  }
+
+  result = binary;
+
+  steps =
+`Binary Arithmetic Right Shift
+
+Input:
+${num1}
+
+Sign Bit:
+${signBit}
+
+Shift Count:
+${shift}
+
+Result:
+${result}
+
+MSB is preserved on every shift.
+`;
+
+  break;
+}
+
+case 'Zero Fill Right Shift (>>>)':{
+
+  if(!isIntegerNumber(num2)){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be Integer';
+
+    return;
+
+  }
+
+  const shift =
+    parseInt(num2);
+
+  let binary =
+    num1.replace('-','');
+
+  for(
+    let i=0;
+    i<shift;
+    i++
+  ){
+
+    binary =
+      '0' +
+      binary.slice(0,-1);
+
+  }
+
+  result = binary;
+
+  steps =
+`Binary Zero Fill Right Shift
+
+Input:
+${num1}
+
+Shift Count:
+${shift}
+
+Result:
+${result}
+
+MSB is always filled with 0.
+`;
+
+  break;
+}
+
+
+case 'Subtraction (1s Complement)':{
+
+  const fracLen =
+    Math.max(
+      (num1.split('.')[1] || '').length,
+      (num2.split('.')[1] || '').length
+    );
+
+  const intDigits =
+    Math.max(
+      num1.split('.')[0].length,
+      num2.split('.')[0].length
+    );
+
+  let paddedN2;
+
+  if(fracLen){
+
+    const parts =
+      num2.split('.');
+
+    paddedN2 =
+      parts[0]
+        .padStart(intDigits,'0')
+      +
+      '.'
+      +
+      parts[1].padEnd(fracLen,'0');
+
+  }
+  else{
+
+    paddedN2 =
+      num2.padStart(intDigits,'0');
+
+  }
+
+  const oneComp =
+    onesComplementBinary(
+      paddedN2
+    );
+
+  const addRes =
+    addInBase(
+      num1,
+      oneComp,
+      2
+    );
+
+  const sum =
+    addRes.result;
+
+  let finalStep = '';
+
+  const carry =
+    sum.split('.')[0].length >
+    intDigits;
+
+  if(carry){
+
+    let withoutCarry;
+
+    if(sum.includes('.')){
+
+      const parts =
+        sum.split('.');
+
+      withoutCarry =
+        parts[0].slice(1)
+        +
+        '.'
+        +
+        parts[1];
+
+    }
+    else{
+
+      withoutCarry =
+        sum.slice(1);
+
+    }
+
+    const increment =
+      fracLen
+        ? (
+            '0.' +
+            '0'.repeat(
+              fracLen - 1
+            ) +
+            '1'
+          )
+        : '1';
+
+    const finalAdd =
+      addInBase(
+        withoutCarry,
+        increment,
+        2
+      );
+
+    result =
+      finalAdd.result;
+
+    finalStep =
+`
+Step 3: End-around Carry Present
+--------------------------------
+Discard Carry
+
+${withoutCarry}
+
+Add 1 to LSB
+
+${finalAdd.visual}
+`;
+
+  }
+  else{
+
+    const comp =
+      onesComplementBinary(sum);
+
+    result =
+      '-' + comp;
+
+    finalStep =
+`
+Step 3: No End-around Carry
+---------------------------
+Take 1's Complement
+
+${comp}
+
+Apply Negative Sign
+
+Answer = ${result}
+`;
+
+  }
+
+  steps =
+`Finding ${num1} - ${num2}
+using 1's Complement
+
+Step 1: Find 1's Complement of B
+
+${paddedN2}
+
+↓
+
+${oneComp}
+
+Step 2: Add A + Complement(B)
+
+${addRes.visual}
+
+${finalStep}
+`;
+
+  break;
+
+}
+
+case 'Subtraction (2s Complement)':{
+
+  const fracLen =
+    Math.max(
+      (num1.split('.')[1] || '').length,
+      (num2.split('.')[1] || '').length
+    );
+
+  const intDigits =
+    Math.max(
+      num1.split('.')[0].length,
+      num2.split('.')[0].length
+    );
+
+  let paddedN2;
+
+  if(fracLen){
+
+    const parts =
+      num2.split('.');
+
+    paddedN2 =
+      parts[0]
+        .padStart(intDigits,'0')
+      +
+      '.'
+      +
+      parts[1].padEnd(fracLen,'0');
+
+  }
+  else{
+
+    paddedN2 =
+      num2.padStart(intDigits,'0');
+
+  }
+
+  const oneComp =
+    onesComplementBinary(
+      paddedN2
+    );
+
+  const increment =
+    fracLen
+      ? (
+          '0.' +
+          '0'.repeat(
+            fracLen - 1
+          ) +
+          '1'
+        )
+      : '1';
+
+  const twoComp =
+    addInBase(
+      oneComp,
+      increment,
+      2
+    ).result;
+
+  const addRes =
+    addInBase(
+      num1,
+      twoComp,
+      2
+    );
+
+  const sum =
+    addRes.result;
+
+  let finalStep = '';
+
+  const carry =
+    sum.split('.')[0].length >
+    intDigits;
+
+  if(carry){
+
+    let withoutCarry;
+
+    if(sum.includes('.')){
+
+      const parts =
+        sum.split('.');
+
+      withoutCarry =
+        parts[0].slice(1)
+        +
+        '.'
+        +
+        parts[1];
+
+    }
+    else{
+
+      withoutCarry =
+        sum.slice(1);
+
+    }
+
+    result =
+      withoutCarry;
+
+    finalStep =
+`
+Step 4: Carry Present
+---------------------
+Discard Carry
+
+${withoutCarry}
+
+Answer = ${result}
+`;
+
+  }
+  else{
+
+    const magnitude =
+      twosComplementBinary(
+        sum
+      );
+
+    result =
+      '-' + magnitude;
+
+    finalStep =
+`
+Step 4: No Carry
+----------------
+Take 2's Complement of Sum
+
+${magnitude}
+
+Apply Negative Sign
+
+Answer = ${result}
+`;
+
+  }
+
+  steps =
+`Finding ${num1} - ${num2}
+using 2's Complement
+
+Step 1: Find 1's Complement of B
+
+${paddedN2}
+
+↓
+
+${oneComp}
+
+Step 2: Add 1 to LSB
+
+${oneComp}
++
+${increment}
+
+↓
+
+${twoComp}
+
+Step 3: Add A + 2's Complement(B)
+
+${addRes.visual}
+
+${finalStep}
+`;
+
+  break;
+}
+
+
+
+
+
+
+
+
+
+
+
+  }
+
+  resultDiv.innerHTML =
+    `Answer: ${result}`;
+
+  stepsDiv.textContent =
+    steps;
+}
 
 
 
@@ -8502,8 +7183,102 @@ ${result}`;
 
 
 
+function updateUnaryOperationUI(
+  operationId,
+  input1Id,
+  input2Id
+){
 
+  const operation =
+    document.getElementById(
+      operationId
+    );
 
+  const input1 =
+    document.getElementById(
+      input1Id
+    );
+
+  const input2 =
+    document.getElementById(
+      input2Id
+    );
+
+  if(
+    !operation ||
+    !input2
+  ) return;
+
+  const unaryOperations = [
+
+    'Bitwise NOT (~)'
+
+  ];
+
+  if(
+    unaryOperations.includes(
+      operation.value
+    )
+  ){
+
+    input2.disabled = true;
+
+    input2.value = '';
+
+    input2.placeholder =
+      'Not Required';
+
+    input2.style.opacity =
+      '0.5';
+
+  }
+
+  else{
+
+    input2.disabled = false;
+
+    input2.placeholder =
+      '';
+
+    input2.style.opacity =
+      '1';
+
+  }
+  input1.focus();
+
+}
+
+document
+  .getElementById(
+    'binaryOperation'
+  )
+  ?.addEventListener(
+    'change',
+    () => {
+
+      updateUnaryOperationUI(
+        'binaryOperation', 'binaryNum1',
+        'binaryNum2'
+      );
+
+    }
+  );
+
+  document
+  .getElementById(
+    'decimalOperation'
+  )
+  ?.addEventListener(
+    'change',
+    () => {
+
+      updateUnaryOperationUI(
+        'decimalOperation', 'decimalNum1',
+        'decimalNum2'
+      );
+
+    }
+  );
 
 
 
@@ -9758,6 +8533,15 @@ function findDecimalArithmetic(){
       'globalSteps'
     );
 
+if(
+  operation ===
+  'Bitwise NOT (~)'
+){
+
+ }
+
+
+else{
   if(
     !isDecimalNumber(num1)
     ||
@@ -9771,7 +8555,7 @@ function findDecimalArithmetic(){
 
     return;
 
-  }
+  }}
 
   let result = '';
   let steps = '';
