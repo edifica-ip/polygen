@@ -66,6 +66,138 @@ document.getElementById(
       target.classList.remove('hidden');
     }
 
+
+
+    /* =================================
+AUTO FOCUS
+================================= */
+
+setTimeout(() => {
+
+  switch(btn.dataset.tab){
+
+    case 'convert':
+      document.getElementById(
+        'convertInput'
+      )?.focus();
+      break;
+
+    case 'arithmetic':
+      document.getElementById(
+        'num1'
+      )?.focus();
+      break;
+
+    case 'decimal':{
+
+      const arithmeticVisible =
+        document.getElementById(
+          'decimalArithmeticGroup'
+        ).style.display === 'block';
+
+      if(arithmeticVisible){
+
+        document.getElementById(
+          'decimalNum1'
+        )?.focus();
+
+      }
+
+      else{
+
+        document.getElementById(
+          'decimalConvertInput'
+        )?.focus();
+
+      }
+
+      break;
+    }
+
+    case 'binary':{
+
+      const arithmeticVisible =
+        document.getElementById(
+          'binaryArithmeticGroup'
+        ).style.display === 'block';
+
+      if(arithmeticVisible){
+
+        document.getElementById(
+          'binaryNum1'
+        )?.focus();
+
+      }
+
+      else{
+
+        document.getElementById(
+          'binaryConvertInput'
+        )?.focus();
+
+      }
+
+      break;
+    }
+
+    case 'complement':
+      document.getElementById(
+        'compInput'
+      )?.focus();
+      break;
+
+    case 'signed':
+      document.getElementById(
+        'signedInput'
+      )?.focus();
+      break;
+
+    case 'shift':
+      document.getElementById(
+        'shiftInput'
+      )?.focus();
+      break;
+
+    case 'bitwise':
+      document.getElementById(
+        'bit1'
+      )?.focus();
+      break;
+
+    case 'float':
+      document.getElementById(
+        'floatInput'
+      )?.focus();
+      break;
+
+    case 'ascii':
+      document.getElementById(
+        'asciiInput'
+      )?.focus();
+      break;
+
+    case 'overflow':
+      document.getElementById(
+        'overflowNum1'
+      )?.focus();
+      break;
+
+    case 'visual':
+      document.getElementById(
+        'visualNum1'
+      )?.focus();
+      break;
+
+    case 'digitalcodes':
+      document.getElementById(
+        'digitalInput'
+      )?.focus();
+      break;
+
+  }
+
+}, 50);
+
   });
 
 });
@@ -182,22 +314,23 @@ function generateBinaryGroupingSteps(
   const chars =
     '0123456789ABCDEF';
 
+  let subscript =
+  {
+    2:'₂',
+    8:'₈',
+    10:'₁₀',
+    16:'₁₆'
+  };
   let steps =
-    'Steps of Calculation:\n\n';
+    `(${value})₂ → ( ? )${subscript[toBase]}\n\n`;
+
 
   // Group size
   const groupSize =
     toBase === 16 ? 4 : 3;
 
-  steps +=
-    toBase === 16
 
-    ? 'Step: Integer Part\n4-bit grouping R-L (←)\n--------------------------------\n'
-
-    : 'Step: Integer Part\n3-bit grouping R-L (←)\n--------------------------------\n';
-
-  // Split decimal part
-  const parts =
+      const parts =
     value.split('.');
 
   let intPart =
@@ -205,6 +338,17 @@ function generateBinaryGroupingSteps(
 
   let fracPart =
     parts[1] || '';
+
+
+
+  steps +=
+    toBase === 16
+
+    ? `Step: Integer Part (${intPart})\n4-bit grouping R-L (←)\n--------------------------------\n`
+
+    : `Step: Integer Part (${intPart})\n3-bit grouping R-L (←)\n--------------------------------\n`;
+
+  // Split decimal part
 
   /* ================================
   INTEGER PART
@@ -263,9 +407,9 @@ function generateBinaryGroupingSteps(
      steps +=
     toBase === 16
 
-    ? '\nStep: Fractional Part\n4-bit grouping L-R (→)\n--------------------------------\n'
+    ? `\nStep: Fractional Part (${fracPart})\n4-bit grouping L-R (→)\n--------------------------------\n`
 
-    : '\nStep: Fractional Part\n3-bit grouping L-R (→)\n--------------------------------\n';
+    : `\nStep: Fractional Part (${fracPart})\n3-bit grouping L-R (→)\n--------------------------------\n`;
 
     
     steps += `${fracGroups.join(' ')}\n\n`;
@@ -366,8 +510,16 @@ function generateAnyToDecimalSteps(value, base){
   value =
     value.toUpperCase();
 
+    let subscript =
+  {
+    2:'₂',
+    8:'₈',
+    10:'₁₀',
+    16:'₁₆'
+  };
+
   let steps =
-    'Steps of Calculation:\n\n';
+    `(${value})${subscript[base]} → ( ? )₁₀\n\n`;
 
   const parts =
     value.split('.');
@@ -389,7 +541,8 @@ function generateAnyToDecimalSteps(value, base){
   ================================ */
 
   steps +=
-`Step: Integer Part\n--------------------------------\n`;
+`Step: Integer Part
+------------------\n`;
 
   for(
     let i = 0;
@@ -425,7 +578,9 @@ function generateAnyToDecimalSteps(value, base){
 
   if(fracPart){
 
-    steps += `\nStep: Fractional Part\n--------------------------------\n`;
+    steps += `
+Step: Fractional Part
+---------------------\n`;
 
     for(
       let i = 0;
@@ -461,9 +616,10 @@ function generateAnyToDecimalSteps(value, base){
   FINAL
   ================================ */
 
-  steps += `\nStep: Expanded Form (Optional)\n--------------------------------\n${expansions.join('\n+ ')}
+  steps += `\nStep: Expanded Form (Optional)\n------------------------------\n${expansions.join('\n+ ')}
 
-Step: Finding Sum\n--------------------------------\n${calculations.join(' + ')}
+Step: Finding Sum
+-----------------\n${calculations.join(' + ')}
 
 --------------------------------
 Answer: ${decimal}\n-------------------------------- `;
@@ -471,7 +627,6 @@ Answer: ${decimal}\n-------------------------------- `;
   return steps;
 
 }
-
 
 function generateDecimalToAnySteps(num, base){
 
@@ -486,9 +641,15 @@ function generateDecimalToAnySteps(num, base){
     return 'Invalid Number';
 
   }
-
+let subscript =
+  {
+    2:'₂',
+    8:'₈',
+    10:'₁₀',
+    16:'₁₆'
+  };
   let steps =
-    'Steps of Calculation:\n\n';
+    `(${num})₁₀ → ( ? )${subscript[base]}\n\n`;
 
   // Split parts
   let integerPart =
@@ -497,6 +658,8 @@ function generateDecimalToAnySteps(num, base){
   let fractionPart =
     number - integerPart;
 
+    let ofp = fractionPart;
+
   let remainders = [];
 
   /* ================================
@@ -504,7 +667,8 @@ function generateDecimalToAnySteps(num, base){
   ================================ */
 
   steps +=
-`Step: Integer Part\n--------------------------------\n`;
+`Step: Integer Part
+-------------------\n`;
 
   // Handle integer 0
   if(integerPart === 0){
@@ -535,7 +699,7 @@ function generateDecimalToAnySteps(num, base){
 
     const right =
 
-      `\nRemainder = ${chars[remainder]}`;
+      `\t Remainder = ${chars[remainder]}`;
 
     steps += left + right + '\n';
 
@@ -555,7 +719,9 @@ function generateDecimalToAnySteps(num, base){
 
   if(fractionPart > 0){
 
-    steps += `\nStep: Fractional Part\n--------------------------------\n`;
+    steps += 
+`\nStep: Fractional Part
+---------------------\n`;
 
     let limit = 10;
 
@@ -578,7 +744,7 @@ function generateDecimalToAnySteps(num, base){
 
 const fracRight =
 
-  `\nInteger = ${chars[digit]}`;
+  `\t Integer = ${chars[digit]}`;
 
 steps +=
   fracLeft + fracRight + '\n';
@@ -611,10 +777,10 @@ steps +=
 
     : remainders.join('');
 
-  steps += `\nStep: Reading the Remainder(s)\n--------------------------------\nUpwards (↑): ${remainders.join('')}\n`
+  steps += `\nStep: Read the Remainder(s)\n------------------------------\nUpwards (↑): ${remainders.join('')}\n`
   
-  if(fractionPart > 0)
-  steps += `\nStep: Reading the Integer(s)\n--------------------------------\nDownwards (↓): ${fractionalDigits.join('')}\n`
+  if(ofp > 0)
+  steps += `\nStep: Read the Integer(s)\n----------------------------\nDownwards (↓): ${fractionalDigits.join('')}\n`
 
   steps += `\n--------------------------------\nAnswer: ${finalAnswer}\n--------------------------------`;
 
@@ -6990,7 +7156,51 @@ if(
 
 
 
+function toggleBinaryMode(mode){
 
+  const conversion =
+    document.getElementById(
+      'binaryConversionGroup'
+    );
+
+  const arithmetic =
+    document.getElementById(
+      'binaryArithmeticGroup'
+    );
+
+  if(mode === 'conversion'){
+
+    conversion.style.display =
+      'block';
+
+    arithmetic.style.display =
+      'none';
+
+    document
+      .getElementById(
+        'binaryConvertInput'
+      )
+      .focus();
+
+  }
+
+  else{
+
+    conversion.style.display =
+      'none';
+
+    arithmetic.style.display =
+      'block';
+
+    document
+      .getElementById(
+        'binaryNum1'
+      )
+      .focus();
+
+  }
+
+}
 
 
 
@@ -7035,7 +7245,1266 @@ function toggleDecimalMode(mode){
 
   }
 
+  document
+    .getElementById('decimalConvertInput')
+    .focus();
+ document
+    .getElementById('decimalNum1')
+    .focus();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function isBinaryNumber(value){
+
+  return /^-?[01]+(\.[01]+)?$/.test(value);
+
+}
+
+function findBinaryConversion(){
+
+  let value =
+    document.getElementById(
+      'binaryConvertInput'
+    ).value.trim();
+
+  const type =
+    document.getElementById(
+      'binaryConvertType'
+    ).value;
+
+  const resultDiv =
+    document.getElementById(
+      'globalResult'
+    );
+
+  const stepsDiv =
+    document.getElementById(
+      'globalSteps'
+    );
+
+  if(!isBinaryNumber(value)){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Binary Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+  const isNegative =
+    value.startsWith('-');
+
+  const absValue =
+    value.replace(/^-/,'');
+
+  let result = '';
+  let steps = '';
+
+  switch(type){
+
+    case 'Decimal':
+
+      result =
+        convertToDecimal(
+          absValue,
+          2
+        );
+
+      if(isNegative)
+        result = '-' + result;
+
+      steps =
+        generateAnyToDecimalSteps(
+          absValue,
+          2
+        );
+
+
+         if(isNegative){
+
+  steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} and prefix '-' to the result)
+
+${steps}
+
+Final Answer = -${result.replace('-','')}`;
+
+}
+
+
+      break;
+
+    case 'Octal':
+
+      result =
+        convertFromDecimal(
+          convertToDecimal(
+            absValue,
+            2
+          ),
+          8
+        );
+
+      if(isNegative)
+        result = '-' + result;
+
+      steps =
+        generateBinaryGroupingSteps(
+          absValue,
+          8
+        );
+
+         if(isNegative){
+
+  steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} and prefix '-' to the result)
+
+${steps}
+
+Final Answer = -${result.replace('-','')}`;
+
+}
+
+
+      break;
+
+    case 'Hexadecimal':
+
+      result =
+        convertFromDecimal(
+          convertToDecimal(
+            absValue,
+            2
+          ),
+          16
+        );
+
+      if(isNegative)
+        result = '-' + result;
+
+      steps =
+        generateBinaryGroupingSteps(
+          absValue,
+          16
+        );
+
+
+         if(isNegative){
+
+  steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} and prefix '-' to the result)
+
+${steps}
+
+Final Answer = -${result.replace('-','')}`;
+
+}
+
+      break;
+
+case "1s complement":
+let ovalue1 = value;
+value = absValue;
+result =
+  value
+    .split('')
+    .map(
+      b => b === '.'
+        ? '.'
+        : 1 - parseInt(b)
+    )
+    .join('');
+
+const onesMask =
+  value.replace(/[01]/g,'1');
+
+steps =
+`Finding 1's Complement of ${value} →
+
+Step 1: Subtract all bits from 1
+--------------------------------
+
+  ${onesMask.split('').join(' ')}
+- ${value.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+  ${result.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+`;
+
+if(isNegative){
+
+  steps =
+`Input Number = ${ovalue1}
+(Please Note: 1's Complement representation of a negative decimal number is obtained by finding the 1's Complement of its magnitude.)
+Magnitude = ${absValue}
+
+${steps}
+`;
+
+}
+
+break;
+
+case "2s complement":
+
+let ovalue2 = value;
+value = absValue;
+const oneComp =
+  value
+    .split('')
+    .map(
+      b => b === '.'
+        ? '.'
+        : 1 - parseInt(b)
+    )
+    .join('');
+
+const increment =
+  value.includes('.')
+    ? '0.' +
+      '0'.repeat(
+        value.split('.')[1].length - 1
+      ) +
+      '1'
+    : '1';
+
+const addRes =
+  addInBase(
+    oneComp,
+    increment,
+    2
+  );
+
+result =
+  addRes.result;
+
+const onesMask2 =
+  value.replace(/[01]/g,'1');
+
+const displayIncrement =
+  increment.padStart(
+    oneComp.length,
+    ' '
+  );
+
+steps =
+`Finding 2's Complement of ${value} →
+
+Step 1: Subtract all bits from 1
+--------------------------------
+
+  ${onesMask2.split('').join(' ')}
+- ${value.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+  ${oneComp.split('').join(' ')}
+
+Step 2: Add 1 to the LSB (Least Significant Bit)
+------------------------------------------------
+
+  ${oneComp.split('').join(' ')}
++ ${displayIncrement.split('').join(' ')}
+${'-'.repeat(
+  Math.max(
+    oneComp.length,
+    increment.length
+  ) * 2 + 2
+)}
+  ${result.split('').join(' ')}
+${'-'.repeat(
+  Math.max(
+    oneComp.length,
+    increment.length
+  ) * 2 + 2
+)}
+`;
+
+
+if(isNegative){
+
+  steps =
+`Input Number = ${ovalue2}
+(Please Note: 2's Complement representation of a negative decimal number is obtained by finding the 2's Complement of its magnitude.)
+Magnitude = ${absValue}
+
+${steps}
+`;
+
+}
+break;
+
+
+
+case 'BCD (Binary Coded Decimal)':{
+
+
+value = absValue;
+  const decimal =
+    convertToDecimal(
+      value,
+      2
+    ).toString();
+
+  let bcd = '';
+
+  let bcdSteps =
+`BCD Representation of ${value}₂ →
+
+Step 1: Convert Binary to Decimal
+---------------------------------
+${value}₂ = ${decimal}₁₀
+
+Step 2: Separate each decimal digit from left to right
+------------------------------------------------------
+`;
+
+  let arr = [];
+
+  for(let d of decimal){
+
+    if(d === '.')
+      continue;
+
+    arr.push(d);
+
+  }
+
+  bcdSteps += arr.join(', ');
+
+  bcdSteps +=
+`
+
+Step 3: Find 4-bit binary code (nibble) of each digit
+-----------------------------------------------------
+`;
+
+  for(let d of decimal){
+
+    if(d === '.'){
+
+      bcd += '. ';
+
+      bcdSteps +=
+`Decimal Point(.)\n`;
+
+      continue;
+
+    }
+
+    const code =
+      parseInt(d)
+      .toString(2)
+      .padStart(4,'0');
+
+    bcd += code + ' ';
+
+    bcdSteps +=
+`Digit ${d} → ${code}
+`;
+
+  }
+
+  result =
+    bcd.trim();
+
+  steps =
+`${bcdSteps}
+Step 4: Combine all the 4-bit nibbles side-by-side
+--------------------------------------------------
+${result}
+--------------------------------------------------
+`;
+
+
+if(isNegative)
+  result = '1101     ' + result;
+
+if(isNegative){
+
+  steps =
+`Input Number = -${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into its BCD form and prefix '1101' as sign block (Packed Style) to the result)
+
+${steps}
+Final Answer = ${result}`;
+
+}
+
+  break;
+}
+
+
+
+case 'Excess 3':{
+
+value = absValue;
+
+  const decimal =
+    convertToDecimal(
+      value,
+      2
+    ).toString();
+
+  let excess3 = '';
+
+  let excessSteps =
+`Excess-3 Representation of ${value}₂ →
+
+Step 1: Convert Binary to Decimal
+---------------------------------
+${value}₂ = ${decimal}₁₀
+
+Step 2: Separate each decimal digit from left to right
+------------------------------------------------------
+`;
+
+  let digits = [];
+
+  for(let d of decimal){
+
+    if(d === '.')
+      continue;
+
+    digits.push(d);
+
+  }
+
+  excessSteps += digits.join(', ');
+
+  excessSteps +=
+`
+
+Step 3: Add 3 to each digit (Excess-3 form)
+-------------------------------------------
+`;
+
+  let excessDigits = [];
+
+  for(let d of decimal){
+
+    if(d === '.')
+      continue;
+
+    const digit =
+      parseInt(d);
+
+    const digitPlus3 =
+      digit + 3;
+
+    excessDigits.push(
+      digitPlus3
+    );
+
+    excessSteps +=
+`Digit ${digit} in Excess-3 form → ${digit} + 3 = ${digitPlus3}
+`;
+
+  }
+
+  excessSteps +=
+`\nExcess-3 digits are:\n${excessDigits.join(', ')}`;
+
+  excessSteps +=
+`
+
+Step 4: Find 4-bit binary code (nibble) of each Excess-3 digit
+--------------------------------------------------------------
+`;
+
+  for(let d of decimal){
+
+    if(d === '.'){
+
+      excess3 += '. ';
+
+      excessSteps +=
+`Decimal Point(.)\n`;
+
+      continue;
+
+    }
+
+    const digit =
+      parseInt(d);
+
+    const digitPlus3 =
+      digit + 3;
+
+    const code =
+      digitPlus3
+      .toString(2)
+      .padStart(4,'0');
+
+    excess3 +=
+      code + ' ';
+
+    excessSteps +=
+`Digit ${digitPlus3} → ${code}
+`;
+
+  }
+
+  result =
+    excess3.trim();
+
+  steps =
+`${excessSteps}
+Step 5: Combine all the 4-bit nibbles side-by-side
+--------------------------------------------------
+${result}
+--------------------------------------------------
+`;
+
+
+if(isNegative)
+  result = '1101     ' + result;
+
+if(isNegative){
+
+  steps =
+`Input Number = -${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into its Excess-3 form and prefix '1101' as sign block (Packed Style) to the result)
+
+${steps}
+Final Answer = ${result}`;
+
+}
+  break;
+}
+
+case 'Gray':
+
+let binary =
+  absValue;
+
+/* Ensure at least one extra fractional position
+   so right-shifted fractional bits are preserved */
+
+if(binary.includes('.')){
+
+  const parts =
+    binary.split('.');
+
+  binary =
+    parts[0] +
+    '.' +
+    parts[1] +
+    '0';
+
+}
+
+const bits =
+  binary.replace('.','');
+
+let shifted =
+  '0' +
+  bits.slice(0,-1);
+
+let grayBits = '';
+
+let graySteps =
+`Binary to Gray Conversion of ${value} →
+
+Step 1: Take the Binary Number
+------------------------------
+${binary}₂
+
+Step 2: Shift Binary Right by 1 Bit
+-----------------------------------
+${bits}
+${shifted}
+
+Step 3: XOR corresponding bits
+------------------------------
+`;
+
+for(
+  let i = 0;
+  i < bits.length;
+  i++
+){
+
+  const g =
+    bits[i] === shifted[i]
+      ? '0'
+      : '1';
+
+  grayBits += g;
+
+  graySteps +=
+`${bits[i]} XOR ${shifted[i]} = ${g}
+`;
+
+}
+
+/* Restore binary point */
+
+const pointPos =
+  binary.indexOf('.');
+
+let gray;
+
+if(pointPos !== -1){
+
+  gray =
+    grayBits.slice(
+      0,
+      pointPos
+    )
+    +
+    '.'
+    +
+    grayBits.slice(
+      pointPos
+    );
+
+}else{
+
+  gray = grayBits;
+
+}
+
+result = gray;
+
+if(isNegative)
+  result = '1     ' + result;
+
+steps =
+`${graySteps}
+Step 4: Combine all Gray bits
+-----------------------------
+${gray.split('').join(' ')}
+
+-----------------------------
+Gray Code = ${gray}
+-----------------------------
+`;
+
+const grayUnsigned =
+  result;
+
+if(isNegative){
+
+  steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into its Gray Code form and prefix '1' as sign bit to the result)
+
+${steps}
+Final Answer = ${grayUnsigned}`;
+
+}
+
+break;
+
+
+
+
+
+
+case 'Sign Magnitude':{
+
+  const negative =
+    value.startsWith('-');
+
+  const absValue =
+    value.replace(/^-/,'');
+
+  const signBit =
+    negative ? '1' : '0';
+
+  const isReal =
+    absValue.includes('.');
+
+  const parts =
+    absValue.split('.');
+
+  const intPart =
+    parts[0];
+
+  const fracPart =
+    parts[1] || '';
+
+  function signMagnitude(
+    totalBits
+  ){
+
+    if(!isReal){
+
+      const magBits =
+        totalBits - 1;
+
+      if(
+        intPart.length >
+        magBits
+      ){
+
+        return 'Overflow';
+
+      }
+
+      return (
+        signBit +
+        intPart.padStart(
+          magBits,
+          '0'
+        )
+      );
+
+    }
+
+    const intBits =
+      Math.floor(
+        (totalBits - 1) / 2
+      );
+
+    const fracBits =
+      totalBits - 1 - intBits;
+
+    if(
+      intPart.length >
+      intBits
+    ){
+
+      return 'Overflow';
+
+    }
+
+    return (
+      signBit
+      + ' '
+      + intPart.padStart(
+          intBits,
+          '0'
+        )
+      + ' '
+      + fracPart.padEnd(
+          fracBits,
+          '0'
+        )
+        .slice(
+          0,
+          fracBits
+        )
+    );
+
+  }
+
+  const sm8 =
+    signMagnitude(8);
+
+  const sm16 =
+    signMagnitude(16);
+
+  const sm32 =
+    signMagnitude(32);
+
+  const sm64 =
+    signMagnitude(64);
+
+  result =
+`<br>8-bit  : ${sm8}<br>
+16-bit : ${sm16}<br>
+32-bit : ${sm32}<br>`;
+
+  steps =
+`Sign Magnitude Representation of ${value}
+
+Step 1: Determine Sign Bit
+--------------------------
+${negative
+  ? 'Negative Number → Sign Bit = 1'
+  : 'Positive Number → Sign Bit = 0'}
+
+Step 2: Find Magnitude
+----------------------
+|${value}| = ${absValue}
+
+Step 3: Binary Magnitude
+------------------------
+Integer Part:
+${intPart}
+${
+  isReal
+  ?
+`Fractional Part:
+${fracPart}`
+  : ''
+}
+
+Step 4: Sign Magnitude Representation
+-------------------------------------
+8-bit  : ${sm8}
+16-bit : ${sm16}
+32-bit : ${sm32}
+${
+  isReal
+  ?
+`
+Please Note:
+8-bit  = 1 Sign + 3 Integer + 4 Fraction
+16-bit = 1 Sign + 7 Integer + 8 Fraction
+32-bit = 1 Sign + 15 Integer + 16 Fraction`
+  :
+`
+Please Note:
+8-bit  = 1 Sign + 7 Magnitude
+16-bit = 1 Sign + 15 Magnitude
+32-bit = 1 Sign + 31 Magnitude`
+}
+`;
+
+  break;
+
+}
+
+
+
+
+case 'Fixed Point':{
+
+  const negative =
+    value.startsWith('-');
+
+  const absValue =
+    value.replace(/^-/,'');
+
+  const parts =
+    absValue.split('.');
+
+  const intPart =
+    parts[0];
+
+  const fracPart =
+    parts[1] || '';
+
+  function fixedPoint(
+    intBits,
+    fracBits
+  ){
+
+    if(
+      intPart.length >
+      intBits
+    ){
+
+      return 'Overflow';
+
+    }
+
+    const intBinary =
+      intPart.padStart(
+        intBits,
+        '0'
+      );
+
+    const fracBinary =
+      fracPart
+        .padEnd(
+          fracBits,
+          '0'
+        )
+        .slice(
+          0,
+          fracBits
+        );
+
+    return (
+      (negative ? '-' : '')
+      +
+      intBinary
+      +
+      '.'
+      +
+      fracBinary
+    );
+
+  }
+
+  const fp8 =
+    fixedPoint(4,4);
+
+  const fp16 =
+    fixedPoint(8,8);
+
+  const fp32 =
+    fixedPoint(16,16);
+
+  result =
+`<br>8-bit  : ${fp8}<br>
+16-bit : ${fp16}<br>
+32-bit : ${fp32}<br>`;
+
+  steps =
+`Fixed Point Representation of ${value}
+
+Step 1: Separate Integer and Fraction Parts
+-------------------------------------------
+Integer Part  = ${intPart}
+Fraction Part = ${fracPart || '0'}
+
+Step 2: Binary Number
+---------------------
+${absValue}
+
+Step 3: Fixed Point Representations
+-----------------------------------
+8-bit  (4 Integer + 4 Fraction)
+${fp8}
+
+16-bit (8 Integer + 8 Fraction)
+${fp16}
+
+32-bit (16 Integer + 16 Fraction)
+${fp32}
+
+Please Note:
+-------------
+Fixed Point uses a fixed location for the radix point.
+Unlike IEEE Floating Point, the radix point never moves.
+`;
+
+  break;
+
+}
+
+
+
+case 'Mantissa Exponent':{
+
+  const negative =
+    value.startsWith('-');
+
+  const absValue =
+    value.replace(/^-/,'');
+
+  if(
+    absValue === '0' ||
+    absValue === '0.0'
+  ){
+
+    result = '0 × 2^0';
+
+    steps =
+`Mantissa-Exponent Form
+
+0 has no normalization.
+
+Answer = 0 × 2^0`;
+
+    break;
+
+  }
+
+  const binary =
+    absValue;
+
+  let exponent = 0;
+
+  let mantissa = '';
+
+  if(binary.includes('.')){
+
+    const parts =
+      binary.split('.');
+
+    if(parts[0] !== '0'){
+
+      exponent =
+        parts[0].length - 1;
+
+      mantissa =
+        '1.' +
+        parts[0].slice(1) +
+        parts[1];
+
+    }
+
+    else{
+
+      const firstOne =
+        parts[1].indexOf('1');
+
+      exponent =
+        -(firstOne + 1);
+
+      mantissa =
+        '1.' +
+        parts[1].slice(
+          firstOne + 1
+        );
+
+    }
+
+  }
+
+  else{
+
+    exponent =
+      binary.length - 1;
+
+    mantissa =
+      '1.' +
+      binary.slice(1);
+
+  }
+
+  const sign =
+    negative ? '-' : '';
+
+  result =
+`${sign}${mantissa} × 2^${exponent}`;
+
+  steps =
+`Mantissa-Exponent Form of ${value}
+
+Step 1: Take the Binary Number
+------------------------------
+${binary}
+
+Step 2: Normalize Binary Number
+-------------------------------
+${result}
+
+Mantissa = ${sign}${mantissa}
+Exponent = ${exponent}`;
+
+  break;
+
+}
+
+
+case 'IEEE-754 Floating Point (32-bit)':{
+
+  const negative =
+    value.startsWith('-');
+
+  const absValue =
+    value.replace(/^-/,'');
+
+  const decimalValue =
+    convertToDecimal(
+      absValue,
+      2
+    );
+
+  const num =
+    negative
+      ? -decimalValue
+      : decimalValue;
+
+  const buffer =
+    new ArrayBuffer(4);
+
+  const view =
+    new DataView(buffer);
+
+  view.setFloat32(
+    0,
+    num
+  );
+
+  let bits = '';
+
+  for(let i=0;i<4;i++){
+
+    bits +=
+      view
+        .getUint8(i)
+        .toString(2)
+        .padStart(8,'0');
+
+  }
+
+  const sign =
+    bits[0];
+
+  const exponent =
+    bits.slice(1,9);
+
+  const mantissa =
+    bits.slice(9);
+
+  result =
+`${sign} ${exponent} ${mantissa}`;
+
+  steps =
+`IEEE-754 Single Precision (32-bit)
+
+Step 1: Convert Binary to Decimal
+---------------------------------
+${value}₂ = ${num}₁₀
+
+Step 2: IEEE-754 Fields
+-----------------------
+
+Sign Bit
+--------
+${sign}
+
+Exponent
+--------
+${exponent}
+
+Mantissa
+--------
+${mantissa}
+
+Final Representation
+--------------------
+${result}`;
+
+  break;
+
+}
+
+
+
+
+case 'IEEE-754 Floating Point (64-bit)':{
+
+  const negative =
+    value.startsWith('-');
+
+  const absValue =
+    value.replace(/^-/,'');
+
+  const decimalValue =
+    convertToDecimal(
+      absValue,
+      2
+    );
+
+  const num =
+    negative
+      ? -decimalValue
+      : decimalValue;
+
+  const buffer =
+    new ArrayBuffer(8);
+
+  const view =
+    new DataView(buffer);
+
+  view.setFloat64(
+    0,
+    num
+  );
+
+  let bits = '';
+
+  for(let i=0;i<8;i++){
+
+    bits +=
+      view
+        .getUint8(i)
+        .toString(2)
+        .padStart(8,'0');
+
+  }
+
+  const sign =
+    bits[0];
+
+  const exponent =
+    bits.slice(1,12);
+
+  const mantissa =
+    bits.slice(12);
+
+  result =
+`${sign} ${exponent} ${mantissa}`;
+
+  steps =
+`IEEE-754 Double Precision (64-bit)
+
+Step 1: Convert Binary to Decimal
+---------------------------------
+${value}₂ = ${num}₁₀
+
+Step 2: IEEE-754 Fields
+-----------------------
+
+Sign Bit
+--------
+${sign}
+
+Exponent
+--------
+${exponent}
+
+Mantissa
+--------
+${mantissa}
+
+Final Representation
+--------------------
+${result}`;
+
+  break;
+
+}
+  }
+
+  resultDiv.innerHTML =
+    `Answer: ${result}`;
+
+  stepsDiv.textContent =
+    steps;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -7055,7 +8524,7 @@ function isIntegerNumber(value){
 
 function findDecimalConversion(){
 
-  const value =
+  let value =
     document.getElementById(
       'decimalConvertInput'
     ).value.trim();
@@ -7190,17 +8659,8 @@ Final Answer = -${result.replace('-','')}`;
       break;
 
     case '9s complement':
-if(isNegative){
-
-  resultDiv.innerHTML =
-    '❌ Negative values not supported';
-
-  stepsDiv.innerHTML =
-    "Use positive decimal values only.";
-
-  return;
-
-}
+let ovalue9 = value;
+value = absValue;
   result =
     value
       .split('')
@@ -7231,21 +8691,23 @@ ${'-'.repeat(
 )}
 `;
 
+if(isNegative){
+
+  steps =
+`Input Number = ${ovalue9}
+(Please Note: 9's Complement representation of a negative decimal number is obtained by finding the 9's Complement of its magnitude.)
+Magnitude = ${absValue}
+
+${steps}
+`;
+
+}
   break;
 
 case '10s complement':
 
-if(isNegative){
-
-  resultDiv.innerHTML =
-    '❌ Negative values not supported';
-
-  stepsDiv.innerHTML =
-    "Use positive decimal values only.";
-
-  return;
-
-}
+let ovalue = value;
+value = absValue;
   const nineCompResult =
     value
       .split('')
@@ -7311,32 +8773,39 @@ ${'-'.repeat(
 )}
 `;
 
-  break;
-
-case 'BCD (Binary Coded Decimal)':
 
 if(isNegative){
 
-  resultDiv.innerHTML =
-    '❌ Negative values not supported';
+  steps =
+`Input Number = ${ovalue}
+(Please Note: 10's Complement representation of a negative decimal number is obtained by finding the 10's Complement of its magnitude.)
+Magnitude = ${absValue}
 
-  stepsDiv.innerHTML =
-    'BCD supports only non-negative numbers.';
-
-  return;
+${steps}
+`;
 
 }
+  break;
+
+
+
+
+
+
+
+
+case 'BCD (Binary Coded Decimal)':
 
   let bcd = '';
   let bcdSteps =
-`BCD Representation of ${value} → 
+`BCD Representation of ${absValue} → 
 
 Step 1: Separate each digit from left to right
 ----------------------------------------------
 `;
 
 let arr = [];
-for(let d of value){
+for(let d of absValue){
   if(d === '.')
     continue;
 
@@ -7353,7 +8822,7 @@ Step 2: Find 4-bit binary code (nibble) of each digit
 -----------------------------------------------------
 `;
 
-  for(let d of value){
+  for(let d of absValue){
 
     if(d === '.'){
 
@@ -7385,30 +8854,32 @@ Step 3: Combine all the 4-bit nibbles side-by-side
 --------------------------------------------------
 ${result}
 --------------------------------------------------
-
 `;
+
+
+if(isNegative)
+  result = '1101     ' + result;
+
+if(isNegative){
+
+  steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into its BCD form and prefix '1101' as sign block (Packed Style) to the result)
+
+${steps}
+Final Answer = ${result}`;
+
+}
 
   break;
 
 case 'Excess 3':
 
-if(isNegative){
-
-  resultDiv.innerHTML =
-    '❌ Negative values not supported';
-
-  stepsDiv.innerHTML =
-    'BCD supports only non-negative numbers.';
-
-  return;
-
-}
-
 
   let excess3 = '';
 
   let excessSteps =
-`Excess-3 Representation of ${value} →
+`Excess-3 Representation of ${absValue} →
 
 Step 1: Separate each digit from left to right
 ----------------------------------------------
@@ -7416,7 +8887,7 @@ Step 1: Separate each digit from left to right
 
   let digits = [];
 
-  for(let d of value){
+  for(let d of absValue){
 
     if(d === '.')
       continue;
@@ -7435,7 +8906,7 @@ Step 2: Add 3 to each digit (Excess-3 form)
 `;
   digits = [];
 
-  for(let d of value){
+  for(let d of absValue){
 
     if(d === '.')
       continue;
@@ -7468,7 +8939,7 @@ Step 3: Find 4-bit binary code (nibble) of each Excess-3 digit
 --------------------------------------------------------------
 `;
 
-  for(let d of value){
+  for(let d of absValue){
 
     if(d === '.'){
 
@@ -7501,99 +8972,160 @@ Step 3: Find 4-bit binary code (nibble) of each Excess-3 digit
   result =
     excess3.trim();
 
+   
+
   steps =
 `${excessSteps}
 Step 4: Combine all the 4-bit nibbles side-by-side
 --------------------------------------------------
 ${result}
 --------------------------------------------------
-
 `;
+
+ if(isNegative)
+  result = '1101     ' + result;
+
+if(isNegative){
+
+  steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into its Excess-3 form and prefix '1101' as sign block (Packed Style) to the result)
+
+${steps}
+Final Answer = ${result}`;
+
+}
 
   break;
 
 case 'Gray':
 
-if(isNegative){
+let binary =
+  convertFromDecimal(
+    absValue,
+    2
+  );
 
-  resultDiv.innerHTML =
-    '❌ Negative values not supported';
+/* Ensure at least one extra fractional position
+   so right-shifted fractional bits are preserved */
 
-  stepsDiv.innerHTML =
-    'BCD supports only non-negative numbers.';
+if(binary.includes('.')){
 
-  return;
+  const parts =
+    binary.split('.');
+
+  binary =
+    parts[0] +
+    '.' +
+    parts[1] +
+    '0';
 
 }
 
+const bits =
+  binary.replace('.','');
 
-  if(!isIntegerNumber(value)){
+let shifted =
+  '0' +
+  bits.slice(0,-1);
 
-    resultDiv.innerHTML =
-      '❌ Error!';
+let grayBits = '';
 
-    stepsDiv.innerHTML =
-      'Gray Code supports integer input only.';
-
-    return;
-
-  }
-
-  const binary =
-    parseInt(value)
-      .toString(2);
-
-  let gray =
-    binary[0];
-
-  let graySteps =
+let graySteps =
 `Decimal to Gray Conversion of ${value} →
 
 Step 1: Convert Decimal to Binary
 ---------------------------------
-
 ${value}₁₀ = ${binary}₂
 
-Step 2: Copy the MSB directly
------------------------------
+Step 2: Shift Binary Right by 1 Bit
+-----------------------------------
+${bits}
+${shifted}
 
-Gray Bit 1 = Binary Bit 1 = ${binary[0]}
-
-Step 3: XOR adjacent binary bits
---------------------------------
-
+Step 3: XOR corresponding bits
+------------------------------
 `;
 
-  for(let i = 1; i < binary.length; i++){
+for(
+  let i = 0;
+  i < bits.length;
+  i++
+){
 
-    const g =
-      binary[i - 1] === binary[i]
-        ? '0'
-        : '1';
+  const g =
+    bits[i] === shifted[i]
+      ? '0'
+      : '1';
 
-    gray += g;
+  grayBits += g;
 
-    graySteps +=
-`${binary[i - 1]} XOR ${binary[i]} = ${g}
+  graySteps +=
+`${bits[i]} XOR ${shifted[i]} = ${g}
 `;
-  }
 
-  result = gray;
+}
 
-  steps =
+/* Restore binary point */
+
+const pointPos =
+  binary.indexOf('.');
+
+let gray;
+
+if(pointPos !== -1){
+
+  gray =
+    grayBits.slice(
+      0,
+      pointPos
+    )
+    +
+    '.'
+    +
+    grayBits.slice(
+      pointPos
+    );
+
+}else{
+
+  gray = grayBits;
+
+}
+
+result = gray;
+if(isNegative)
+  result = '1     ' + result;
+
+steps =
 `${graySteps}
 Step 4: Combine all Gray bits
 -----------------------------
-
 ${gray.split('').join(' ')}
+-----------------------------
 Gray Code = ${gray}
 -----------------------------
 `;
 
-  break;
+
+
+const grayUnsigned =
+  result;
+
+  if(isNegative){
+
+  steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into its Gray Code form and prefix '1' as sign bit to the result)
+
+${steps}
+Final Answer = ${grayUnsigned}`;
+
+}
 
 
 
+break;
 
   case 'Sign Magnitude':{
 
@@ -7753,6 +9285,7 @@ Gray Code = ${gray}
 
   steps =
 `Sign Magnitude Representation of ${value}
+
 Step 1: Determine Sign Bit
 --------------------------
 ${num < 0  ? 'Negative Number → Sign Bit = 1'  : 'Positive Number → Sign Bit = 0'}
@@ -7764,11 +9297,15 @@ Step 2: Find Magnitude
 Step 3: Convert Magnitude to Binary
 -----------------------------------
 Integer Part:
-${intPart}₁₀ = ${intPart.toString(2)}₂
+(${intPart})₁₀ = (${intPart.toString(2)})₂
 ${
   isReal
   ?
-`Fractional Part:${fracPart}`  :''
+`Fractional Part:
+(${fracPart})₁₀ =  (${fracToBinary(
+        fracPart,
+        8
+      )})₂`  :''
 }
 
 Step 4: Sign Magnitude Representation
@@ -8099,29 +9636,38 @@ case 'Fixed Point':{
     fracBits
   ){
 
-    const intBinary =
-      intPart
-        .toString(2)
-        .padStart(
-          intBits,
-          '0'
-        );
+ const rawInt =
+  intPart.toString(2);
 
-    const fracBinary =
-      fracToBinary(
-        fracPart,
-        fracBits
-      );
+if(
+  rawInt.length > intBits
+){
 
-    return (
-      (negative ? '-' : '')
-      +
-      intBinary
-      +
-      '.'
-      +
-      fracBinary
-    );
+  return 'Overflow';
+
+}
+
+const intBinary =
+  rawInt.padStart(
+    intBits,
+    '0'
+  );
+
+const fracBinary =
+  fracToBinary(
+    fracPart,
+    fracBits
+  );
+
+return (
+  (negative ? '-' : '')
+  +
+  intBinary
+  +
+  '.'
+  +
+  fracBinary
+);
 
   }
 
@@ -8184,55 +9730,6 @@ Unlike IEEE Floating Point, the radix point never moves.
     steps;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function findDecimalArithmetic(){
 
