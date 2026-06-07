@@ -632,7 +632,7 @@ let subscript =
 
     const right =
 
-      `\t Remainder = ${chars[remainder]}`;
+      `\nRemainder = ${chars[remainder]}`;
 
     steps += left + right + '\n';
 
@@ -1206,7 +1206,7 @@ b = b.padStart(maxLen,'0');
 
   let carryRow = [];
 
-  let steps = 'Explanation:\n';
+  let steps = 'Explanation:';
 
   /* ================================
   MAIN ADDITION LOOP
@@ -1251,10 +1251,7 @@ if(base !== 10){
     
 
    steps += `
-${a[i]} + ${b[i]} ${incomingCarry > 0 ? `+ Carry(${incomingCarry})`: ''} = ${baseExplanation}
-Write: ${valueToChar(digit)}, Carry: ${carry}\n`;
-
-  }
+${a[i]} + ${b[i]} ${incomingCarry > 0 ? `+ Carry(${incomingCarry})`: ''} = ${baseExplanation}\nWrite: ${valueToChar(digit)}, Carry: ${carry}`;  }
 
   /* ================================
   FINAL CARRY
@@ -1374,7 +1371,6 @@ if(fracLen > 0){
 
     result:
       rawAnswer,
-
     visual: `${rawA}  +  ${rawB} →
 
 Carry (↓)
@@ -1550,7 +1546,7 @@ let answer = [];
 let borrowRow = [];
 
 let steps =
-  'Explanation:\n\n';
+  'Explanation:\n';
 
   /* ================================
 NEGATIVE EXPLANATION
@@ -1622,10 +1618,7 @@ const originalD1 =
 
   }
 
- steps += `${a[i]} - ${b[i]} ${incomingBorrow > 0? `- Borrow (${incomingBorrow})`: ''} ${borrowed? `Borrow from next digit (+${base})`: ''} = ${baseExplanation}
-Write: ${valueToChar(diff)}, Borrow: ${borrow}
-
-`;
+ steps += `${a[i]} - ${b[i]} ${incomingBorrow > 0? `- Borrow (${incomingBorrow})`: ''} ${borrowed? `Borrow from next digit (+${base})`: ''} = ${baseExplanation}\nWrite: ${valueToChar(diff)}, Borrow: ${borrow}\n`;
 
 }
 
@@ -1745,13 +1738,12 @@ return {
   result:
     rawAnswer,
 
-  visual: `Base ${base} Subtraction:\n${displayA}  -  ${displayB} = ${negative ? `- (${visualA} - ${visualB}) →` : ''}
+  visual: `${displayA}  -  ${displayB} → ${negative ? `- (${visualA} - ${visualB}) →` : ''}
 
 Borrow (↓)
 ${spaced(
   formattedBorrowRaw.padStart(totalDigits - 1)
 )}
-
 ${spaced(
   visualA.padStart(totalDigits)
 )}
@@ -1763,12 +1755,8 @@ ${spaced(
   rawAnswer.padStart(totalDigits)
 )}
 ${'-'.repeat(totalDigits * 2 + 2)}
-${
-negative? `Final Answer = ${finalDisplayAnswer} (-ve for the initial swap)`: `Final Answer = ${finalDisplayAnswer}`}
 
-${steps}
-
-`
+${steps}`
 
 };
 
@@ -2022,7 +2010,7 @@ return {
   result:
     finalAnswer,
 
-  visual: `Base ${base} Multiplication:\n${displayA}  ×  ${displayB} →
+  visual: `${displayA}  ×  ${displayB} →
 
 ${spaced(
   displayA.padStart(totalDigits)
@@ -6059,20 +6047,21 @@ else{
             : add.result;
 
         steps =
-`Both numbers have the same sign.
+`Input Number 1 = ${num1}\nInput Number 2 = ${num2}\n
+Step 1:
+-------
+Both input numbers have the same sign. Therefore, we find: ${abs1} + ${abs2} and apply ${neg1 ? '(-)' : '(+)'} sign to the answer.
 
-Therefore find:
-
-${abs1} + ${abs2}
-
+Step 2:
+-------
 ${add.visual}
 
-${neg1
- ? 'Apply negative sign.'
- : 'Result remains positive.'
-}
+Step 3:
+-------
+Apply ${neg1 ? '(-)' : '(+)'} sign.
 
-Answer = ${result}`;
+Answer = ${result}
+`;
       }
 
       else{
@@ -6124,17 +6113,18 @@ Answer = ${result}`;
             : sub.result;
 
         steps =
-`Numbers have different signs.
+`Input Number 1 = ${num1}\nInput Number 2 = ${num2}\n
+Step 1:
+-------
+The input numbers have different signs. Therefore, addition is converted into subtraction. We find: ${big} - ${small} and apply sign ${resultNegative ? '(-)' : '(+)'} of the larger magnitude number.
 
-Convert addition into subtraction.
-
-Find:
-
-${big} - ${small}
-
+Step 2:
+-------
 ${sub.visual}
 
-Apply sign of larger magnitude.
+Step 3:
+-------
+Apply ${resultNegative ? '(-)' : '(+)'} sign.
 
 Answer = ${result}`;
       }
@@ -6160,6 +6150,24 @@ Answer = ${result}`;
       const abs2 =
         num2.replace('-','');
 
+
+
+
+        let explanation = '';
+
+if(neg2){
+
+  explanation =
+`The 2nd input number ${num2} is negative. Therefore:
+${num1} - (${num2}) = ${abs1} + ${abs2}`;
+}
+else{
+  explanation = `The 1st input number ${num1} is negative. Therefore:
+${num1} - ${num2} = -(${abs1} + ${abs2})`;
+}
+
+
+
       if(neg1 !== neg2){
 
         const add =
@@ -6175,15 +6183,20 @@ Answer = ${result}`;
             : add.result;
 
         steps =
-`Convert subtraction into addition.
+`Input Number 1 = ${num1}
+Input Number 2 = ${num2}
 
-${num1} - (${num2})
+Step 1:
+-------
+${explanation}
 
-Find:
-
-${abs1} + ${abs2}
-
+Step 2:
+-------
 ${add.visual}
+
+Step 3:
+-------
+Apply ${neg1 ? '(-)' : '(+)'} sign.
 
 Answer = ${result}`;
       }
@@ -6230,6 +6243,26 @@ Answer = ${result}`;
             !neg1;
         }
 
+
+let sameSignExplanation = '';
+
+if(!neg1 && !neg2){
+
+  sameSignExplanation =
+`Both input numbers are positive and ${big} > ${small}:
+Therefore, we find:
+${big} - ${small} and apply ${resultNegative ? '(-)' : '(+)'} sign to the answer.`;
+}
+
+else{
+
+  sameSignExplanation =
+`Both input numbers are negative. ${num1} - (${num2}) is evaluated by comparing magnitudes.
+Since ${big} > ${small}, therefore, we find: ${big} - ${small} and apply ${resultNegative ? '(-)' : '(+)'} sign to the answer.`;
+
+}
+
+
         const sub =
           subtractInBase(
             big,
@@ -6243,17 +6276,25 @@ Answer = ${result}`;
             : sub.result;
 
         steps =
-`Both numbers have same sign.
+`Input Number 1 = ${num1}
+Input Number 2 = ${num2}
 
-Find:
+Step 1:
+-------
+${sameSignExplanation}
 
-${big} - ${small}
-
+Step 2:
+-------
 ${sub.visual}
 
-Apply sign of larger magnitude.
+Step 3:
+-------
+Apply
+${resultNegative ? '(-)' : '(+)'}
+sign.
 
-Answer = ${result}`;
+Answer = ${result}
+`;
       }
 
       break;
@@ -6292,20 +6333,30 @@ Answer = ${result}`;
           ? '-' + mul.result
           : mul.result;
 
-      steps =
-`Step 1: Determine Sign
-
-${negative
- ? 'Different signs → Negative'
- : 'Same signs → Positive'}
+steps =
+`Input Number 1 = ${num1}\nInput Number 2 = ${num2}\n
+Step 1: Determine Sign
+----------------------
+Number 1: ${neg1 ? '(-ve)' : '(+ve)'}
+Number 2: ${neg2 ? '(-ve)' : '(+ve)'}
+${
+negative
+? 'Signs are different → Answer will be negative (-ve)'
+: 'Signs are same → Answer will be positive (+ve)'
+}
 
 Step 2: Multiply Magnitudes
-
+---------------------------
 ${mul.visual}
 
 Step 3: Apply Sign
+------------------
+${negative
+? 'Apply (-) sign.'
+: 'Apply (+) sign.'}
 
-Answer = ${result}`;
+Answer = ${result}
+`;
       break;
     }
 
@@ -6355,17 +6406,31 @@ case 'Bitwise AND (&)':{
 
   result = resultBits;
 
-  steps =
-`${a}
+ steps =
+`Input Number 1 = ${num1}
+Input Number 2 = ${num2}
+
+Step 1: Align the Binary numbers
+---------------------------------
+${a}
+${b}
+
+Step 2: AND Rule
+----------------
+1 AND 1 = 1
+1 AND 0 = 0
+0 AND 1 = 0
+0 AND 0 = 0
+
+Step 3: Perform Bitwise AND
+---------------------------
+  ${a}
 & ${b}
 ${'-'.repeat(width + 2)}
   ${resultBits}
 
-Rule:
-1 AND 1 = 1
-otherwise 0
-
-Answer = ${result}`;
+Answer = ${result}
+`;
 
   break;
 }
@@ -6405,13 +6470,31 @@ case 'Bitwise OR (|)':{
 
   result = resultBits;
 
-  steps =
-`${a}
+steps =
+`Input Number 1 = ${num1}
+Input Number 2 = ${num2}
+
+Step 1: Align the Binary Numbers
+--------------------------------
+${a}
+${b}
+
+Step 2: OR Rule
+---------------
+1 OR 1 = 1
+1 OR 0 = 1
+0 OR 1 = 1
+0 OR 0 = 0
+
+Step 3: Perform Bitwise OR
+--------------------------
+  ${a}
 | ${b}
 ${'-'.repeat(width + 2)}
   ${resultBits}
 
-Answer = ${result}`;
+Answer = ${result}
+`;
 
   break;
 }
@@ -6447,13 +6530,31 @@ case 'Bitwise XOR (^)':{
 
   result = resultBits;
 
-  steps =
-`${a}
+steps =
+`Input Number 1 = ${num1}
+Input Number 2 = ${num2}
+
+Step 1: Align the Binary Numbers
+--------------------------------
+${a}
+${b}
+
+Step 2: XOR Rule
+----------------
+1 XOR 1 = 0
+1 XOR 0 = 1
+0 XOR 1 = 1
+0 XOR 0 = 0
+
+Step 3: Perform Bitwise XOR
+---------------------------
+  ${a}
 ^ ${b}
 ${'-'.repeat(width + 2)}
   ${resultBits}
 
-Answer = ${result}`;
+Answer = ${result}
+`;
 
   break;
 }
@@ -6489,14 +6590,32 @@ Answer = ${result}`;
 
   result = resultBits;
 
-  steps =
-`${a}
-XNOR
-${b}
-${'-'.repeat(width + 2)}
-${resultBits}
+steps =
+`Input Number 1 = ${num1}
+Input Number 2 = ${num2}
 
-Answer = ${result}`;
+Step 1: Align the Binary Numbers
+--------------------------------
+${a}
+${b}
+
+Step 2: XNOR Rule
+-----------------
+1 XNOR 1 = 1
+1 XNOR 0 = 0
+0 XNOR 1 = 0
+0 XNOR 0 = 1
+
+Step 3: Perform Bitwise XNOR
+----------------------------
+  ${a}
+XNOR
+  ${b}
+${'-'.repeat(width + 2)}
+  ${resultBits}
+
+Answer = ${result}
+`;
 
   break;
 }
@@ -6542,16 +6661,32 @@ case 'Bitwise NAND':{
 
   result = resultBits;
 
-  steps =
-`NAND = NOT(AND)
+steps =
+`Input Number 1 = ${num1}
+Input Number 2 = ${num2}
 
+Step 1: Align the Binary Numbers
+--------------------------------
 ${a}
-NAND
 ${b}
-${'-'.repeat(width + 2)}
-${resultBits}
 
-Answer = ${result}`;
+Step 2: NAND Rule
+-----------------
+1 NAND 1 = 0
+1 NAND 0 = 1
+0 NAND 1 = 1
+0 NAND 0 = 1
+
+Step 3: Perform Bitwise NAND
+----------------------------
+  ${a}
+NAND
+  ${b}
+${'-'.repeat(width + 2)}
+  ${resultBits}
+
+Answer = ${result}
+`;
 
   break;
 }
@@ -6597,16 +6732,32 @@ case 'Bitwise NOR':{
 
   result = resultBits;
 
-  steps =
-`NOR = NOT(OR)
+steps =
+`Input Number 1 = ${num1}
+Input Number 2 = ${num2}
 
+Step 1: Align the Binary Numbers
+--------------------------------
 ${a}
-NOR
 ${b}
-${'-'.repeat(width + 2)}
-${resultBits}
 
-Answer = ${result}`;
+Step 2: NOR Rule
+----------------
+1 NOR 1 = 0
+1 NOR 0 = 0
+0 NOR 1 = 0
+0 NOR 0 = 1
+
+Step 3: Perform Bitwise NOR
+---------------------------
+  ${a}
+NOR
+  ${b}
+${'-'.repeat(width + 2)}
+  ${resultBits}
+
+Answer = ${result}
+`;
 
   break;
 }
@@ -6646,19 +6797,71 @@ case 'Bitwise NOT (~)':{
 
   result = resultBits;
 
-  steps =
-`${a}
-↓ NOT
-${'-'.repeat(a.length)}
-${resultBits}
+steps =
+`Input Number = ${num1}
 
+Step 1: Original Binary Number
+------------------------------
+${a}
+
+Step 2: NOT Rule
+----------------
 0 → 1
 1 → 0
 
-Answer = ${result}`;
+Step 3: Perform Bitwise NOT
+---------------------------
+${a}
+${'-'.repeat(a.length)}
+${resultBits}
+
+Answer = ${result}
+`;
 
   break;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 case 'Left Shift (<<)':{
@@ -7283,6 +7486,19 @@ document
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+//#region Decimal Conversions & Arithmetic
 
 
 function isDecimalNumber(value){
@@ -8089,7 +8305,7 @@ Step 4: Sign Magnitude Representation
 16-bit : ${sm16}
 32-bit : ${sm32}
 ${  isReal  ?`
-  Please Note:
+Please Note:
 8-bit  = 1 Sign + 3 Integer + 4 Fraction
 16-bit = 1 Sign + 7 Integer + 8 Fraction
 32-bit = 1 Sign + 15 Integer + 16 Fraction`
@@ -8582,6 +8798,7 @@ else{
   const neg2 =
     n2 < 0;
 
+  
   if(
     neg1 === neg2
   ){
@@ -8599,12 +8816,21 @@ else{
         : add.result;
 
     steps =
-`Both numbers have the same sign.
-Therefore, we find: ${abs1} + ${abs2}
+`Input Number 1 = ${num1}\nInput Number 2 = ${num2}\n
+Step 1: 
+-------
+Both the numbers have same signs. Therefore, we find: ${abs1} + ${abs2}, and apply the (${neg1 ? '-' : '+'}) sign.
+
+Step 2:
+-------
 ${add.visual}
+
+Step 3:
+-------
 ${
-  neg1  ? 'Apply negative sign.'  : 'Result remains positive.'
+  neg1  ? 'Apply (-) sign to the answer.'  : 'Apply (+) sign to the answer.'
 }
+
 Answer = ${result}
 `;
 
@@ -8612,6 +8838,7 @@ Answer = ${result}
 
   else{
 
+    let bigws = n1;
     let big =
       abs1;
 
@@ -8626,7 +8853,7 @@ Answer = ${result}
       >
       Math.abs(n1)
     ){
-
+      bigws = n2;
       big =
         abs2;
 
@@ -8651,19 +8878,24 @@ Answer = ${result}
         : sub.result;
 
     steps =
-`Numbers have different signs.
-Convert addition into subtraction.
-Therefore, we find: ${big} - ${small}
+`Input Number 1 = ${num1}\nInput Number 2 = ${num2}\n
+Step 1:
+-------
+The numbers have different signs, so we convert addition into subtraction. Thus, we find: ${big} - ${small} and apply sign (${bigws<0 ? '-' : '+'}) of the larger magnitude ${big}.
+
+Step 2:
+-------
 ${sub.visual}
-and apply sign of larger magnitude.
+Step 3:
+-------
+${
+  bigws<0  ? 'Apply (-) sign'  : 'Apply (+) sign' } of the larger magnitude ${big}, to the answer.
 
 Answer = ${result}`;
-
-  }
-
-  break;
-
+  
 }
+break;
+    }
 
 case 'Subtraction':{
 
@@ -8691,6 +8923,27 @@ case 'Subtraction':{
    * A + (-B)
    */
 
+  let explanation = '';
+
+if(neg2){
+
+  explanation =
+`The 2nd input number ${num2} is negative. Therefore, we find:
+${num1} - (${num2}) = ${abs1} + ${abs2}`;
+
+}
+else{
+
+  explanation =
+`The 1st input number ${num1} is negative. Therefore, we find:
+${num1} - ${num2} = -(${abs1} + ${abs2})`;
+
+}
+
+
+
+
+
   if(
     neg1 !== neg2
   ){
@@ -8708,23 +8961,20 @@ case 'Subtraction':{
         : add.result;
 
     steps =
-`
-Convert subtraction into addition:
+`Input Number 1 = ${num1}\nInput Number 2 = ${num2}\n
+Step 1:
+-------
+${explanation}
 
-${num1} - (${num2})
-
-Numbers now have the same sign.
-
-Find:
-
-${abs1} + ${abs2}
-
+Step 2:
+-------
 ${add.visual}
 
+Step 3:
+-------
 ${
   neg1
-  ? 'Apply negative sign.'
-  : 'Result remains positive.'
+  ? 'Apply (-) sign.'  : 'Apply (+) sign.'
 }
 
 Answer = ${result}
@@ -8734,6 +8984,7 @@ Answer = ${result}
 
   else{
 
+    let bigwss = n1;
     let big =
       abs1;
 
@@ -8756,6 +9007,7 @@ Answer = ${result}
 
     else{
 
+      bigwss = n2;
       big =
         abs2;
 
@@ -8766,6 +9018,29 @@ Answer = ${result}
         !neg1;
 
     }
+
+    let sameSignExplanation = '';
+
+if(!neg1 && !neg2){
+
+  sameSignExplanation =
+`Both the input numbers are positive and ${big} > ${small}.
+Therefore, we find:
+${big} - ${small} and apply ${resultNegative     ? '(-)'    : '(+)'} sign to the answer.`;
+
+}
+
+else{
+
+  sameSignExplanation =
+`Both input numbers are negative:
+${num1} - (${num2}) = ${num1} + ${abs2}
+
+Now since, ${big} > ${small} we find: 
+${big} - ${small} and apply ${resultNegative    ? '(-)'    : '(+)'} sign to the answer.`;
+
+}
+
 
     const sub =
       subtractInBase(
@@ -8780,16 +9055,17 @@ Answer = ${result}
         : sub.result;
 
     steps =
-`
-Both numbers have the same sign.
+`Input Number 1 = ${num1}\nInput Number 2 = ${num2}\n
+Step 1:
+-------
+${sameSignExplanation}
 
-Find:
-
-${big} - ${small}
-
+Step 2:
+-------
 ${sub.visual}
-
-Apply sign of larger magnitude.
+Step 3:
+-------
+Apply ${resultNegative    ? '(-)'    : '(+)'} sign to the answer.
 
 Answer = ${result}
 `;
@@ -8836,32 +9112,23 @@ case 'Multiplication':{
       : mul.result;
 
   steps =
-`
-Step 1: Determine Sign of Result
---------------------------------
-
-Number 1:
-${n1 < 0 ? 'Negative' : 'Positive'}
-
-Number 2:
-${n2 < 0 ? 'Negative' : 'Positive'}
-
+`Input Number 1 = ${num1}\nInput Number 2 = ${num2}\n
+Step 1: Determine Sign of the Answer
+------------------------------------
+Number 1: ${n1 < 0 ? '(- ve)' : '(+ ve)'}
+Number 2: ${n2 < 0 ? '(- ve)' : '(+ ve)'}
 ${
   negative
-  ? 'Signs are different → Result will be Negative'
-  : 'Signs are same → Result will be Positive'
+  ? 'Signs are different → Answer will be negative (- ve)'
+  : 'Signs are same → Answer will be positive (+ ve)'
 }
 
 Step 2: Multiply Magnitudes
 ---------------------------
-
-${abs1} × ${abs2}
-
 ${mul.visual}
 
 Step 3: Apply Sign
 ------------------
-
 Answer = ${result}
 `;
 
@@ -8905,7 +9172,7 @@ case 'Subtraction (9s Complement)':{
     '❌ Positive numbers only';
 
   stepsDiv.innerHTML =
-    "9's Complement subtraction currently supports positive numbers only.";
+    "9's Complement subtraction supports positive numbers only.";
 
   return;
 
@@ -9184,7 +9451,7 @@ case 'Subtraction (10s Complement)':{
     '❌ Positive numbers only';
 
   stepsDiv.innerHTML =
-    "9's Complement subtraction currently supports positive numbers only.";
+    "9's Complement subtraction supports positive numbers only.";
 
   return;
 
@@ -9682,10 +9949,6 @@ Step 2: Interpret Result as Signed Integer
 Result
 ------
 ${resultNum}
-
-Verification
-------------
-~${n} = ${resultNum}
 `;
 
   break;
@@ -9965,20 +10228,20 @@ Answer = ${resultNum}
 case 'Zero Fill Right Shift (>>>)':{
 
   if(
-  !isIntegerNumber(num1)
-  ||
-  !isIntegerNumber(num2)
-){
+    !isIntegerNumber(num1)
+    ||
+    !isIntegerNumber(num2)
+  ){
 
-  resultDiv.innerHTML =
-    '❌ Integer Only';
+    resultDiv.innerHTML =
+      '❌ Integer Only';
 
-  stepsDiv.innerHTML =
-    'Shift operations support integers only.';
+    stepsDiv.innerHTML =
+      'Shift operations support integers only.';
 
-  return;
+    return;
 
-}
+  }
 
   const n =
     parseInt(num1);
@@ -9986,8 +10249,24 @@ case 'Zero Fill Right Shift (>>>)':{
   const shift =
     parseInt(num2);
 
+  const binary32 =
+    (n >>> 0)
+      .toString(2)
+      .padStart(
+        32,
+        '0'
+      );
+
   const resultNum =
     n >>> shift;
+
+  const shiftedBinary =
+    resultNum
+      .toString(2)
+      .padStart(
+        32,
+        '0'
+      );
 
   result =
     resultNum;
@@ -9995,114 +10274,174 @@ case 'Zero Fill Right Shift (>>>)':{
   steps =
 `${n} >>> ${shift} →
 
-Step 1: Find 32-bit Binary
---------------------------
+Step 1: Find 32-bit Binary Code
+-------------------------------
+(${n})₁₀ = (${binary32})₂
 
-(${n})₁₀ = (${(n >>> 0)
-    .toString(2)
-    .padStart(32,'0')})₂
-
-Step 2: Shift Right
--------------------
-By ${shift} positions → ${resultNum
-    .toString(2)
-    .padStart(32,'0')}
-
-(Vacated positions are filled with 0)
-
-Step 3: Convert back to Decimal
---------------------------------------
-${resultNum}
-
-Answer: ${resultNum}`;
-
-  break;
-
-}
-
-
-
-
-
-case 'Right Shift (>>)':{
-
-  if(
-  !isIntegerNumber(num1)
-  ||
-  !isIntegerNumber(num2)
-){
-
-  resultDiv.innerHTML =
-    '❌ Integer Only';
-
-  stepsDiv.innerHTML =
-    'Shift operations support integers only.';
-
-  return;
-
-}
-
-
-  const n =
-    parseInt(num1);
-
-  const shift =
-    parseInt(num2);
-
-  const resultNum =
-    n >> shift;
-
-  result =
-    resultNum;
-
-  steps =
-`${n} >> ${shift} → 
-
-Step 1: Find Binary Code
-------------------------
-(${n})₁₀ = (${(n >>> 0).toString(2)})₂
-
-Step 2: Shift Right
-------------------
-By ${shift} positions → ${(resultNum >>> 0).toString(2)}
+Step 2: Zero Fill Right Shift
+-----------------------------
+${binary32}
+↓ ${shift} positions
+${shiftedBinary}
+(Vacant bits are filled with 0)
 
 Step 3: Convert back to Decimal
 -------------------------------
 ${resultNum}
 
 Answer: ${resultNum}`;
+
   break;
 
 }
 
 
 
-case 'Left Shift (<<)':{
-
+case 'Right Shift (>>)':{
 
   if(
-  !isIntegerNumber(num1)
-  ||
-  !isIntegerNumber(num2)
-){
+    !isIntegerNumber(num1)
+    ||
+    !isIntegerNumber(num2)
+  ){
 
-  resultDiv.innerHTML =
-    '❌ Integer Only';
+    resultDiv.innerHTML =
+      '❌ Integer Only';
 
-  stepsDiv.innerHTML =
-    'Shift operations support integers only.';
+    stepsDiv.innerHTML =
+      'Shift operations support integers only.';
 
-  return;
+    return;
 
-}
+  }
+
   const n =
     parseInt(num1);
 
   const shift =
     parseInt(num2);
 
+  let binary32 =
+    (n >>> 0)
+      .toString(2)
+      .padStart(
+        32,
+        '0'
+      );
+
+  let shiftedBinary;
+
+  let resultNum;
+
+  if(
+    shift >= 32
+  ){
+
+    if(n < 0){
+
+      shiftedBinary =
+        '1'.repeat(32);
+
+      resultNum = -1;
+
+    }
+
+    else{
+
+      shiftedBinary =
+        '0'.repeat(32);
+
+      resultNum = 0;
+
+    }
+
+  }
+
+  else{
+
+    resultNum =
+      n >> shift;
+
+    shiftedBinary =
+      (resultNum >>> 0)
+        .toString(2)
+        .padStart(
+          32,
+          '0'
+        );
+
+  }
+
+  result =
+    resultNum;
+
+  steps =
+`${n} >> ${shift} →
+
+Step 1: Find 32-bit Binary Code
+-------------------------------
+(${n})₁₀ = (${binary32})₂
+
+Step 2: Arithmetic Right Shift
+------------------------------
+${binary32}
+↓ ${shift} positions
+${shiftedBinary}
+(Sign bit is preserved)
+
+Step 3: Convert back to Decimal
+-------------------------------
+${resultNum}
+
+Answer: ${resultNum}`;
+
+  break;
+
+}
+
+
+case 'Left Shift (<<)':{
+
+  if(
+    !isIntegerNumber(num1)
+    ||
+    !isIntegerNumber(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Only';
+
+    stepsDiv.innerHTML =
+      'Shift operations support integers only.';
+
+    return;
+
+  }
+
+  const n =
+    parseInt(num1);
+
+  const shift =
+    parseInt(num2);
+
+  const binary32 =
+    (n >>> 0)
+      .toString(2)
+      .padStart(
+        32,
+        '0'
+      );
+
   const resultNum =
     n << shift;
+
+  const shiftedBinary =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(
+        32,
+        '0'
+      );
 
   result =
     resultNum;
@@ -10110,19 +10449,24 @@ case 'Left Shift (<<)':{
   steps =
 `${n} << ${shift} →
 
-Step 1: Find Binary Code
-------------------------
-(${n})₁₀ = (${(n >>> 0).toString(2)})₂
+Step 1: Find 32-bit Binary Code
+-------------------------------
+(${n})₁₀ = (${binary32})₂
 
-Step 2: Shift Left
+Step 2: Left Shift
 ------------------
-By ${shift} positions → ${(resultNum >>> 0).toString(2)}
+${binary32}
+↓ ${shift} positions
+${shiftedBinary}
+
+(Vacant bits are filled with 0)
 
 Step 3: Convert back to Decimal
 -------------------------------
 ${resultNum}
 
 Answer: ${resultNum}`;
+
   break;
 
 }
@@ -10152,12 +10496,5 @@ Answer: ${resultNum}`;
 }
 
 
-
-
-
-
-
-
-
-
+//#endregion
 
