@@ -8414,7 +8414,21 @@ document
     }
   );
 
+document
+  .getElementById(
+    'octalOperation'
+  )
+  ?.addEventListener(
+    'change',
+    () => {
 
+      updateUnaryOperationUI(
+        'octalOperation', 'octalNum1',
+        'octalNum2'
+      );
+
+    }
+  );
 
 
 
@@ -12248,29 +12262,7 @@ Answer: ${resultNum}`;
 //#region Octal Conversions & Arithmetic
 
 
-function octalToBinaryString(value){
 
-  let binary = '';
-
-  for(let ch of value){
-
-    if(ch === '.'){
-
-      binary += '.';
-      continue;
-
-    }
-
-    binary +=
-      parseInt(ch,8)
-      .toString(2)
-      .padStart(3,'0');
-
-  }
-
-  return binary;
-
-}
 
 
 function generateOctalToBinarySteps(
@@ -12342,6 +12334,30 @@ function isOctalNumber(value){
 
 }
 
+
+function octalToBinaryString(value){
+
+  let binary = '';
+
+  for(let ch of value){
+
+    if(ch === '.'){
+
+      binary += '.';
+      continue;
+
+    }
+
+    binary +=
+      parseInt(ch,8)
+      .toString(2)
+      .padStart(3,'0');
+
+  }
+
+  return binary;
+
+}
 function findOctalConversion(){
 
   let value =
@@ -12850,12 +12866,8 @@ break;
 case 'Gray':{
 
 const octBinary =
-  convertFromDecimal(
-    convertToDecimal(
-      absValue,
-      8
-    ),
-    2
+  octalToBinaryString(
+    absValue
   );
 
 let binaryForGray =
@@ -13124,10 +13136,11 @@ case 'Mantissa Exponent':{
     );
 
   if(
-    binary === '0'
-    ||
-    binary === '000'
-  ){
+  parseInt(
+    binary.replace('.',''),
+    2
+  ) === 0
+){
 
     result = '0 × 2^0';
 
@@ -13527,9 +13540,2356 @@ ${result}
 
 
 
+function isIntegerOctal(value){
+
+  return /^-?[0-7]+$/.test(value);
+
+}
+
+function octalToSignedInt(value){
+
+  return parseInt(
+    convertToDecimal(
+      value.replace('-',''),
+      8
+    )
+  ) * (
+    value.startsWith('-')
+      ? -1
+      : 1
+  );
+
+}
 
 
+function normalizeOctal(value){
+
+  let negative =
+    value.startsWith('-');
+
+  if(negative){
+
+    value =
+      value.slice(1);
+
+  }
+
+  if(value.includes('.')){
+
+    let parts =
+      value.split('.');
+
+    let intPart =
+      parts[0]
+        .replace(/^0+/,'')
+      || '0';
+
+    let fracPart =
+      parts[1]
+        .replace(/0+$/,'');
+
+    value =
+      fracPart.length
+        ? intPart + '.' + fracPart
+        : intPart;
+
+  }
+  else{
+
+    value =
+      value.replace(/^0+/,'')
+      || '0';
+
+  }
+
+  if(value === '0'){
+
+    return '0';
+
+  }
+
+  return negative
+    ? '-' + value
+    : value;
+
+}
+function octalAbs(value){
+
+  return value.replace(
+    /^-/,
+    ''
+  );
+
+}
+
+function isNegativeOctal(value){
+
+  return value.startsWith(
+    '-'
+  );
+
+}
+
+function octalToNumber(value){
+
+  const negative =
+    value.startsWith('-');
+
+  const absValue =
+    value.replace(
+      /^-/,
+      ''
+    );
+
+  const decimal =
+    convertToDecimal(
+      absValue,
+      8
+    );
+
+  return negative
+    ? -decimal
+    : decimal;
+
+}
 function findOctalArithmetic(){
+
+  const num1 =
+    document.getElementById(
+      'octalNum1'
+    ).value.trim();
+
+  const num2 =
+    document.getElementById(
+      'octalNum2'
+    ).value.trim();
+
+  const operation =
+    document.getElementById(
+      'octalOperation'
+    ).value;
+
+  const resultDiv =
+    document.getElementById(
+      'globalResult'
+    );
+
+  const stepsDiv =
+    document.getElementById(
+      'globalSteps'
+    );
+
+  if(
+    operation ===
+    'Bitwise NOT (~)'
+  ){
+
+  }
+
+  else{
+
+    if(
+      !isOctalNumber(num1)
+      ||
+      !isOctalNumber(num2)
+    ){
+
+      resultDiv.innerHTML =
+        '❌ Invalid Octal Number';
+
+      stepsDiv.innerHTML = '';
+
+      return;
+
+    }
+
+  }
+
+  let result = '';
+  let steps = '';
+
+  switch(operation){
+
+    case 'Addition':{
+
+  const n1 =
+    octalToNumber(num1);
+
+  const n2 =
+    octalToNumber(num2);
+
+   const neg1 =
+  num1.startsWith('-');
+
+const neg2 =
+  num2.startsWith('-');
+
+  if(
+    neg1 === neg2
+  ){
+
+    const add =
+      addInBase(
+        num1.replace('-',''),
+        num2.replace('-',''),
+        8
+      );
+
+    if(add.result === '0'){
+
+  result = '0';
+
+}
+else{
+
+  result =
+    neg1
+      ? '-' + add.result
+      : add.result;
+
+}
+
+    steps =
+`Input Number 1 = ${num1}₈
+Input Number 2 = ${num2}₈
+
+Step 1:
+-------
+Both numbers have same sign.
+Perform Octal Addition.
+
+Step 2:
+-------
+${add.visual}
+
+Step 3:
+-------
+Apply sign.
+
+Answer = ${result}₈`;
+
+  }
+
+  else{
+
+    let big =
+      num1.replace('-','');
+
+    let small =
+      num2.replace('-','');
+
+    let resultNegative =
+      neg1;
+
+    if(
+      Math.abs(n2)
+      >
+      Math.abs(n1)
+    ){
+
+      big =
+        num2.replace('-','');
+
+      small =
+        num1.replace('-','');
+
+      resultNegative =
+        neg2;
+
+    }
+
+    const sub =
+      subtractInBase(
+        big,
+        small,
+        8
+      );
+
+if(sub.result === '0'){
+
+  result = '0';
+
+}
+else{
+
+  result =
+    resultNegative
+      ? '-' + sub.result
+      : sub.result;
+
+}
+
+    steps =
+`Input Number 1 = ${num1}₈
+Input Number 2 = ${num2}₈
+
+Step 1:
+-------
+Signs are different.
+Convert addition into subtraction.
+
+Step 2:
+-------
+${sub.visual}
+
+Step 3:
+-------
+Apply sign of larger magnitude.
+
+Answer = ${result}₈`;
+
+  }
+
+  break;
+}
+
+
+case 'Subtraction':{
+
+  const n1 =
+    octalToNumber(
+      num1
+    );
+
+  const n2 =
+    octalToNumber(
+      num2
+    );
+
+  const abs1 =
+    octalAbs(num1);
+
+  const abs2 =
+    octalAbs(num2);
+
+  const neg1 =
+    isNegativeOctal(
+      num1
+    );
+
+  const neg2 =
+    isNegativeOctal(
+      num2
+    );
+
+  let explanation = '';
+
+  if(neg2){
+
+    explanation =
+`The 2nd input number ${num2} is negative.
+Therefore, ${num1} - (${num2}) = ${abs1} + ${abs2}`;
+
+  }
+
+  else{
+
+    explanation =
+`The 1st input number ${num1} is negative.
+
+Therefore, ${num1} - ${num2} = -(${abs1} + ${abs2})`;
+
+  }
+
+  if(
+    neg1 !== neg2
+  ){
+
+    const add =
+      addInBase(
+        abs1,
+        abs2,
+        8
+      );
+
+    if(add.result === '0'){
+
+  result = '0';
+
+}
+else{
+
+  result =
+    neg1
+      ? '-' + add.result
+      : add.result;
+
+}
+
+    steps =
+`Input Number 1 = ${num1}₈
+Input Number 2 = ${num2}₈
+
+Step 1:
+-------
+${explanation}
+
+Step 2:
+-------
+${add.visual}
+
+Step 3:
+-------
+${
+  neg1
+    ? 'Apply (-) sign.'
+    : 'Apply (+) sign.'
+}
+
+Answer = ${result}₈
+`;
+
+  }
+
+  else{
+
+    let bigValue =
+      n1;
+
+    let big =
+      abs1;
+
+    let small =
+      abs2;
+
+    let resultNegative =
+      false;
+
+    if(
+      Math.abs(n1)
+      >=
+      Math.abs(n2)
+    ){
+
+      resultNegative =
+        neg1;
+
+    }
+
+    else{
+
+      bigValue =
+        n2;
+
+      big =
+        abs2;
+
+      small =
+        abs1;
+
+      resultNegative =
+        !neg1;
+
+    }
+
+    let sameSignExplanation =
+      '';
+
+    if(
+      !neg1
+      &&
+      !neg2
+    ){
+
+      sameSignExplanation =
+`Both input numbers are positive.
+Since ${big} > ${small},  find: ${big} - ${small}
+and apply ${  resultNegative    ? '(-)'    : '(+)'} sign.`;
+
+    }
+
+    else{
+
+      sameSignExplanation =
+`Both input numbers are negative.
+${num1} - (${num2})
+Now since, ${big} > ${small}, find: ${big} - ${small}
+and apply ${  resultNegative    ? '(-)'    : '(+)'} sign.`;
+
+    }
+
+    const sub =
+      subtractInBase(
+        big,
+        small,
+        8
+      );
+
+if(sub.result === '0'){
+
+  result = '0';
+
+}
+else{
+
+  result =
+    resultNegative
+      ? '-' + sub.result
+      : sub.result;
+
+}
+
+    steps =
+`Input Number 1 = ${num1}₈
+Input Number 2 = ${num2}₈
+
+Step 1:
+-------
+${sameSignExplanation}
+
+Step 2:
+-------
+${sub.visual}
+
+Step 3:
+-------
+Apply ${  resultNegative    ? '(-)'    : '(+)'} sign.
+
+Answer = ${result}₈
+`;
+
+  }
+
+  break;
+}
+
+case 'Multiplication':{
+
+  const n1 =
+    octalToNumber(
+      num1
+    );
+
+  const n2 =
+    octalToNumber(
+      num2
+    );
+
+  const abs1 =
+    octalAbs(
+      num1
+    );
+
+  const abs2 =
+    octalAbs(
+      num2
+    );
+
+  const negative =
+    (n1 < 0)
+    !==
+    (n2 < 0);
+
+  const mul =
+    multiplyInBase(
+      abs1,
+      abs2,
+      8
+    );
+
+  if(mul.result === '0'){
+
+  result = '0';
+
+}
+else{
+
+  result =
+    negative
+      ? '-' + mul.result
+      : mul.result;
+
+}
+
+  steps =
+`Input Number 1 = ${num1}₈
+Input Number 2 = ${num2}₈
+
+Step 1: Determine Sign of the Answer
+------------------------------------
+Number 1: ${n1 < 0 ? '(- ve)' : '(+ ve)'}
+Number 2: ${n2 < 0 ? '(- ve)' : '(+ ve)'}
+
+${
+  negative
+  ? 'Signs are different → Answer will be negative (- ve)'
+  : 'Signs are same → Answer will be positive (+ ve)'
+}
+
+Step 2: Multiply Magnitudes
+---------------------------
+${mul.visual}
+
+Step 3: Apply Sign
+------------------
+Answer = ${result}₈
+`;
+
+  break;
+
+}
+
+
+case 'Subtraction (7s Complement)':{
+
+  if(
+    !isOctalNumber(num1)
+    ||
+    !isOctalNumber(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Octal Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+let signStep = '';
+
+let workingNum1 = num1;
+let workingNum2 = num2;
+
+const neg1 =
+  num1.startsWith('-');
+
+const neg2 =
+  num2.startsWith('-');
+
+if(neg1 && neg2){
+
+  const abs1 =
+    num1.slice(1);
+
+  const abs2 =
+    num2.slice(1);
+
+  signStep =
+`Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${abs2} - ${abs1}
+
+Now apply 7's Complement subtraction.
+`;
+
+  workingNum1 = abs2;
+  workingNum2 = abs1;
+
+}
+else if(!neg1 && neg2){
+
+  const abs2 =
+    num2.slice(1);
+
+  const add =
+    addInBase(
+      num1,
+      abs2,
+      8
+    );
+
+  result =
+    add.result;
+
+  steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${num1} + ${abs2}
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+else if(neg1 && !neg2){
+
+  const abs1 =
+    num1.slice(1);
+
+  const add =
+    addInBase(
+      abs1,
+      num2,
+      8
+    );
+
+  result =
+    '-' + add.result;
+
+  steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - ${num2} = -(${abs1} + ${num2})
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+
+const fracLen =
+  Math.max(
+    (workingNum1.split('.')[1] || '').length,
+    (workingNum2.split('.')[1] || '').length
+  );
+
+const intDigits =
+  Math.max(
+    workingNum1.split('.')[0]
+      .replace('-','')
+      .length,
+    workingNum2.split('.')[0]
+      .replace('-','')
+      .length
+  );
+
+let paddedN1;
+let paddedN2;
+
+if(fracLen){
+
+  const p1 =
+    workingNum1.split('.');
+
+  const fracPart1 =
+    (p1[1] || '')
+      .padEnd(
+        fracLen,
+        '0'
+      );
+
+  paddedN1 =
+    p1[0]
+      .padStart(
+        intDigits,
+        '0'
+      )
+    +
+    '.'
+    +
+    fracPart1;
+
+  const p2 =
+    workingNum2.split('.');
+
+  const fracPart2 =
+    (p2[1] || '')
+      .padEnd(
+        fracLen,
+        '0'
+      );
+
+  paddedN2 =
+    p2[0]
+      .padStart(
+        intDigits,
+        '0'
+      )
+    +
+    '.'
+    +
+    fracPart2;
+
+}
+else{
+
+  paddedN1 =
+    workingNum1.padStart(
+      intDigits,
+      '0'
+    );
+
+  paddedN2 =
+    workingNum2.padStart(
+      intDigits,
+      '0'
+    );
+
+}
+
+const sevenComp =
+  paddedN2
+    .split('')
+    .map(
+      ch =>
+        ch === '.'
+          ? '.'
+          : (
+              7 -
+              parseInt(ch)
+            )
+    )
+    .join('');
+
+const addRes =
+  addInBase(
+    paddedN1,
+    sevenComp,
+    8
+  );
+
+const sum7 =
+  addRes.result;
+
+let finalStep = '';
+
+const carry =
+  sum7.split('.')[0].length >
+  intDigits;
+
+if(carry){
+
+  let withoutCarry;
+
+  if(sum7.includes('.')){
+
+    const p =
+      sum7.split('.');
+
+    withoutCarry =
+      p[0].slice(1)
+      +
+      '.'
+      +
+      p[1];
+
+  }
+  else{
+
+    withoutCarry =
+      sum7.slice(1);
+
+  }
+
+  const increment =
+    fracLen
+      ? (
+          '0.'
+          +
+          '0'.repeat(
+            fracLen - 1
+          )
+          +
+          '1'
+        )
+      : '1';
+
+  const finalAdd =
+    addInBase(
+      withoutCarry,
+      increment,
+      8
+    );
+
+  result =
+    finalAdd.result;
+
+  finalStep =
+`
+Step 3: D has End-around Carry? Yes
+-----------------------------------
+a) Discard the End-around Carry from D
+${withoutCarry}
+
+b) Find E = Add 1 to LSD of D
+
+${finalAdd.visual}
+`;
+
+}
+else{
+
+  const comp =
+    sum7
+      .split('')
+      .map(
+        ch =>
+          ch === '.'
+            ? '.'
+            : (
+                7 -
+                parseInt(ch)
+              )
+      )
+      .join('');
+
+  const sevensForSum =
+    sum7.replace(
+      /[0-7]/g,
+      '7'
+    );
+
+  result =
+    /^0*\.?0*$/.test(comp)
+      ? '0'
+      : '-' + comp;
+
+  finalStep =
+`
+Step 3: D has End-around Carry? No
+----------------------------------
+a) Find E = 7's Complement of D
+
+  ${sevensForSum.split('').join(' ')}
+- ${sum7.split('').join(' ')}
+${'-'.repeat(sum7.length*2+2)}
+  ${comp.split('').join(' ')}
+
+b) Add a negative sign to E
+
+${result}
+`;
+
+}
+
+steps =
+`${signStep}Finding ${paddedN1} - ${paddedN2} using 7's Complement →
+
+Let A = ${paddedN1}
+Let B = ${paddedN2}
+
+Step 1: Find C = 7's Complement of B
+------------------------------------
+
+  ${paddedN2
+      .replace(/[0-7]/g,'7')
+      .split('')
+      .join(' ')}
+
+- ${paddedN2
+      .split('')
+      .join(' ')}
+
+${'-'.repeat(
+  paddedN2.length * 2 + 2
+)}
+
+  ${sevenComp
+      .split('')
+      .join(' ')}
+
+Step 2: Find D = A + C
+----------------------
+
+${addRes.visual}
+
+${finalStep}
+
+Answer = ${result}
+`;
+
+break;
+}
+case 'Subtraction (8s Complement)':{
+
+  if(
+    !isOctalNumber(num1)
+    ||
+    !isOctalNumber(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Octal Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+  let signStep = '';
+
+  let workingNum1 = num1;
+  let workingNum2 = num2;
+
+  const neg1 =
+    num1.startsWith('-');
+
+  const neg2 =
+    num2.startsWith('-');
+
+  if(neg1 && neg2){
+
+    const abs1 =
+      num1.slice(1);
+
+    const abs2 =
+      num2.slice(1);
+
+    signStep =
+`Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${abs2} - ${abs1}
+Now apply 8's Complement subtraction.
+`;
+
+    workingNum1 = abs2;
+    workingNum2 = abs1;
+
+  }
+  else if(!neg1 && neg2){
+
+    const abs2 =
+      num2.slice(1);
+
+    const add =
+      addInBase(
+        num1,
+        abs2,
+        8
+      );
+
+    result =
+      add.result;
+
+    steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${num1} + ${abs2}
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+    break;
+
+  }
+  else if(neg1 && !neg2){
+
+    const abs1 =
+      num1.slice(1);
+
+    const add =
+      addInBase(
+        abs1,
+        num2,
+        8
+      );
+
+    result =
+      '-' + add.result;
+
+    steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - ${num2} = -(${abs1} + ${num2})
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+    break;
+
+  }
+
+  const fracLen =
+    Math.max(
+      (workingNum1.split('.')[1] || '').length,
+      (workingNum2.split('.')[1] || '').length
+    );
+
+  const intDigits =
+    Math.max(
+      workingNum1.split('.')[0]
+        .replace('-','')
+        .length,
+      workingNum2.split('.')[0]
+        .replace('-','')
+        .length
+    );
+
+  let paddedN1;
+  let paddedN2;
+
+ if(fracLen){
+
+  const p1 =
+    workingNum1.split('.');
+
+  const fracPart1 =
+    (p1[1] || '')
+      .padEnd(
+        fracLen,
+        '0'
+      );
+
+  paddedN1 =
+    p1[0]
+      .padStart(
+        intDigits,
+        '0'
+      )
+    +
+    '.'
+    +
+    fracPart1;
+
+  const p2 =
+    workingNum2.split('.');
+
+  const fracPart2 =
+    (p2[1] || '')
+      .padEnd(
+        fracLen,
+        '0'
+      );
+
+  paddedN2 =
+    p2[0]
+      .padStart(
+        intDigits,
+        '0'
+      )
+    +
+    '.'
+    +
+    fracPart2;
+
+}
+  else{
+
+    paddedN1 =
+      workingNum1.padStart(
+        intDigits,
+        '0'
+      );
+
+    paddedN2 =
+      workingNum2.padStart(
+        intDigits,
+        '0'
+      );
+
+  }
+
+  const sevenComp =
+    paddedN2
+      .split('')
+      .map(
+        ch =>
+          ch === '.'
+            ? '.'
+            : (
+                7 -
+                parseInt(ch)
+              )
+      )
+      .join('');
+
+  const increment =
+    fracLen
+      ? (
+          '0.' +
+          '0'.repeat(
+            fracLen - 1
+          ) +
+          '1'
+        )
+      : '1';
+
+  const eightCompAdd =
+    addInBase(
+      sevenComp,
+      increment,
+      8
+    );
+
+  let eightComp =
+    eightCompAdd.result;
+
+  if(
+    eightComp.length >
+    paddedN2.length
+  ){
+
+    eightComp =
+      eightComp.slice(1);
+
+  }
+
+  const addRes =
+    addInBase(
+      paddedN1,
+      eightComp,
+      8
+    );
+
+  const sum8 =
+    addRes.result;
+
+  result = '';
+
+  let finalStep = '';
+
+  const carry =
+    addRes.result
+      .split('.')[0]
+      .length >
+    intDigits;
+
+  if(carry){
+
+    let withoutCarry;
+
+    if(sum8.includes('.')){
+
+      const parts =
+        sum8.split('.');
+
+      withoutCarry =
+        parts[0].slice(1)
+        +
+        '.'
+        +
+        parts[1];
+
+    }
+    else{
+
+      withoutCarry =
+        sum8.slice(1);
+
+    }
+
+    result =
+      withoutCarry;
+
+    finalStep =
+`
+Step 3: D has End-around Carry? Yes
+-----------------------------------
+a) Discard the End-around Carry from D
+
+${withoutCarry}
+
+b) Result is positive
+`;
+
+  }
+  else{
+
+    const sevensForSum =
+      sum8.replace(
+        /[0-7]/g,
+        '7'
+      );
+
+    const comp =
+      sum8
+        .split('')
+        .map(
+          ch =>
+            ch === '.'
+              ? '.'
+              : (
+                  7 -
+                  parseInt(ch)
+                )
+        )
+        .join('');
+
+    const eightCompResult =
+      addInBase(
+        comp,
+        increment,
+        8
+      );
+
+    let magnitudeResult =
+      eightCompResult.result;
+
+    if(
+      magnitudeResult.length >
+      comp.length
+    ){
+
+      magnitudeResult =
+        magnitudeResult.slice(1);
+
+    }
+
+    result =
+      /^0*\.?0*$/.test(
+        magnitudeResult
+      )
+        ? '0'
+        : '-' + magnitudeResult;
+
+    finalStep =
+`
+Step 3: D has End-around Carry? No
+----------------------------------
+a) Find E = 8's Complement of D
+
+  ${sevensForSum
+      .split('')
+      .join(' ')}
+
+- ${sum8
+      .split('')
+      .join(' ')}
+
+${'-'.repeat(
+  sum8.length * 2 + 2
+)}
+
+  ${comp
+      .split('')
+      .join(' ')}
+
++ ${increment
+      .padStart(
+        comp.length,
+        ' '
+      )
+      .split('')
+      .join(' ')}
+
+${'-'.repeat(
+  comp.length * 2 + 2
+)}
+
+  ${magnitudeResult
+      .padStart(
+        comp.length,
+        '0'
+      )
+      .split('')
+      .join(' ')}
+
+b) Add a negative sign to E: ${result}
+`;
+
+  }
+
+  steps =
+`${signStep}Finding ${paddedN1} - ${paddedN2} using 8's Complement →
+
+Let A = ${paddedN1}
+Let B = ${paddedN2}
+
+Step 1: Find C = 8's Complement of B
+------------------------------------
+a) Find 7's Complement of B
+
+  ${paddedN2
+      .replace(
+        /[0-7]/g,
+        '7'
+      )
+      .split('')
+      .join(' ')}
+
+- ${paddedN2
+      .split('')
+      .join(' ')}
+
+${'-'.repeat(
+  paddedN2.length * 2 + 2
+)}
+
+  ${sevenComp
+      .split('')
+      .join(' ')}
+
+b) Add 1 to LSD
+
+${eightCompAdd.visual}
+
+C = ${eightComp}
+
+Step 2: Find D = A + C
+----------------------
+
+${addRes.visual}
+
+D = ${sum8}
+
+${finalStep}
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+
+
+
+
+
+
+
+case 'Bitwise AND (&)':{
+
+  if(
+    !isIntegerOctal(num1)
+    ||
+    !isIntegerOctal(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Octal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer octal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    octalToSignedInt(num1);
+
+  const n2 =
+    octalToSignedInt(num2);
+
+  const resultNum =
+    n1 & n2;
+
+  const resultOctal =
+    resultNum.toString(8);
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(width,'0');
+
+  const p2 =
+    b2.padStart(width,'0');
+
+  const p3 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  result =
+    resultOctal;
+
+  steps =
+`${num1}₈ & ${num2}₈ →
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${num1}₈ = ${n1}₁₀
+${num2}₈ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise AND (&)
+-------------------------------
+  ${p1}
+& ${p2}
+${'-'.repeat(width+2)}
+  ${p3}
+
+Step 4: Convert Result
+----------------------
+(${p3})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultOctal})₈
+
+Answer = ${resultOctal}₈
+`;
+
+  break;
+}
+
+case 'Bitwise OR (|)':{
+
+  if(
+    !isIntegerOctal(num1)
+    ||
+    !isIntegerOctal(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Octal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer octal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    octalToSignedInt(num1);
+
+  const n2 =
+    octalToSignedInt(num2);
+
+  const resultNum =
+    n1 | n2;
+
+  const resultOctal =
+    resultNum.toString(8);
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(width,'0');
+
+  const p2 =
+    b2.padStart(width,'0');
+
+  const p3 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  result =
+    resultOctal;
+
+  steps =
+`${num1}₈ | ${num2}₈ →
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${num1}₈ = ${n1}₁₀
+${num2}₈ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise OR (|)
+------------------------------
+  ${p1}
+| ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 4: Convert Result
+----------------------
+(${p3})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultOctal})₈
+
+Answer = ${resultOctal}₈
+`;
+
+  break;
+
+}
+
+case 'Bitwise XOR (^)':{
+
+  if(
+    !isIntegerOctal(num1)
+    ||
+    !isIntegerOctal(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Octal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer octal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    octalToSignedInt(num1);
+
+  const n2 =
+    octalToSignedInt(num2);
+
+  const resultNum =
+    n1 ^ n2;
+
+  const resultOctal =
+    resultNum.toString(8);
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(width,'0');
+
+  const p2 =
+    b2.padStart(width,'0');
+
+  const p3 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  result =
+    resultOctal;
+
+  steps =
+`${num1}₈ ^ ${num2}₈ →
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${num1}₈ = ${n1}₁₀
+${num2}₈ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise XOR (^)
+-------------------------------
+  ${p1}
+^ ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 4: Convert Result
+----------------------
+(${p3})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultOctal})₈
+
+Answer = ${resultOctal}₈
+`;
+
+  break;
+
+}
+
+case 'Bitwise XNOR':{
+
+  if(
+    !isIntegerOctal(num1)
+    ||
+    !isIntegerOctal(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Octal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer octal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    octalToSignedInt(num1);
+
+  const n2 =
+    octalToSignedInt(num2);
+
+  const xorResult =
+    n1 ^ n2;
+
+  const resultNum =
+    ~xorResult;
+
+  const resultOctal =
+    resultNum.toString(8);
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(width,'0');
+
+  const p2 =
+    b2.padStart(width,'0');
+
+  const p3 =
+    (xorResult >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  const p4 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  result =
+    resultOctal;
+
+  steps =
+`${num1}₈ XNOR ${num2}₈ →
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${num1}₈ = ${n1}₁₀
+${num2}₈ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise XOR (^)
+-------------------------------
+  ${p1}
+^ ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 4: Apply NOT (~)
+---------------------
+~${p3}
+${'-'.repeat(width)}
+${p4}
+
+Step 5: Convert Result
+----------------------
+(${p4})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultOctal})₈
+
+Answer = ${resultOctal}₈
+`;
+
+  break;
+
+}
+
+case 'Bitwise NAND':{
+
+  if(
+    !isIntegerOctal(num1)
+    ||
+    !isIntegerOctal(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Octal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer octal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    octalToSignedInt(num1);
+
+  const n2 =
+    octalToSignedInt(num2);
+
+  const andResult =
+    n1 & n2;
+
+  const resultNum =
+    ~andResult;
+
+  const resultOctal =
+    resultNum.toString(8);
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(width,'0');
+
+  const p2 =
+    b2.padStart(width,'0');
+
+  const p3 =
+    (andResult >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  const p4 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  result =
+    resultOctal;
+
+  steps =
+`${num1}₈ NAND ${num2}₈ →
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${num1}₈ = ${n1}₁₀
+${num2}₈ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise AND (&)
+-------------------------------
+  ${p1}
+& ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 4: Apply NOT (~)
+---------------------
+~${p3}
+${'-'.repeat(width)}
+${p4}
+
+Step 5: Convert Result
+----------------------
+(${p4})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultOctal})₈
+
+Answer = ${resultOctal}₈
+`;
+
+  break;
+
+}
+
+case 'Bitwise NOR':{
+
+  if(
+    !isIntegerOctal(num1)
+    ||
+    !isIntegerOctal(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Octal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer octal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    octalToSignedInt(num1);
+
+  const n2 =
+    octalToSignedInt(num2);
+
+  const orResult =
+    n1 | n2;
+
+  const resultNum =
+    ~orResult;
+
+  const resultOctal =
+    resultNum.toString(8);
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(width,'0');
+
+  const p2 =
+    b2.padStart(width,'0');
+
+  const p3 =
+    (orResult >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  const p4 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  result =
+    resultOctal;
+
+  steps =
+`${num1}₈ NOR ${num2}₈ →
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${num1}₈ = ${n1}₁₀
+${num2}₈ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise OR (|)
+------------------------------
+  ${p1}
+| ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 4: Apply NOT (~)
+---------------------
+~${p3}
+${'-'.repeat(width)}
+${p4}
+
+Step 5: Convert Result
+----------------------
+(${p4})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultOctal})₈
+
+Answer = ${resultOctal}₈
+`;
+
+  break;
+
+}
+
+case 'Bitwise NOT (~)':{
+
+  if(
+    !isIntegerOctal(num1)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Octal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise NOT supports integer octal numbers only.';
+
+    return;
+
+  }
+
+  const n =
+    octalToSignedInt(num1);
+
+  const resultNum =
+    ~n;
+
+  const resultOctal =
+    resultNum.toString(8);
+
+  const binary =
+    (n >>> 0)
+      .toString(2)
+      .padStart(32,'0');
+
+  let complement = '';
+
+  for(let bit of binary){
+
+    complement +=
+      bit === '0'
+        ? '1'
+        : '0';
+
+  }
+
+  const formulaResult =
+    -(n + 1);
+
+  result =
+    resultOctal;
+
+  steps =
+`Bitwise NOT (~)
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${num1}₈ = ${n}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+${binary}
+
+Step 3: Flip every bit
+----------------------
+${binary}
+${'-'.repeat(32)}
+${complement}
+
+Step 4: Interpret Result as Signed Integer
+------------------------------------------
+~${n} = -( ${n} + 1 ) = ${formulaResult}
+
+Step 5: Convert Result to Octal
+-------------------------------
+${resultNum}₁₀ = ${resultOctal}₈
+
+Answer = ${resultOctal}₈
+`;
+
+  break;
+
+}
+
+
+
+
+
+
+
+case 'Zero Fill Right Shift (>>>)':{
+
+  if(
+    !isIntegerOctal(num1)
+    ||
+    !isIntegerOctal(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Octal Only';
+
+    stepsDiv.innerHTML =
+      'Shift operations support integer octal numbers only.';
+
+    return;
+
+  }
+
+  if(num2.startsWith('-')){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be a Non-Negative Integer';
+
+    return;
+
+  }
+
+  const n =
+    octalToSignedInt(num1);
+
+  const shift =
+    octalToSignedInt(num2);
+
+  const binary32 =
+    (n >>> 0)
+      .toString(2)
+      .padStart(32,'0');
+
+  const resultNum =
+    n >>> shift;
+
+  const shiftedBinary =
+    resultNum
+      .toString(2)
+      .padStart(32,'0');
+
+  const resultOctal =
+    resultNum.toString(8);
+
+  result =
+    resultOctal;
+
+  steps =
+`${num1}₈ >>> ${num2}₈ →
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${num1}₈ = ${n}₁₀
+${num2}₈ = ${shift}₁₀
+
+Step 2: Find 32-bit Binary Code
+-------------------------------
+(${n})₁₀ = (${binary32})₂
+
+Step 3: Zero Fill Right Shift
+-----------------------------
+${binary32}
+↓ ${shift} positions
+${shiftedBinary}
+
+(Vacant bits are filled with 0)
+
+Step 4: Convert Result
+----------------------
+${resultNum}₁₀ = ${resultOctal}₈
+
+Answer = ${resultOctal}₈`;
+
+  break;
+
+}
+
+case 'Right Shift (>>)':{
+
+  if(
+    !isIntegerOctal(num1)
+    ||
+    !isIntegerOctal(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Octal Only';
+
+    stepsDiv.innerHTML =
+      'Shift operations support integer octal numbers only.';
+
+    return;
+
+  }
+
+  if(num2.startsWith('-')){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be a Non-Negative Integer';
+
+    return;
+
+  }
+
+  const n =
+    octalToSignedInt(num1);
+
+  const shift =
+    octalToSignedInt(num2);
+
+  const binary32 =
+    (n >>> 0)
+      .toString(2)
+      .padStart(32,'0');
+
+  let shiftedBinary;
+  let resultNum;
+
+  if(shift >= 32){
+
+    if(n < 0){
+
+      shiftedBinary =
+        '1'.repeat(32);
+
+      resultNum = -1;
+
+    }
+    else{
+
+      shiftedBinary =
+        '0'.repeat(32);
+
+      resultNum = 0;
+
+    }
+
+  }
+  else{
+
+    resultNum =
+      n >> shift;
+
+    shiftedBinary =
+      (resultNum >>> 0)
+        .toString(2)
+        .padStart(32,'0');
+
+  }
+
+  const resultOctal =
+    resultNum.toString(8);
+
+  result =
+    resultOctal;
+
+  steps =
+`${num1}₈ >> ${num2}₈ →
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${num1}₈ = ${n}₁₀
+${num2}₈ = ${shift}₁₀
+
+Step 2: Find 32-bit Binary Code
+-------------------------------
+(${n})₁₀ = (${binary32})₂
+
+Step 3: Arithmetic Right Shift
+------------------------------
+${binary32}
+↓ ${shift} positions
+${shiftedBinary}
+
+(Sign bit is preserved)
+
+Step 4: Convert Result
+----------------------
+${resultNum}₁₀ = ${resultOctal}₈
+
+Answer = ${resultOctal}₈`;
+
+  break;
+
+}
+
+case 'Left Shift (<<)':{
+
+  if(
+    !isIntegerOctal(num1)
+    ||
+    !isIntegerOctal(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Octal Only';
+
+    stepsDiv.innerHTML =
+      'Shift operations support integer octal numbers only.';
+
+    return;
+
+  }
+
+  if(num2.startsWith('-')){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be a Non-Negative Integer';
+
+    return;
+
+  }
+
+  const n =
+    octalToSignedInt(num1);
+
+  const shift =
+    octalToSignedInt(num2);
+
+  const binary32 =
+    (n >>> 0)
+      .toString(2)
+      .padStart(32,'0');
+
+  const resultNum =
+    n << shift;
+
+  const shiftedBinary =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(32,'0');
+
+  const resultOctal =
+    resultNum.toString(8);
+
+  result =
+    resultOctal;
+
+  steps =
+`${num1}₈ << ${num2}₈ →
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${num1}₈ = ${n}₁₀
+${num2}₈ = ${shift}₁₀
+
+Step 2: Find 32-bit Binary Code
+-------------------------------
+(${n})₁₀ = (${binary32})₂
+
+Step 3: Left Shift
+------------------
+${binary32}
+↓ ${shift} positions
+${shiftedBinary}
+
+(Vacant bits are filled with 0)
+
+Step 4: Convert Result
+----------------------
+${resultNum}₁₀ = ${resultOctal}₈
+
+Answer = ${resultOctal}₈`;
+
+  break;
+
+}
+
+  }
+
+  resultDiv.innerHTML =
+    `Answer: ${result}`;
+
+  stepsDiv.textContent =
+    steps;
 
 }
 
