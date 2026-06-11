@@ -76,6 +76,34 @@ setTimeout(() => {
 
   switch(btn.dataset.tab){
 
+    case 'octal':{
+
+  const arithmeticVisible =
+    document.getElementById(
+      'octalArithmeticGroup'
+    ).style.display === 'block';
+
+  if(arithmeticVisible){
+
+    document.getElementById(
+      'octalNum1'
+    )?.focus();
+
+  }
+
+  else{
+
+    document.getElementById(
+      'octalConvertInput'
+    )?.focus();
+
+  }
+
+  break;
+}
+
+
+
     case 'decimal':{
 
       const arithmeticVisible =
@@ -181,7 +209,7 @@ function generateCrossGroupingSteps(
   ================================ */
 
   steps +=
-`Step 1: Convert to Binary\n\n`;
+`Step 1: Convert to Binary\n`;
 
   const binarySteps =
     generateGroupingSteps(
@@ -213,16 +241,12 @@ function generateCrossGroupingSteps(
   ================================ */
 
   steps += `
-
-================================
-
 Step 2: Convert Binary to ${
   toBase === 16
     ? 'Hexadecimal'
     : 'Octal'
 }
-
-\n`;
+`;
 
   const regroupSteps =
     generateBinaryGroupingSteps(
@@ -277,9 +301,9 @@ function generateBinaryGroupingSteps(
   steps +=
     toBase === 16
 
-    ? `Step: Integer Part (${intPart})\n4-bit grouping R-L (←)\n--------------------------------\n`
+    ? `Step: Integer Part (${intPart})\n4-bit grouping R-L (←)\n----------------------\n`
 
-    : `Step: Integer Part (${intPart})\n3-bit grouping R-L (←)\n--------------------------------\n`;
+    : `Step: Integer Part (${intPart})\n3-bit grouping R-L (←)\n----------------------\n`;
 
   // Split decimal part
 
@@ -340,9 +364,9 @@ function generateBinaryGroupingSteps(
      steps +=
     toBase === 16
 
-    ? `\nStep: Fractional Part (${fracPart})\n4-bit grouping L-R (→)\n--------------------------------\n`
+    ? `\nStep: Fractional Part (${fracPart})\n4-bit grouping L-R (→)\n----------------------\n`
 
-    : `\nStep: Fractional Part (${fracPart})\n3-bit grouping L-R (→)\n--------------------------------\n`;
+    : `\nStep: Fractional Part (${fracPart})\n3-bit grouping L-R (→)\n----------------------\n`;
 
     
     steps += `${fracGroups.join(' ')}\n\n`;
@@ -378,8 +402,26 @@ function generateGroupingSteps(value, fromBase){
   value =
     value.toUpperCase();
 
+      const parts =
+    value.split('.');
+
+  let intPart =
+    parts[0];
+
+  let fracPart =
+    parts[1] || '';
+
+
+    let subscript =
+  {
+    2:'₂',
+    8:'₈',
+    10:'₁₀',
+    16:'₁₆'
+  };
   let steps =
-    'Steps of Calculation:\n\n';
+    `(${value})${subscript[fromBase]} → (?)₂\n\n`;
+
 
   let result = '';
 
@@ -390,9 +432,9 @@ function generateGroupingSteps(value, fromBase){
   steps +=
     fromBase === 16
 
-    ? 'Step: Integer Part\nIn 4-bits L-R (→)\n--------------------------------\n'
+    ? `Step: Integer Part (${intPart})\nIn 4-bits L-R (→)\n-----------------\n`
 
-    : 'Step: Integer Part\nIn 3-bits L-R (→)\n--------------------------------\n';
+    : `Step: Integer Part (${intPart})\nIn 3-bits L-R (→)\n-----------------\n`;
 
   for(let ch of value){
 
@@ -404,9 +446,9 @@ function generateGroupingSteps(value, fromBase){
        steps +=
     fromBase === 16
 
-    ? '\nStep: Fractional Part\nIn 4-bits L-R (→)\n--------------------------------\n'
+    ? `\nStep: Fractional Part (${fracPart})\nIn 4-bits L-R (→)\n-----------------\n`
 
-    : '\nStep: Fractional Part\nIn 3-bits L-R (→)\n--------------------------------\n';
+    : `\nStep: Fractional Part (${fracPart})\nIn 3-bits L-R (→)\n-----------------\n`;
 
       continue;
 
@@ -427,7 +469,7 @@ function generateGroupingSteps(value, fromBase){
 
   }
 
-  steps += `\n--------------------------------\nAnswer: ${result}\n--------------------------------`;
+  steps += `--------------------------------\nAnswer: ${result}\n--------------------------------\n`;
 
   return steps;
 
@@ -2981,7 +3023,7 @@ ${'-'.repeat(width)}
 
 
 
-
+//#region CPU Process
 
 /* =========================================
 MINI CPU EMULATOR
@@ -4573,35 +4615,7 @@ if(
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//#endregion
 
 
 
@@ -4667,6 +4681,53 @@ function toggleBinaryMode(mode){
 /* =========================================
 DECIMAL TAB TOGGLE
 ========================================= */
+
+function toggleOctalMode(mode){
+
+  const conversion =
+    document.getElementById(
+      'octalConversionGroup'
+    );
+
+  const arithmetic =
+    document.getElementById(
+      'octalArithmeticGroup'
+    );
+
+  if(mode === 'conversion'){
+
+    conversion.style.display =
+      'block';
+
+    arithmetic.style.display =
+      'none';
+
+    document
+      .getElementById(
+        'octalConvertInput'
+      )
+      .focus();
+
+  }
+
+  else{
+
+    conversion.style.display =
+      'none';
+
+    arithmetic.style.display =
+      'block';
+
+    document
+      .getElementById(
+        'octalNum1'
+      )
+      .focus();
+
+  }
+
+}
+
 
 function toggleDecimalMode(mode){
 
@@ -8988,6 +9049,17 @@ Final Answer = ${grayUnsigned}`;
 
 break;
 
+
+
+
+
+
+
+
+
+
+
+
   case 'Sign Magnitude':{
 
   if(!isDecimalNumber(value)){
@@ -9191,13 +9263,6 @@ Please Note:
 
 }
 
-
-
-
-
-
-
-
 case 'Mantissa Exponent':{
 
   const num =
@@ -9298,11 +9363,6 @@ Exponent = ${exponent}`;
 
 }
 
-
-
-
-
-
 case 'IEEE-754 Floating Point (32-bit)':{
 
   const num =
@@ -9368,8 +9428,6 @@ ${result}`;
 
 }
 
-
-
 case 'IEEE-754 Floating Point (64-bit)':{
 
   const num =
@@ -9434,8 +9492,6 @@ ${result}`;
   break;
 
 }
-
-
 
 
 case 'Fixed Point':{
@@ -12181,3 +12237,1301 @@ Answer: ${resultNum}`;
 
 //#endregion
 
+
+
+
+
+
+
+
+
+//#region Octal Conversions & Arithmetic
+
+
+function octalToBinaryString(value){
+
+  let binary = '';
+
+  for(let ch of value){
+
+    if(ch === '.'){
+
+      binary += '.';
+      continue;
+
+    }
+
+    binary +=
+      parseInt(ch,8)
+      .toString(2)
+      .padStart(3,'0');
+
+  }
+
+  return binary;
+
+}
+
+
+function generateOctalToBinarySteps(
+  value
+){
+
+  let steps =
+`Octal to Binary Conversion of ${value}
+
+Step 1: Convert every octal digit into 3-bit binary
+---------------------------------------------------
+`;
+
+  let binary = '';
+
+  for(let ch of value){
+
+    if(ch === '.'){
+
+      binary += '.';
+
+      steps +=
+`Decimal Point(.)\n`;
+
+      continue;
+
+      
+    }
+
+    if(ch === '-'){
+
+      binary += '-';
+
+      steps +=
+`Minus Sign(-)\n`;
+
+      continue;
+
+    }
+
+    const bits =
+      parseInt(ch,8)
+      .toString(2)
+      .padStart(3,'0');
+
+    steps +=
+`${ch}₈ → ${bits}₂\n`;
+
+    binary += bits;
+
+  }
+
+  steps +=
+`
+Step 2: Combine all binary groups
+---------------------------------
+${binary}
+
+Answer = ${binary}₂
+`;
+
+  return steps;
+
+}
+
+function isOctalNumber(value){
+
+  return /^-?[0-7]+(\.[0-7]+)?$/.test(value);
+
+}
+
+function findOctalConversion(){
+
+  let value =
+    document.getElementById(
+      'octalConvertInput'
+    ).value.trim();
+
+  const type =
+    document.getElementById(
+      'octalConvertType'
+    ).value;
+
+  const resultDiv =
+    document.getElementById(
+      'globalResult'
+    );
+
+  const stepsDiv =
+    document.getElementById(
+      'globalSteps'
+    );
+
+  if(!isOctalNumber(value)){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Octal Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+  const isNegative =
+  value.startsWith('-');
+
+const absValue =
+  value.replace(/^-/,'');
+
+  let result = '';
+  let steps = '';
+
+  switch(type){
+
+    case 'Binary':{
+
+  let binary = '';
+
+  for(let ch of value){
+
+    if(ch === '.'){
+
+      binary += '.';
+      continue;
+
+    }
+
+    if(ch === '-'){
+
+      binary += '-';
+      continue;
+
+    }
+
+
+    binary +=
+      parseInt(ch,8)
+      .toString(2)
+      .padStart(3,'0');
+
+  }
+
+  result = binary;
+
+  steps =
+    generateOctalToBinarySteps(
+      value
+    );
+
+  break;
+}
+
+case 'Hexadecimal':{
+
+  const decimal =
+    convertToDecimal(
+      absValue,
+      8
+    );
+
+  result =
+    convertFromDecimal(
+      decimal,
+      16
+    );
+
+  if(isNegative){
+
+    result = '-' + result;
+
+  }
+
+  steps =
+    generateCrossGroupingSteps(
+      absValue,
+      8,
+      16
+    );
+
+  if(isNegative){
+
+    steps =
+`Input Number = ${value}
+
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} and prefix '-' to the final answer)
+
+${steps}
+
+Final Answer = ${result}`;
+  }
+
+  break;
+}
+
+case 'Decimal':{
+
+  const decimal =
+    convertToDecimal(
+      absValue,
+      8
+    );
+
+  result = decimal;
+
+  steps =
+    generateAnyToDecimalSteps(
+      absValue,
+      8
+    );
+
+
+    if(isNegative){
+
+  result = '-' + result;
+
+  steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} and prefix '-' to the result)
+
+${steps}
+
+Final Answer = ${result}`;
+}
+
+  break;
+}
+
+
+
+case '7s complement':{
+
+let ovalue7 = value;
+value = absValue;
+
+result =
+  value
+    .split('')
+    .map(
+      d => d === '.'
+        ? '.'
+        : 7 - parseInt(d)
+    )
+    .join('');
+
+const sevens =
+  value.replace(/[0-7]/g,'7');
+
+steps =
+`Finding 7's Complement of ${value} →
+
+Step 1: Subtract all digits from 7
+----------------------------------
+
+  ${sevens.split('').join(' ')}
+- ${value.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+  ${result.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+`;
+
+if(isNegative){
+
+  steps =
+`Input Number = ${ovalue7}
+(Please Note: 7's Complement representation of a negative octal number is obtained by finding the 7's Complement of its magnitude.)
+Magnitude = ${absValue}
+
+${steps}
+`;
+
+}
+
+break;
+}
+
+
+case '8s complement':{
+
+let ovalue8 = value;
+value = absValue;
+
+const sevenCompResult =
+  value
+    .split('')
+    .map(
+      d => d === '.'
+        ? '.'
+        : 7 - parseInt(d)
+    )
+    .join('');
+
+const increment =
+  value.includes('.')
+    ? '0.' +
+      '0'.repeat(
+        value.split('.')[1].length - 1
+      ) +
+      '1'
+    : '1';
+
+const addRes =
+  addInBase(
+    sevenCompResult,
+    increment,
+    8
+  );
+
+result =
+  addRes.result;
+
+const sevens2 =
+  value.replace(/[0-7]/g,'7');
+
+const displayIncrement =
+  increment.padStart(
+    sevenCompResult.length,
+    ' '
+  );
+
+steps =
+`Finding 8's Complement of ${value} →
+
+Step 1: Subtract all digits from 7
+----------------------------------
+
+  ${sevens2.split('').join(' ')}
+- ${value.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+  ${sevenCompResult.split('').join(' ')}
+
+Step 2: Add 1 to the LSD (Least Significant Digit)
+--------------------------------------------------
+
+  ${sevenCompResult.split('').join(' ')}
++ ${displayIncrement.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+  ${result.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+`;
+
+if(isNegative){
+
+  steps =
+`Input Number = ${ovalue8}
+(Please Note: 8's Complement representation of a negative octal number is obtained by finding the 8's Complement of its magnitude.)
+Magnitude = ${absValue}
+
+${steps}
+`;
+
+}
+
+break;
+}
+
+case 'BCD (Binary Coded Decimal)': {
+
+let bcd = '';
+
+let bcdSteps =
+`BCD Representation of ${absValue}₈ →
+
+Step 1: Separate each octal digit from left to right
+----------------------------------------------------
+`;
+
+let octDigits = [];
+
+for(let d of absValue){
+
+  if(d === '.')
+    continue;
+
+  octDigits.push(d);
+
+}
+
+bcdSteps += octDigits.join(', ');
+
+bcdSteps +=
+`
+
+Step 2: Find 4-bit binary code (nibble) of each octal digit
+-----------------------------------------------------------
+`;
+
+for(let d of absValue){
+
+  if(d === '.'){
+
+    bcd += '. ';
+
+    bcdSteps +=
+`Decimal Point(.)\n`;
+
+    continue;
+
+  }
+
+  const code =
+    parseInt(d,8)
+      .toString(2)
+      .padStart(4,'0');
+
+  bcd += code + ' ';
+
+  bcdSteps +=
+`${d}₈ → ${code}\n`;
+
+}
+
+result =
+  bcd.trim();
+
+steps =
+`${bcdSteps}
+
+Step 3: Combine all the 4-bit nibbles side-by-side
+--------------------------------------------------
+${result}
+--------------------------------------------------
+`;
+
+if(isNegative)
+  result = '1101     ' + result;
+
+if(isNegative){
+
+steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into its BCD form and prefix '1101' as sign block.)
+
+${steps}
+
+Final Answer = ${result}`;
+
+}
+
+break;
+}
+
+
+case 'Excess 3': {
+
+let excess3 = '';
+
+let excessSteps =
+`Excess-3 Representation of ${absValue}₈ →
+
+Step 1: Separate each octal digit from left to right
+----------------------------------------------------
+`;
+
+let digits = [];
+
+for(let d of absValue){
+
+  if(d === '.')
+    continue;
+
+  digits.push(d);
+
+}
+
+excessSteps += digits.join(', ');
+
+excessSteps +=
+`
+
+Step 2: Add 3 to each octal digit
+---------------------------------
+`;
+
+let excessDigits = [];
+
+for(let d of absValue){
+
+  if(d === '.')
+    continue;
+
+  const digit =
+    parseInt(d,8);
+
+  const digitPlus3 =
+    digit + 3;
+
+  excessDigits.push(digitPlus3);
+
+  excessSteps +=
+`${digit} + 3 = ${digitPlus3}\n`;
+
+}
+
+excessSteps +=
+`\nExcess-3 digits are:\n${excessDigits.join(', ')}`;
+
+excessSteps +=
+`
+
+Step 3: Convert each Excess-3 digit into 4-bit binary
+-----------------------------------------------------
+`;
+
+for(let d of absValue){
+
+  if(d === '.'){
+
+    excess3 += '. ';
+
+    excessSteps +=
+`Decimal Point(.)\n`;
+
+    continue;
+
+  }
+
+  const digit =
+    parseInt(d,8);
+
+  const digitPlus3 =
+    digit + 3;
+
+  const code =
+    digitPlus3
+      .toString(2)
+      .padStart(4,'0');
+
+  excess3 += code + ' ';
+
+  excessSteps +=
+`${digitPlus3} → ${code}\n`;
+
+}
+
+result =
+  excess3.trim();
+
+steps =
+`${excessSteps}
+
+Step 4: Combine all the 4-bit nibbles side-by-side
+--------------------------------------------------
+${result}
+--------------------------------------------------
+`;
+
+if(isNegative)
+  result = '1101     ' + result;
+
+if(isNegative){
+
+steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into its Excess-3 form and prefix '1101' as sign block.)
+
+${steps}
+
+Final Answer = ${result}`;
+
+}
+
+break;
+  }
+
+
+case 'Gray':{
+
+const octBinary =
+  convertFromDecimal(
+    convertToDecimal(
+      absValue,
+      8
+    ),
+    2
+  );
+
+let binaryForGray =
+  octBinary;
+
+if(binaryForGray.includes('.')){
+
+  const parts =
+    binaryForGray.split('.');
+
+  binaryForGray =
+    parts[0]
+    + '.'
+    + parts[1]
+    + '0';
+
+}
+
+const bits =
+  binaryForGray.replace('.','');
+
+const shifted =
+  '0' + bits.slice(0,-1);
+
+let grayBits = '';
+
+let graySteps =
+`Octal to Gray Conversion of ${value} →
+
+Step 1: Convert Octal to Binary
+-------------------------------
+${absValue}₈ = ${octBinary}₂
+
+Step 2: Shift Binary Right by 1 Bit
+-----------------------------------
+${bits}
+${shifted}
+
+Step 3: XOR corresponding bits
+------------------------------
+`;
+
+for(
+  let i = 0;
+  i < bits.length;
+  i++
+){
+
+  const g =
+    bits[i] === shifted[i]
+      ? '0'
+      : '1';
+
+  grayBits += g;
+
+  graySteps +=
+`${bits[i]} XOR ${shifted[i]} = ${g}\n`;
+
+}
+
+const pointPos =
+  binaryForGray.indexOf('.');
+
+let gray;
+
+if(pointPos !== -1){
+
+  gray =
+    grayBits.slice(
+      0,
+      pointPos
+    )
+    +
+    '.'
+    +
+    grayBits.slice(
+      pointPos
+    );
+
+}else{
+
+  gray = grayBits;
+
+}
+
+result = gray;
+
+steps =
+`${graySteps}
+
+Step 4: Combine all Gray bits
+-----------------------------
+${gray.split('').join(' ')}
+
+Gray Code = ${gray}
+-----------------------------
+`;
+
+if(isNegative)
+  result = '1     ' + result;
+
+if(isNegative){
+
+steps =
+`Input Number = ${value}
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into Gray Code and prefix '1' as sign bit.)
+
+${steps}
+
+Final Answer = ${result}`;
+
+}
+
+break;}
+
+
+case 'Sign Magnitude':{
+
+  const signBit =
+    isNegative ? '1' : '0';
+
+  const binaryMagnitude =
+    octalToBinaryString(
+      absValue
+    );
+
+  const isReal =
+    absValue.includes('.');
+
+  function signMagnitude(
+    totalBits
+  ){
+
+    const pureBinary =
+      binaryMagnitude.replace('.','');
+
+    if(!isReal){
+
+      const magBits =
+        totalBits - 1;
+
+      if(
+        pureBinary.length >
+        magBits
+      ){
+
+        return 'Overflow';
+
+      }
+
+      return (
+        signBit +
+        pureBinary.padStart(
+          magBits,
+          '0'
+        )
+      );
+
+    }
+
+    const parts =
+      binaryMagnitude.split('.');
+
+    const intBinary =
+      parts[0];
+
+    const fracBinary =
+      parts[1] || '';
+
+    const intBits =
+      Math.floor(
+        (totalBits - 1) / 2
+      );
+
+    const fracBits =
+      totalBits - 1 - intBits;
+
+    if(
+      intBinary.length >
+      intBits
+    ){
+
+      return 'Overflow';
+
+    }
+
+    return (
+      signBit
+      + ' '
+      + intBinary.padStart(
+          intBits,
+          '0'
+        )
+      + ' '
+      + fracBinary.padEnd(
+          fracBits,
+          '0'
+        )
+        .slice(0,fracBits)
+    );
+
+  }
+
+  const sm8 =
+    signMagnitude(8);
+
+  const sm16 =
+    signMagnitude(16);
+
+  const sm32 =
+    signMagnitude(32);
+
+  result =
+`<br>8-bit  : ${sm8}<br>
+16-bit : ${sm16}<br>
+32-bit : ${sm32}<br>`;
+
+  steps =
+`Sign Magnitude Representation of ${value}
+
+Step 1: Determine Sign Bit
+--------------------------
+${isNegative
+  ? 'Negative Number → Sign Bit = 1'
+  : 'Positive Number → Sign Bit = 0'}
+
+Step 2: Find Magnitude
+----------------------
+|${value}| = ${absValue}
+
+Step 3: Convert Octal Magnitude to Binary
+-----------------------------------------
+${absValue}₈ = ${binaryMagnitude}₂
+
+Step 4: Sign Magnitude Representation
+-------------------------------------
+8-bit  : ${sm8}
+16-bit : ${sm16}
+32-bit : ${sm32}
+
+${
+  isReal
+  ?
+`Please Note:
+8-bit  = 1 Sign + 3 Integer + 4 Fraction
+16-bit = 1 Sign + 7 Integer + 8 Fraction
+32-bit = 1 Sign + 15 Integer + 16 Fraction`
+  :
+`Please Note:
+8-bit  = 1 Sign + 7 Magnitude
+16-bit = 1 Sign + 15 Magnitude
+32-bit = 1 Sign + 31 Magnitude`
+}
+`;
+
+  break;
+
+}
+
+
+case 'Mantissa Exponent':{
+
+  const binary =
+    octalToBinaryString(
+      absValue
+    );
+
+  if(
+    binary === '0'
+    ||
+    binary === '000'
+  ){
+
+    result = '0 × 2^0';
+
+    steps =
+`Mantissa-Exponent Form
+
+0 has no normalization.
+
+Answer = 0 × 2^0`;
+
+    break;
+
+  }
+
+  let exponent = 0;
+
+  let mantissa = '';
+
+  if(binary.includes('.')){
+
+    const parts =
+      binary.split('.');
+
+    const intPart =
+      parts[0];
+
+    const fracPart =
+      parts[1];
+
+    if(
+      parseInt(intPart,2) !== 0
+    ){
+
+      exponent =
+        intPart.length - 1;
+
+      mantissa =
+        '1.' +
+        intPart.slice(1) +
+        fracPart;
+
+    }
+
+    else{
+
+      const firstOne =
+        fracPart.indexOf('1');
+
+      exponent =
+        -(firstOne + 1);
+
+      mantissa =
+        '1.' +
+        fracPart.slice(
+          firstOne + 1
+        );
+
+    }
+
+  }
+
+  else{
+
+    exponent =
+      binary.length - 1;
+
+    mantissa =
+      '1.' +
+      binary.slice(1);
+
+  }
+
+  result =
+`${isNegative ? '-' : ''}${mantissa} × 2^${exponent}`;
+
+  steps =
+`Mantissa-Exponent Form of ${value}
+
+Step 1: Convert Octal to Binary
+-------------------------------
+${absValue}₈ = ${binary}₂
+
+Step 2: Normalize Binary Number
+-------------------------------
+${result}
+
+Mantissa
+--------
+${isNegative ? '-' : ''}${mantissa}
+
+Exponent
+--------
+${exponent}
+`;
+
+  break;
+
+}
+
+case 'Fixed Point':{
+
+  const negative =
+    isNegative;
+
+  const parts =
+    absValue.split('.');
+
+  const octalInt =
+    parts[0];
+
+  const octalFrac =
+    parts[1] || '';
+
+  let intBinary = '';
+
+  for(let ch of octalInt){
+
+    intBinary +=
+      parseInt(ch,8)
+      .toString(2)
+      .padStart(3,'0');
+
+  }
+
+  intBinary =
+    intBinary.replace(/^0+/,'') || '0';
+
+  let fracBinary = '';
+
+  for(let ch of octalFrac){
+
+    fracBinary +=
+      parseInt(ch,8)
+      .toString(2)
+      .padStart(3,'0');
+
+  }
+
+  function fixedPoint(
+    intBits,
+    fracBits
+  ){
+
+    if(
+      intBinary.length >
+      intBits
+    ){
+
+      return 'Overflow';
+
+    }
+
+    return (
+      (negative ? '-' : '')
+      +
+      intBinary.padStart(
+        intBits,
+        '0'
+      )
+      +
+      '.'
+      +
+      fracBinary
+        .padEnd(
+          fracBits,
+          '0'
+        )
+        .slice(
+          0,
+          fracBits
+        )
+    );
+
+  }
+
+  const fp8 =
+    fixedPoint(4,4);
+
+  const fp16 =
+    fixedPoint(8,8);
+
+  const fp32 =
+    fixedPoint(16,16);
+
+  result =
+`<br>8-bit  : ${fp8}<br>
+16-bit : ${fp16}<br>
+32-bit : ${fp32}<br>`;
+
+  steps =
+`Fixed Point Representation of ${value}
+
+Step 1: Separate Integer and Fraction Parts
+-------------------------------------------
+Integer Part  = ${octalInt}
+Fraction Part = ${octalFrac || '0'}
+
+Step 2: Convert Integer Part to Binary
+--------------------------------------
+${octalInt}₈ = ${intBinary}₂
+
+Step 3: Convert Fraction Part to Binary
+---------------------------------------
+${octalFrac || '0'}₈ = ${fracBinary || '0'}₂
+
+Step 4: Fixed Point Representations
+-----------------------------------
+8-bit  (4 Integer + 4 Fraction)
+${fp8}
+
+16-bit (8 Integer + 8 Fraction)
+${fp16}
+
+32-bit (16 Integer + 16 Fraction)
+${fp32}
+
+Please Note:
+------------
+Fixed Point uses a fixed radix point.
+The radix point never moves.
+`;
+
+  break;
+
+}
+
+case 'IEEE-754 Floating Point (32-bit)':{
+
+  const decimalValue =
+    convertToDecimal(
+      absValue,
+      8
+    );
+
+  const actualValue =
+    isNegative
+      ? -decimalValue
+      : decimalValue;
+
+  const buffer =
+    new ArrayBuffer(4);
+
+  const view =
+    new DataView(buffer);
+
+  view.setFloat32(
+    0,
+    actualValue
+  );
+
+  let bits = '';
+
+  for(let i=0;i<4;i++){
+
+    bits +=
+      view
+        .getUint8(i)
+        .toString(2)
+        .padStart(8,'0');
+
+  }
+
+  const sign =
+    bits[0];
+
+  const exponent =
+    bits.slice(1,9);
+
+  const mantissa =
+    bits.slice(9);
+
+  result =
+`${sign} ${exponent} ${mantissa}`;
+
+  steps =
+`IEEE-754 Single Precision (32-bit)
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${value}₈ = ${actualValue}₁₀
+
+Step 2: IEEE-754 Encoding
+-------------------------
+Sign Bit
+--------
+${sign}
+
+Exponent (8 bits)
+----------------
+${exponent}
+
+Mantissa (23 bits)
+------------------
+${mantissa}
+
+Final Representation
+--------------------
+${result}
+`;
+
+  break;
+
+}
+
+
+case 'IEEE-754 Floating Point (64-bit)':{
+
+  const decimalValue =
+    convertToDecimal(
+      absValue,
+      8
+    );
+
+  const actualValue =
+    isNegative
+      ? -decimalValue
+      : decimalValue;
+
+  const buffer =
+    new ArrayBuffer(8);
+
+  const view =
+    new DataView(buffer);
+
+  view.setFloat64(
+    0,
+    actualValue
+  );
+
+  let bits = '';
+
+  for(let i=0;i<8;i++){
+
+    bits +=
+      view
+        .getUint8(i)
+        .toString(2)
+        .padStart(8,'0');
+
+  }
+
+  const sign =
+    bits[0];
+
+  const exponent =
+    bits.slice(1,12);
+
+  const mantissa =
+    bits.slice(12);
+
+  result =
+`${sign} ${exponent} ${mantissa}`;
+
+  steps =
+`IEEE-754 Double Precision (64-bit)
+
+Step 1: Convert Octal to Decimal
+--------------------------------
+${value}₈ = ${actualValue}₁₀
+
+Step 2: IEEE-754 Encoding
+-------------------------
+Sign Bit
+--------
+${sign}
+
+Exponent (11 bits)
+-----------------
+${exponent}
+
+Mantissa (52 bits)
+------------------
+${mantissa}
+
+Final Representation
+--------------------
+${result}
+`;
+
+  break;
+
+}
+
+
+
+
+  }
+
+  resultDiv.innerHTML =
+    `Answer: ${result}`;
+
+  stepsDiv.textContent =
+    steps;
+
+}
+
+
+
+
+
+
+function findOctalArithmetic(){
+
+}
+
+
+//#endregion
