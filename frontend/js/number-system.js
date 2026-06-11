@@ -1279,12 +1279,27 @@ ${a[i]} + ${b[i]} ${incomingCarry > 0 ? `+ Carry(${incomingCarry})`: ''} = ${bas
   RAW VALUES
   ================================ */
 
-  const rawA = displayA;
+/* ================================
+RAW VALUES (ALIGNED DISPLAY)
+================================ */
 
-  const rawB = displayB;
+const rawA =
+  fracLen > 0
+    ? a.slice(0, maxLen - fracLen)
+      + '.'
+      + a.slice(maxLen - fracLen)
+    : a;
+
+const rawB =
+  fracLen > 0
+    ? b.slice(0, maxLen - fracLen)
+      + '.'
+      + b.slice(maxLen - fracLen)
+    : b;
 
 let rawAnswer =
   answer.join('');
+
 
 /* ================================
 REINSERT DECIMAL POINT
@@ -1352,16 +1367,18 @@ if(fracLen > 0){
   WIDTH CALCULATION
   ================================ */
 
-  const totalDigits =
-    Math.max(
+const totalDigits =
+  Math.max(
 
-      rawA.length,
+    rawA.length,
 
-      rawB.length + 1,
+    rawB.length + 1,
 
-      rawAnswer.length
+    rawAnswer.length,
 
-    );
+    formattedCarryRaw.length + 1
+
+  );
 
   /* ================================
   VISUAL OUTPUT
@@ -1430,31 +1447,19 @@ let bFrac =
 SAVE DISPLAY VALUES
 ================================ */
 
-const displayA =
-
+const originalA =
   aFrac.length > 0
-
   ? aInt + '.' + aFrac
-
   : aInt;
 
-const displayB =
-
+const originalB =
   bFrac.length > 0
-
   ? bInt + '.' + bFrac
-
   : bInt;
-
   /* ================================
 VISUAL DISPLAY VALUES
 ================================ */
 
-let visualA =
-  displayA;
-
-let visualB =
-  displayB;
 
   
 /* ================================
@@ -1499,14 +1504,6 @@ if(
   a = b;
   b = temp;
 
-   let tempVisual =
-    visualA;
-
-  visualA =
-    visualB;
-
-  visualB =
-    tempVisual;
 }
 
 /* ================================
@@ -1525,6 +1522,30 @@ a =
 b =
   b.padStart(maxLen,'0');
 
+  const displayA =
+  fracLen > 0
+    ? a.slice(0, maxLen - fracLen)
+      + '.'
+      + a.slice(maxLen - fracLen)
+    : a;
+
+const displayB =
+  fracLen > 0
+    ? b.slice(0, maxLen - fracLen)
+      + '.'
+      + b.slice(maxLen - fracLen)
+    : b;
+
+    
+let visualA = displayA;
+let visualB = displayB;
+
+if(negative){
+
+  visualA = displayB;
+  visualB = displayA;
+
+}
 /* ================================
 SPACING HELPER
 ================================ */
@@ -1554,7 +1575,8 @@ NEGATIVE EXPLANATION
 
 if(negative){
 
-  steps += `Note: (${displayA} < ${displayB}, so we swap the numbers to find ${visualA} - ${visualB}. Answer will be negative.)\n\n`;
+  //steps += `Note: (${displayA} < ${displayB}, so we swap the numbers to find ${visualA} - ${visualB}. Answer will be negative.)\n\n`;
+  steps += `Note: (${originalA} < ${originalB}), so we swap the numbers to find ${visualA} - ${visualB}. Answer will be negative.\n\n`;
 
 }
   
@@ -1720,13 +1742,10 @@ VISUAL WIDTH
 
 const totalDigits =
   Math.max(
-
     displayA.length,
-
     displayB.length + 1,
-
-    rawAnswer.length
-
+    rawAnswer.length,
+    formattedBorrowRaw.length + 1
   ) + 1;
 
 /* ================================
@@ -1805,20 +1824,14 @@ let bFrac =
 SAVE DISPLAY VALUES
 ================================ */
 
-const displayA =
-
+const originalA =
   aFrac.length > 0
-
   ? aInt + '.' + aFrac
-
   : aInt;
 
-const displayB =
-
+const originalB =
   bFrac.length > 0
-
   ? bInt + '.' + bFrac
-
   : bInt;
 
 /* ================================
@@ -1832,12 +1845,72 @@ const totalFracLen =
 REMOVE DECIMAL POINTS
 ================================ */
 
+
+
+
+const maxIntLen =
+  Math.max(
+    aInt.length,
+    bInt.length
+  );
+
+const maxFracLen =
+  Math.max(
+    aFrac.length,
+    bFrac.length
+  );
+
+/* Equalize lengths */
+
+aInt =
+  aInt.padStart(
+    maxIntLen,
+    '0'
+  );
+
+bInt =
+  bInt.padStart(
+    maxIntLen,
+    '0'
+  );
+
+aFrac =
+  aFrac.padEnd(
+    maxFracLen,
+    '0'
+  );
+
+bFrac =
+  bFrac.padEnd(
+    maxFracLen,
+    '0'
+  );
+
+/* Display */
+
+const displayA =
+  aInt +
+  (
+    maxFracLen > 0
+      ? '.' + aFrac
+      : ''
+  );
+
+const displayB =
+  bInt +
+  (
+    maxFracLen > 0
+      ? '.' + bFrac
+      : ''
+  );
+
+/* Values used for multiplication */
+
 a =
   aInt + aFrac;
 
 b =
   bInt + bFrac;
-
 /* ================================
 SPACING HELPER
 ================================ */
@@ -1959,6 +2032,15 @@ REINSERT DECIMAL POINT
 ================================ */
 
 if(totalFracLen > 0){
+
+  while(
+    finalAnswer.length <= totalFracLen
+  ){
+
+    finalAnswer =
+      '0' + finalAnswer;
+
+  }
 
   finalAnswer =
 
@@ -4690,6 +4772,10 @@ function twosComplementBinary(value){
 
 
 
+
+//#region Binary Arithmetic and Conversion
+
+
 function isBinaryNumber(value){
 
   return /^-?[01]+(\.[01]+)?$/.test(value);
@@ -5898,7 +5984,228 @@ ${result}`;
     steps;
 }
 
+function binaryToTwosComplement(
+  binary,
+  width
+){
 
+  const abs =
+    binary.replace('-','');
+
+  const padded =
+    abs.padStart(
+      width,
+      '0'
+    );
+
+  const oneComp =
+    onesComplementBinary(
+      padded
+    );
+
+  const twoComp =
+    addInBase(
+      oneComp,
+      '1',
+      2
+    ).result;
+
+  if(
+  twoComp.length > width
+){
+  return twoComp.slice(1);
+}
+
+return twoComp;
+
+}
+function prepareSignedBinary(
+  num1,
+  num2
+){
+
+  const bits1 =
+    num1.replace('-','')
+      .replace('.','')
+      .length;
+
+  const bits2 =
+    num2.replace('-','')
+      .replace('.','')
+      .length;
+
+  let width =
+  Math.max(
+    bits1,
+    bits2
+  );
+
+if(width <= 8){
+
+  width = 8;
+
+}
+else if(width <= 16){
+
+  width = 16;
+
+}
+else if(width <= 32){
+
+  width = 32;
+
+}
+else{
+
+  width =
+    Math.ceil(width / 8) * 8;
+
+}
+
+  let a = num1;
+  let b = num2;
+
+  let note = '';
+
+  if(num1.startsWith('-')){
+
+  const abs =
+    num1.replace('-','');
+
+  const padded =
+    abs.padStart(
+      width,
+      '0'
+    );
+
+  const oneComp =
+    onesComplementBinary(
+      padded
+    );
+
+  const addOne =
+    addInBase(
+      oneComp,
+      '1',
+      2
+    );
+
+  const tc =
+    binaryToTwosComplement(
+      num1,
+      width
+    );
+
+  note += `Input 1 is negative → ${num1}
+Therefore, convert to its 2s Complement form (in ${width} bits):
+a) Find 1s Complement:
+${padded} → ${oneComp}
+b) Add 1: ${addOne.visual}
+
+2s Complement Form:
+${tc}
+`;
+
+  a = tc;
+
+}
+
+if(num2.startsWith('-')){
+
+  const abs =
+    num2.replace('-','');
+
+  const padded =
+    abs.padStart(
+      width,
+      '0'
+    );
+
+  const oneComp =
+    onesComplementBinary(
+      padded
+    );
+
+  const addOne =
+    addInBase(
+      oneComp,
+      '1',
+      2
+    );
+
+  const tc =
+    binaryToTwosComplement(
+      num2,
+      width
+    );
+
+  note +=
+`Input 2 is negative → ${num2}
+Therefore, convert to its 2s Complement form (in ${width} bits):
+a) Find 1s Complement:
+${padded} → ${oneComp}
+b) Add 1: ${addOne.visual}
+
+2s Complement Form:
+${tc}
+`;
+
+  b = tc;
+
+}
+
+  return {
+    a,
+    b,
+    width,
+    note
+  };
+
+}
+
+function alignBinaryNumbers(a,b){
+
+  const aParts = a.split('.');
+  const bParts = b.split('.');
+
+  const aInt  = aParts[0];
+  const bInt  = bParts[0];
+
+  const aFrac = aParts[1] || '';
+  const bFrac = bParts[1] || '';
+
+  const intLen =
+    Math.max(
+      aInt.length,
+      bInt.length
+    );
+
+  const fracLen =
+    Math.max(
+      aFrac.length,
+      bFrac.length
+    );
+
+  const alignedA =
+    aInt.padStart(intLen,'0')
+    +
+    (fracLen
+      ? '.' + aFrac.padEnd(fracLen,'0')
+      : '');
+
+  const alignedB =
+    bInt.padStart(intLen,'0')
+    +
+    (fracLen
+      ? '.' + bFrac.padEnd(fracLen,'0')
+      : '');
+
+  return {
+    a: alignedA,
+    b: alignedB
+  };
+
+}
 function findBinaryArithmetic(){
 
   const num1 =
@@ -6361,37 +6668,49 @@ Answer = ${result}
     }
 
 
-    
+    case 'Bitwise AND (&)':{
 
+const signedData =
+  prepareSignedBinary(
+    num1,
+    num2
+  );
 
+let a =
+  signedData.a;
 
+let b =
+  signedData.b;
 
+const negativeNote =
+  signedData.note;
 
+  const aligned =
+  alignBinaryNumbers(
+    a,
+    b
+  );
 
+a = aligned.a;
+b = aligned.b;
 
-
-
-
-case 'Bitwise AND (&)':{
-
-  let a =
-    num1.replace('-','');
-
-  let b =
-    num2.replace('-','');
-
-  const width =
-    Math.max(
-      a.length,
-      b.length
-    );
-
-  a = a.padStart(width,'0');
-  b = b.padStart(width,'0');
+const width = a.length;
 
   let resultBits = '';
 
   for(let i=0;i<width;i++){
+
+    if(
+    a[i] === '.'
+    &&
+    b[i] === '.'
+  ){
+
+    resultBits += '.';
+
+    continue;
+
+  }
 
     resultBits +=
       (
@@ -6407,9 +6726,11 @@ case 'Bitwise AND (&)':{
   result = resultBits;
 
  steps =
-`Input Number 1 = ${num1}
+ `Input Number 1 = ${num1}
 Input Number 2 = ${num2}
+Operation = Bitwise AND (&)
 
+${negativeNote ? negativeNote + '\n' : ''}
 Step 1: Align the Binary numbers
 ---------------------------------
 ${a}
@@ -6432,48 +6753,79 @@ ${'-'.repeat(width + 2)}
 Answer = ${result}
 `;
 
+
   break;
 }
 
-
 case 'Bitwise OR (|)':{
 
-  let a =
-    num1.replace('-','');
+const signedData =
+  prepareSignedBinary(
+    num1,
+    num2
+  );
 
-  let b =
-    num2.replace('-','');
+let a =
+  signedData.a;
 
-  const width =
-    Math.max(
-      a.length,
-      b.length
-    );
+let b =
+  signedData.b;
 
-  a = a.padStart(width,'0');
-  b = b.padStart(width,'0');
+const negativeNote =
+  signedData.note;
 
-  let resultBits = '';
+const aligned =
+  alignBinaryNumbers(
+    a,
+    b
+  );
 
-  for(let i=0;i<width;i++){
+a = aligned.a;
+b = aligned.b;
 
-    resultBits +=
-      (
-        a[i] === '1'
-        ||
-        b[i] === '1'
-      )
-      ? '1'
-      : '0';
+const width =
+  a.length;
+
+let resultBits = '';
+
+for(
+  let i = 0;
+  i < width;
+  i++
+){
+
+  if(
+    a[i] === '.'
+    &&
+    b[i] === '.'
+  ){
+
+    resultBits += '.';
+
+    continue;
 
   }
 
-  result = resultBits;
+  resultBits +=
+    (
+      a[i] === '1'
+      ||
+      b[i] === '1'
+    )
+    ? '1'
+    : '0';
+
+}
+
+result =
+  resultBits;
 
 steps =
 `Input Number 1 = ${num1}
 Input Number 2 = ${num2}
+Operation = Bitwise OR (|)
 
+${negativeNote ? negativeNote + '\n' : ''}
 Step 1: Align the Binary Numbers
 --------------------------------
 ${a}
@@ -6496,44 +6848,74 @@ ${'-'.repeat(width + 2)}
 Answer = ${result}
 `;
 
-  break;
+break;
 }
-
 
 case 'Bitwise XOR (^)':{
 
-  let a =
-    num1.replace('-','');
+const signedData =
+  prepareSignedBinary(
+    num1,
+    num2
+  );
 
-  let b =
-    num2.replace('-','');
+let a =
+  signedData.a;
 
-  const width =
-    Math.max(
-      a.length,
-      b.length
-    );
+let b =
+  signedData.b;
 
-  a = a.padStart(width,'0');
-  b = b.padStart(width,'0');
+const negativeNote =
+  signedData.note;
 
-  let resultBits = '';
+const aligned =
+  alignBinaryNumbers(
+    a,
+    b
+  );
 
-  for(let i=0;i<width;i++){
+a = aligned.a;
+b = aligned.b;
 
-    resultBits +=
-      a[i] === b[i]
-      ? '0'
-      : '1';
+const width =
+  a.length;
+
+let resultBits = '';
+
+for(
+  let i = 0;
+  i < width;
+  i++
+){
+
+  if(
+    a[i] === '.'
+    &&
+    b[i] === '.'
+  ){
+
+    resultBits += '.';
+
+    continue;
 
   }
 
-  result = resultBits;
+  resultBits +=
+    a[i] === b[i]
+      ? '0'
+      : '1';
+
+}
+
+result =
+  resultBits;
 
 steps =
 `Input Number 1 = ${num1}
 Input Number 2 = ${num2}
+Operation = Bitwise XOR (^)
 
+${negativeNote ? negativeNote + '\n' : ''}
 Step 1: Align the Binary Numbers
 --------------------------------
 ${a}
@@ -6556,44 +6938,74 @@ ${'-'.repeat(width + 2)}
 Answer = ${result}
 `;
 
-  break;
+break;
 }
 
+case 'Bitwise XNOR':{
 
-  case 'Bitwise XNOR':{
+const signedData =
+  prepareSignedBinary(
+    num1,
+    num2
+  );
 
-  let a =
-    num1.replace('-','');
+let a =
+  signedData.a;
 
-  let b =
-    num2.replace('-','');
+let b =
+  signedData.b;
 
-  const width =
-    Math.max(
-      a.length,
-      b.length
-    );
+const negativeNote =
+  signedData.note;
 
-  a = a.padStart(width,'0');
-  b = b.padStart(width,'0');
+const aligned =
+  alignBinaryNumbers(
+    a,
+    b
+  );
 
-  let resultBits = '';
+a = aligned.a;
+b = aligned.b;
 
-  for(let i=0;i<width;i++){
+const width =
+  a.length;
 
-    resultBits +=
-      a[i] === b[i]
-      ? '1'
-      : '0';
+let resultBits = '';
+
+for(
+  let i = 0;
+  i < width;
+  i++
+){
+
+  if(
+    a[i] === '.'
+    &&
+    b[i] === '.'
+  ){
+
+    resultBits += '.';
+
+    continue;
 
   }
 
-  result = resultBits;
+  resultBits +=
+    a[i] === b[i]
+      ? '1'
+      : '0';
+
+}
+
+result =
+  resultBits;
 
 steps =
 `Input Number 1 = ${num1}
 Input Number 2 = ${num2}
+Operation = Bitwise XNOR
 
+${negativeNote ? negativeNote + '\n' : ''}
 Step 1: Align the Binary Numbers
 --------------------------------
 ${a}
@@ -6617,54 +7029,85 @@ ${'-'.repeat(width + 2)}
 Answer = ${result}
 `;
 
-  break;
+break;
 }
 
 
 
 case 'Bitwise NAND':{
 
-  let a =
-    num1.replace('-','');
+const signedData =
+  prepareSignedBinary(
+    num1,
+    num2
+  );
 
-  let b =
-    num2.replace('-','');
+let a =
+  signedData.a;
 
-  const width =
-    Math.max(
-      a.length,
-      b.length
-    );
+let b =
+  signedData.b;
 
-  a = a.padStart(width,'0');
-  b = b.padStart(width,'0');
+const negativeNote =
+  signedData.note;
 
-  let resultBits = '';
+const aligned =
+  alignBinaryNumbers(
+    a,
+    b
+  );
 
-  for(let i=0;i<width;i++){
+a = aligned.a;
+b = aligned.b;
 
-    const andBit =
-      (
-        a[i] === '1'
-        &&
-        b[i] === '1'
-      )
-      ? '1'
-      : '0';
+const width =
+  a.length;
 
-    resultBits +=
-      andBit === '1'
-      ? '0'
-      : '1';
+let resultBits = '';
+
+for(
+  let i = 0;
+  i < width;
+  i++
+){
+
+  if(
+    a[i] === '.'
+    &&
+    b[i] === '.'
+  ){
+
+    resultBits += '.';
+
+    continue;
 
   }
 
-  result = resultBits;
+  const andBit =
+    (
+      a[i] === '1'
+      &&
+      b[i] === '1'
+    )
+    ? '1'
+    : '0';
+
+  resultBits +=
+    andBit === '1'
+      ? '0'
+      : '1';
+
+}
+
+result =
+  resultBits;
 
 steps =
 `Input Number 1 = ${num1}
 Input Number 2 = ${num2}
+Operation = Bitwise NAND
 
+${negativeNote ? negativeNote + '\n' : ''}
 Step 1: Align the Binary Numbers
 --------------------------------
 ${a}
@@ -6688,54 +7131,83 @@ ${'-'.repeat(width + 2)}
 Answer = ${result}
 `;
 
-  break;
+break;
 }
-
-
 
 case 'Bitwise NOR':{
 
-  let a =
-    num1.replace('-','');
+const signedData =
+  prepareSignedBinary(
+    num1,
+    num2
+  );
 
-  let b =
-    num2.replace('-','');
+let a =
+  signedData.a;
 
-  const width =
-    Math.max(
-      a.length,
-      b.length
-    );
+let b =
+  signedData.b;
 
-  a = a.padStart(width,'0');
-  b = b.padStart(width,'0');
+const negativeNote =
+  signedData.note;
 
-  let resultBits = '';
+const aligned =
+  alignBinaryNumbers(
+    a,
+    b
+  );
 
-  for(let i=0;i<width;i++){
+a = aligned.a;
+b = aligned.b;
 
-    const orBit =
-      (
-        a[i] === '1'
-        ||
-        b[i] === '1'
-      )
-      ? '1'
-      : '0';
+const width =
+  a.length;
 
-    resultBits +=
-      orBit === '1'
-      ? '0'
-      : '1';
+let resultBits = '';
+
+for(
+  let i = 0;
+  i < width;
+  i++
+){
+
+  if(
+    a[i] === '.'
+    &&
+    b[i] === '.'
+  ){
+
+    resultBits += '.';
+
+    continue;
 
   }
 
-  result = resultBits;
+  const orBit =
+    (
+      a[i] === '1'
+      ||
+      b[i] === '1'
+    )
+    ? '1'
+    : '0';
+
+  resultBits +=
+    orBit === '1'
+      ? '0'
+      : '1';
+
+}
+
+result =
+  resultBits;
 
 steps =
 `Input Number 1 = ${num1}
 Input Number 2 = ${num2}
+Operation = Bitwise NOR
 
+${negativeNote ? negativeNote + '\n' : ''}
 Step 1: Align the Binary Numbers
 --------------------------------
 ${a}
@@ -6759,49 +7231,68 @@ ${'-'.repeat(width + 2)}
 Answer = ${result}
 `;
 
-  break;
+break;
 }
-
-
 
 case 'Bitwise NOT (~)':{
 
- if(
+  if(
     !isBinaryNumber(num1)
   ){
 
     resultDiv.innerHTML =
-      '❌ Integer Only';
+      '❌ Invalid Binary Number';
 
-    stepsDiv.innerHTML =
-      'Bitwise NOT supports integers only.';
+    stepsDiv.innerHTML = '';
 
     return;
 
   }
 
-  
+  const signedData =
+    prepareSignedBinary(
+      num1,
+      '0'
+    );
+
   let a =
-    num1.replace('-','');
+    signedData.a;
+
+  const negativeNote =
+    signedData.note;
 
   let resultBits = '';
 
   for(let bit of a){
 
-    resultBits +=
-      bit === '0'
-      ? '1'
-      : '0';
+    if(bit === '.'){
+
+      resultBits += '.';
+
+    }
+    else if(bit === '0'){
+
+      resultBits += '1';
+
+    }
+    else{
+
+      resultBits += '0';
+
+    }
 
   }
 
-  result = resultBits;
+  result =
+    resultBits;
 
-steps =
+  steps =
 `Input Number = ${num1}
+Operation = Bitwise NOT (~)
 
-Step 1: Original Binary Number
-------------------------------
+${negativeNote ? negativeNote + '\n' : ''}
+Step 1: Binary Number Used
+--------------------------
 ${a}
 
 Step 2: NOT Rule
@@ -6822,54 +7313,12 @@ Answer = ${result}
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 case 'Left Shift (<<)':{
 
-  if(!isIntegerNumber(num2)){
+  if(!isIntegerNumber(num2) || num2.startsWith('-')){
 
     resultDiv.innerHTML =
-      '❌ Shift Count Must Be Integer';
+      '❌ Shift Count Must Be a Non-Negative Integer';
 
     return;
 
@@ -6878,47 +7327,58 @@ case 'Left Shift (<<)':{
   const shift =
     parseInt(num2);
 
-  const negative =
-    num1.startsWith('-');
+  const signedData =
+    prepareSignedBinary(
+      num1,
+      '0'
+    );
 
-  const binary =
-    num1.replace('-','');
+  const negativeNote =
+    signedData.note;
+
+  const originalBinary =
+    signedData.a;
+
+  const shiftedBinary =
+    originalBinary +
+    '0'.repeat(shift);
 
   result =
-    binary + '0'.repeat(shift);
-
-  if(negative)
-    result = '-' + result;
+    shiftedBinary;
 
   steps =
-`Binary Left Shift
+`Input Number = ${num1}
+Shift Count = ${shift}
+Operation = Left Shift (<<)
 
-Input:
-${num1}
+${negativeNote ? negativeNote + '\n' : ''}
+Step 1: Binary Number Used
+--------------------------
+${originalBinary}
 
-Shift Count:
-${shift}
+Step 2: Left Shift
+------------------
+${originalBinary}
+← ${shift} position${shift !== 1 ? 's' : ''}
+${shiftedBinary}
 
-${binary}
-${' '.repeat(shift)}←
+(${shift} zero${shift !== 1 ? 's' : ''} appended at LSB)
 
-Append ${shift} zero(s) at LSB
+Step 3: Result
+--------------
+${shiftedBinary}
 
-Result:
-${result}
-`;
+Answer = ${shiftedBinary}`;
 
   break;
 }
 
-
-
 case 'Right Shift (>>)':{
 
-  if(!isIntegerNumber(num2)){
+  if(!isIntegerNumber(num2) || num2.startsWith('-')){
 
     resultDiv.innerHTML =
-      '❌ Shift Count Must Be Integer';
+      '❌ Shift Count Must Be a Non-Negative Integer';
 
     return;
 
@@ -6927,56 +7387,94 @@ case 'Right Shift (>>)':{
   const shift =
     parseInt(num2);
 
-  const negative =
-    num1.startsWith('-');
+  const signedData =
+    prepareSignedBinary(
+      num1,
+      '0'
+    );
+
+  const negativeNote =
+    signedData.note;
 
   let binary =
-    num1.replace('-','');
+    signedData.a;
+
+  const originalBinary =
+    binary;
 
   const signBit =
-    negative ? '1' : '0';
+    binary[0];
 
-  for(
-    let i=0;
-    i<shift;
-    i++
+  let shiftedBinary;
+
+  if(
+    shift >= binary.length
   ){
 
-    binary =
-      signBit +
-      binary.slice(0,-1);
+    shiftedBinary =
+      signBit.repeat(
+        binary.length
+      );
+
+  }
+  else{
+
+    shiftedBinary =
+      binary;
+
+    for(
+      let i = 0;
+      i < shift;
+      i++
+    ){
+
+      shiftedBinary =
+        signBit +
+        shiftedBinary.slice(
+          0,
+          -1
+        );
+
+    }
 
   }
 
-  result = binary;
+  result =
+    shiftedBinary;
 
   steps =
-`Binary Arithmetic Right Shift
+`Input Number = ${num1}
+Shift Count = ${shift}
+Operation = Right Shift (>>)
 
-Input:
-${num1}
+${negativeNote ? negativeNote + '\n' : ''}
+Step 1: Binary Number Used
+--------------------------
+${originalBinary}
 
-Sign Bit:
-${signBit}
+Step 2: Arithmetic Right Shift
+------------------------------
+${originalBinary}
+↓ ${shift} position${shift !== 1 ? 's' : ''}
+${shiftedBinary}
 
-Shift Count:
-${shift}
+(MSB / Sign Bit is preserved)
 
-Result:
-${result}
+Step 3: Result
+--------------
+${shiftedBinary}
 
-MSB is preserved on every shift.
-`;
+Answer = ${shiftedBinary}`;
 
   break;
 }
 
 case 'Zero Fill Right Shift (>>>)':{
 
-  if(!isIntegerNumber(num2)){
+  if(!isIntegerNumber(num2) || num2.startsWith('-')){
 
     resultDiv.innerHTML =
-      '❌ Shift Count Must Be Integer';
+      '❌ Shift Count Must Be a Non-Negative Integer';
 
     return;
 
@@ -6985,37 +7483,68 @@ case 'Zero Fill Right Shift (>>>)':{
   const shift =
     parseInt(num2);
 
-  let binary =
-    num1.replace('-','');
+  const signedData =
+    prepareSignedBinary(
+      num1,
+      '0'
+    );
+
+  const negativeNote =
+    signedData.note;
+
+  const originalBinary =
+    signedData.a;
+
+  let shiftedBinary =
+    originalBinary;
+
+  let shiftSteps = '';
 
   for(
-    let i=0;
-    i<shift;
+    let i = 1;
+    i <= shift;
     i++
   ){
 
-    binary =
+    shiftedBinary =
       '0' +
-      binary.slice(0,-1);
+      shiftedBinary.slice(
+        0,
+        -1
+      );
+
+    shiftSteps +=
+`
+Shift ${i}:
+${shiftedBinary}
+`;
 
   }
 
-  result = binary;
+  result =
+    shiftedBinary;
 
   steps =
-`Binary Zero Fill Right Shift
+`Input Number = ${num1}
+Shift Count = ${shift}
+Operation = Zero Fill Right Shift (>>>)
 
-Input:
-${num1}
+${negativeNote ? negativeNote + '\n' : ''}
+Step 1: Binary Number Used
+--------------------------
+${originalBinary}
 
-Shift Count:
-${shift}
+Step 2: Zero Fill Right Shift
+-----------------------------
+Fill MSB with 0 and discard LSB on every shift.
 
-Result:
-${result}
+${shiftSteps}
 
-MSB is always filled with 0.
-`;
+Step 3: Result
+--------------
+${shiftedBinary}
+
+Answer = ${shiftedBinary}`;
 
   break;
 }
@@ -7023,24 +7552,148 @@ MSB is always filled with 0.
 
 case 'Subtraction (1s Complement)':{
 
+let signStep = '';
+
+let workingNum1 = num1;
+let workingNum2 = num2;
+
+const neg1 =
+  num1.startsWith('-');
+
+const neg2 =
+  num2.startsWith('-');
+
+
+  if(neg1 && neg2){
+
+  const abs1 =
+    num1.slice(1);
+
+  const abs2 =
+    num2.slice(1);
+
+  signStep =
+`Step 0: Simplify Signs
+----------------------
+${num1} - (${num2})
+
+= ${abs2} - ${abs1}
+
+Now apply 1's Complement subtraction.
+
+`;
+
+  workingNum1 = abs2;
+  workingNum2 = abs1;
+
+}
+else if(!neg1 && neg2){
+
+  const abs2 =
+    num2.slice(1);
+
+  const add =
+    addInBase(
+      num1,
+      abs2,
+      2
+    );
+
+  result =
+    add.result;
+
+  steps = `Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${num1} + ${abs2}
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+else if(neg1 && !neg2){
+
+  const abs1 =
+    num1.slice(1);
+
+  const add =
+    addInBase(
+      abs1,
+      num2,
+      2
+    );
+
+  result =
+    '-' + add.result;
+
+  steps =`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - ${num2} = -(${abs1} + ${num2})
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+
+
   const fracLen =
     Math.max(
-      (num1.split('.')[1] || '').length,
-      (num2.split('.')[1] || '').length
+      (workingNum1.split('.')[1] || '').length,
+      (workingNum2.split('.')[1] || '').length
     );
 
   const intDigits =
     Math.max(
-      num1.split('.')[0].length,
-      num2.split('.')[0].length
+      workingNum1.split('.')[0].length,
+      workingNum2.split('.')[0].length
     );
+
+
+    let paddedN1;
+
+if(fracLen){
+
+  const parts =
+    workingNum1.split('.');
+
+  paddedN1 =
+    parts[0]
+      .padStart(intDigits,'0')
+    +
+    '.'
+    +
+    parts[1].padEnd(fracLen,'0');
+
+}
+else{
+
+  paddedN1 =
+    workingNum1.padStart(
+      intDigits,
+      '0'
+    );
+
+}
+
+
 
   let paddedN2;
 
   if(fracLen){
 
     const parts =
-      num2.split('.');
+      workingNum2.split('.');
 
     paddedN2 =
       parts[0]
@@ -7054,7 +7707,7 @@ case 'Subtraction (1s Complement)':{
   else{
 
     paddedN2 =
-      num2.padStart(intDigits,'0');
+      workingNum2.padStart(intDigits,'0');
 
   }
 
@@ -7065,7 +7718,7 @@ case 'Subtraction (1s Complement)':{
 
   const addRes =
     addInBase(
-      num1,
+      paddedN1,
       oneComp,
       2
     );
@@ -7126,55 +7779,74 @@ case 'Subtraction (1s Complement)':{
 
     finalStep =
 `
-Step 3: End-around Carry Present
---------------------------------
-Discard Carry
-
+Step 3: D has End-around Carry? Yes
+-----------------------------------
+a) Discard the End-around Carry from D
 ${withoutCarry}
 
-Add 1 to LSB
-
+b) Find E = Add 1 to LSB (Least Significant Bit) of D
 ${finalAdd.visual}
-`;
+
+Answer = ${result}`;
 
   }
   else{
 
-    const comp =
-      onesComplementBinary(sum);
+let magnitude =
+  onesComplementBinary(sum);
 
-    result =
-      '-' + comp;
+magnitude =
+  magnitude.replace(
+    /^0+(?=[01])/,
+    ''
+  );
+
+if(magnitude.startsWith('.')){
+  magnitude = '0' + magnitude;
+}
+
+result =
+  /^0*\.?0*$/.test(magnitude)
+    ? '0'
+    : '-' + magnitude;
+
+      const onesForSum =
+  sum.replace(/[01]/g,'1');
 
     finalStep =
-`
-Step 3: No End-around Carry
----------------------------
-Take 1's Complement
+`Step 3: D has End-around Carry? No
+----------------------------------
+a) Find E = 1's Complement of D
 
-${comp}
+  ${onesForSum.split('').join(' ')}
+- ${sum.split('').join(' ')}
+${'-'.repeat(sum.length * 2 + 2)}
+  ${magnitude
+    .padStart(sum.length,'0')
+    .split('')
+    .join(' ')}
 
-Apply Negative Sign
+b) Add a negative sign to E
 
-Answer = ${result}
-`;
+Answer = ${result}`;
 
   }
 
   steps =
-`Finding ${num1} - ${num2}
-using 1's Complement
+`${signStep}Finding ${paddedN1} - ${paddedN2} using 1's Complement →
 
-Step 1: Find 1's Complement of B
+Let A = ${paddedN1}
+Let B = ${paddedN2}
 
-${paddedN2}
+Step 1: Find C = 1's Complement of B
+------------------------------------
+  ${paddedN2.replace(/[01]/g,'1').split('').join(' ')}
+- ${paddedN2.split('').join(' ')}
+${'-'.repeat(paddedN2.length * 2 + 2)}
+  ${oneComp.split('').join(' ')}
 
-↓
-
-${oneComp}
-
-Step 2: Add A + Complement(B)
-
+Step 2: Find D = A + C
+----------------------
 ${addRes.visual}
 
 ${finalStep}
@@ -7186,24 +7858,143 @@ ${finalStep}
 
 case 'Subtraction (2s Complement)':{
 
+
+let signStep = '';
+
+let workingNum1 = num1;
+let workingNum2 = num2;
+
+const neg1 =
+  num1.startsWith('-');
+
+const neg2 =
+  num2.startsWith('-');
+
+if(neg1 && neg2){
+
+  const abs1 =
+    num1.slice(1);
+
+  const abs2 =
+    num2.slice(1);
+
+  signStep = `Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${abs2} - ${abs1}
+Now apply 2's Complement subtraction.
+`;
+
+  workingNum1 = abs2;
+  workingNum2 = abs1;
+
+}
+else if(!neg1 && neg2){
+
+  const abs2 =
+    num2.slice(1);
+
+  const add =
+    addInBase(
+      num1,
+      abs2,
+      2
+    );
+
+  result =
+    add.result;
+
+  steps = `Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${num1} + ${abs2}
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+else if(neg1 && !neg2){
+
+  const abs1 =
+    num1.slice(1);
+
+  const add =
+    addInBase(
+      abs1,
+      num2,
+      2
+    );
+
+  result =
+    '-' + add.result;
+
+  steps = `Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - ${num2} = -(${abs1} + ${num2})
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+
   const fracLen =
     Math.max(
-      (num1.split('.')[1] || '').length,
-      (num2.split('.')[1] || '').length
+      (workingNum1.split('.')[1] || '').length,
+      (workingNum2.split('.')[1] || '').length
     );
 
   const intDigits =
     Math.max(
-      num1.split('.')[0].length,
-      num2.split('.')[0].length
+      workingNum1.split('.')[0].length,
+      workingNum2.split('.')[0].length
     );
+
+
+
+    let paddedN1;
+
+if(fracLen){
+
+  const parts =
+    workingNum1.split('.');
+
+  paddedN1 =
+    parts[0]
+      .padStart(intDigits,'0')
+    +
+    '.'
+    +
+    parts[1].padEnd(fracLen,'0');
+
+}
+else{
+
+  paddedN1 =
+    workingNum1.padStart(
+      intDigits,
+      '0'
+    );
+
+}
+
+
 
   let paddedN2;
 
   if(fracLen){
 
     const parts =
-      num2.split('.');
+      workingNum2.split('.');
 
     paddedN2 =
       parts[0]
@@ -7217,7 +8008,7 @@ case 'Subtraction (2s Complement)':{
   else{
 
     paddedN2 =
-      num2.padStart(intDigits,'0');
+      workingNum2.padStart(intDigits,'0');
 
   }
 
@@ -7237,16 +8028,28 @@ case 'Subtraction (2s Complement)':{
         )
       : '1';
 
-  const twoComp =
+  const twoCompAdd =
     addInBase(
       oneComp,
       increment,
       2
-    ).result;
+    );
+let twoComp =
+  twoCompAdd.result;
+
+if(
+  twoComp.length >
+  paddedN2.length
+){
+
+  twoComp =
+    twoComp.slice(1);
+
+}
 
   const addRes =
     addInBase(
-      num1,
+      paddedN1,
       twoComp,
       2
     );
@@ -7289,81 +8092,148 @@ case 'Subtraction (2s Complement)':{
 
     finalStep =
 `
-Step 4: Carry Present
----------------------
-Discard Carry
+Step 3: D has End-around Carry? Yes
+-----------------------------------
+a) Discard the End-around Carry from D
 
 ${withoutCarry}
 
-Answer = ${result}
+b) Result is positive
 `;
 
   }
   else{
 
-    const magnitude =
-      twosComplementBinary(
+    const onesForSum =
+      sum.replace(
+        /[01]/g,
+        '1'
+      );
+
+    const oneCompSum =
+      onesComplementBinary(
         sum
       );
 
-    result =
-      '-' + magnitude;
+    const twoCompResult =
+      addInBase(
+        oneCompSum,
+        increment,
+        2
+      );
+
+let magnitude =
+  twoCompResult.result;
+
+magnitude =
+  magnitude.replace(
+    /^0+(?=[01])/,
+    ''
+  );
+
+if(magnitude.startsWith('.')){
+  magnitude = '0' + magnitude;
+}
+
+result =
+  /^0*\.?0*$/.test(magnitude)
+    ? '0'
+    : '-' + magnitude;
 
     finalStep =
 `
-Step 4: No Carry
-----------------
-Take 2's Complement of Sum
+Step 3: D has End-around Carry? No
+----------------------------------
+a) Find E = 2's Complement of D
 
-${magnitude}
+  ${onesForSum
+      .split('')
+      .join(' ')}
 
-Apply Negative Sign
+- ${sum
+      .split('')
+      .join(' ')}
 
-Answer = ${result}
+${'-'.repeat(
+  sum.length * 2 + 2
+)}
+
+  ${oneCompSum
+      .split('')
+      .join(' ')}
+
++ ${increment
+      .padStart(
+        oneCompSum.length,
+        ' '
+      )
+      .split('')
+      .join(' ')}
+
+${'-'.repeat(
+  oneCompSum.length * 2 + 2
+)}
+
+${twoCompResult.result
+      .padStart(
+        oneCompSum.length,
+        '0'
+      )
+      .split('')
+      .join(' ')}
+
+b) Add a negative sign to E: ${result}
 `;
 
   }
 
   steps =
-`Finding ${num1} - ${num2}
-using 2's Complement
+`${signStep}Finding ${paddedN1} - ${paddedN2} using 2's Complement →
 
-Step 1: Find 1's Complement of B
+Let A = ${paddedN1}
+Let B = ${paddedN2}
 
-${paddedN2}
+Step 1: Find C = 2's Complement of B
+------------------------------------
+a) Find 1's Complement of B
 
-↓
+  ${paddedN2
+      .replace(/[01]/g,'1')
+      .split('')
+      .join(' ')}
 
-${oneComp}
+- ${paddedN2
+      .split('')
+      .join(' ')}
 
-Step 2: Add 1 to LSB
+${'-'.repeat(
+  paddedN2.length * 2 + 2
+)}
 
-${oneComp}
-+
-${increment}
+  ${oneComp
+      .split('')
+      .join(' ')}
 
-↓
+b) Add 1 to LSB
 
-${twoComp}
+${twoCompAdd.visual}
 
-Step 3: Add A + 2's Complement(B)
+C = ${twoComp}
 
+Step 2: Find D = A + C
+----------------------
 ${addRes.visual}
 
+D = ${sum}
+
 ${finalStep}
+
+Answer = ${result}
 `;
 
   break;
+
 }
-
-
-
-
-
-
-
-
-
 
 
   }
@@ -7376,7 +8246,7 @@ ${finalStep}
 }
 
 
-
+//#endregion
 
 
 
@@ -9145,7 +10015,7 @@ Answer = ${result}
 
 
 
-case 'Subtraction (9s Complement)':{
+case 'Subtraction (91s Complement)':{
 
   if(
     !isDecimalNumber(num1)
@@ -9412,6 +10282,379 @@ Answer = ${result}
   }
 
 
+case 'Subtraction (9s Complement)':{
+
+  if(
+    !isDecimalNumber(num1)
+    ||
+    !isDecimalNumber(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Decimal Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+let signStep = '';
+
+let workingNum1 = num1;
+let workingNum2 = num2;
+
+const neg1 =
+  num1.startsWith('-');
+
+const neg2 =
+  num2.startsWith('-');
+
+
+  if(neg1 && neg2){
+
+  const abs1 =
+    num1.slice(1);
+
+  const abs2 =
+    num2.slice(1);
+
+  signStep =
+`Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${abs2} - ${abs1}
+Now apply 9's Complement subtraction.
+`;
+
+  workingNum1 = abs2;
+  workingNum2 = abs1;
+
+}
+else if(!neg1 && neg2){
+
+  const abs2 =
+    num2.slice(1);
+
+  const add =
+    addInBase(
+      num1,
+      abs2,
+      10
+    );
+
+  result =
+    add.result;
+
+  steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${num1} + ${abs2}
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+else if(neg1 && !neg2){
+
+  const abs1 =
+    num1.slice(1);
+
+  const add =
+    addInBase(
+      abs1,
+      num2,
+      10
+    );
+
+  result =
+    '-' + add.result;
+
+  steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - ${num2} = -(${abs1} + ${num2})
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+
+
+
+
+
+  const fracLen =
+    Math.max(
+      (workingNum1.split('.')[1] || '').length,
+      (workingNum2.split('.')[1] || '').length
+    );
+
+  const n1 =
+    fracLen
+      ? Number(workingNum1).toFixed(fracLen)
+      : workingNum1;
+
+  const n2 =
+    fracLen
+      ? Number(workingNum2).toFixed(fracLen)
+      : workingNum2;
+
+  const intDigits =
+    Math.max(
+      n1.split('.')[0].length,
+      n2.split('.')[0].length
+    );
+
+
+    let paddedN1;
+
+if(fracLen){
+
+  const parts =
+    n1.split('.');
+
+  paddedN1 =
+    parts[0]
+      .padStart(intDigits,'0')
+    +
+    '.'
+    +
+    parts[1];
+
+}
+else{
+
+  paddedN1 =
+    n1.padStart(
+      intDigits,
+      '0'
+    );
+
+}
+
+
+  let paddedN2;
+
+  if(fracLen){
+
+    const parts =
+      n2.split('.');
+
+    paddedN2 =
+      parts[0]
+        .padStart(
+          intDigits,
+          '0'
+        )
+      +
+      '.'
+      +
+      parts[1];
+
+  }
+
+  else{
+
+    paddedN2 =
+      n2.padStart(
+        intDigits,
+        '0'
+      );
+
+  }
+
+  const nineComp =
+    paddedN2
+      .split('')
+      .map(
+        ch =>
+          ch === '.'
+            ? '.'
+            : (
+                9 -
+                parseInt(ch)
+              )
+      )
+      .join('');
+
+  const addRes =
+    addInBase(
+      paddedN1,
+      nineComp,
+      10
+    );
+
+  const sum9 =
+    addRes.result;
+
+  result = '';
+
+  let finalStep = '';
+
+  const carry =
+    sum9.split('.')[0].length >
+    intDigits;
+
+  if(carry){
+
+    let withoutCarry;
+
+    if(sum9.includes('.')){
+
+      const parts =
+        sum9.split('.');
+
+      withoutCarry =
+        parts[0].slice(1)
+        +
+        '.'
+        +
+        parts[1];
+
+    }
+
+    else{
+
+      withoutCarry =
+        sum9.slice(1);
+
+    }
+
+    const increment =
+      fracLen
+        ? (
+            '0.' +
+            '0'.repeat(
+              fracLen - 1
+            ) +
+            '1'
+          )
+        : '1';
+
+    const finalAdd =
+      addInBase(
+        withoutCarry,
+        increment,
+        10
+      );
+
+    result =
+      String(
+        parseFloat(
+          finalAdd.result
+        )
+      );
+
+    finalStep =
+`
+Step 3: D has End-around Carry? Yes
+-----------------------------------
+a) Discard the End-around Carry from D
+${withoutCarry}
+
+b) Find E = Add 1 to LSD of D
+${finalAdd.visual}
+`;
+
+  }
+
+  else{
+
+    const comp =
+      sum9
+        .split('')
+        .map(
+          ch =>
+            ch === '.'
+              ? '.'
+              : (
+                  9 -
+                  parseInt(ch)
+                )
+        )
+        .join('');
+
+    const ninesForSum =
+      sum9.replace(
+        /[0-9]/g,
+        '9'
+      );
+
+    const magnitude =
+      parseFloat(comp);
+
+    result =
+      magnitude === 0
+        ? '0'
+        : '-' + magnitude;
+
+    finalStep =
+`
+Step 3: D has End-around Carry? No
+----------------------------------
+a) Find E = 9's Complement of D
+  ${ninesForSum
+      .split('')
+      .join(' ')}
+- ${sum9
+      .split('')
+      .join(' ')}
+${'-'.repeat(
+  sum9.length * 2 + 2
+)}
+  ${comp
+      .split('')
+      .join(' ')}
+b) Add a negative sign to E: ${result}`;
+
+  }
+
+  steps =
+`${signStep}Finding ${paddedN1} - ${paddedN2} using 9's Complement →
+
+Let A = ${paddedN1}
+Let B = ${paddedN2}
+
+Step 1: Find C = 9's Complement of B
+------------------------------------
+  ${paddedN2
+      .replace(/[0-9]/g,'9')
+      .split('')
+      .join(' ')}
+- ${paddedN2
+      .split('')
+      .join(' ')}
+${'-'.repeat(
+  paddedN2.length * 2 + 2
+)}
+  ${nineComp
+      .split('')
+      .join(' ')}
+
+Step 2: Find D = A + C
+----------------------
+${addRes.visual}
+${finalStep}
+
+Answer = ${result}
+
+`;
+
+  break;
+
+  }
 
 
 
@@ -9423,8 +10666,7 @@ Answer = ${result}
 
 
 
-
-case 'Subtraction (10s Complement)':{
+case 'Subtraction (100s Complement)':{
 
   if(
     !isDecimalNumber(num1)
@@ -9451,7 +10693,7 @@ case 'Subtraction (10s Complement)':{
     '❌ Positive numbers only';
 
   stepsDiv.innerHTML =
-    "9's Complement subtraction supports positive numbers only.";
+    "10's Complement subtraction supports positive numbers only.";
 
   return;
 
@@ -9714,6 +10956,420 @@ Answer = ${result}
   }
 
 
+case 'Subtraction (10s Complement)':{
+
+  if(
+    !isDecimalNumber(num1)
+    ||
+    !isDecimalNumber(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Decimal Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+let signStep = '';
+
+let workingNum1 = num1;
+let workingNum2 = num2;
+
+const neg1 =
+  num1.startsWith('-');
+
+const neg2 =
+  num2.startsWith('-');
+
+
+
+  if(neg1 && neg2){
+
+  const abs1 =
+    num1.slice(1);
+
+  const abs2 =
+    num2.slice(1);
+
+  signStep =
+`Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${abs2} - ${abs1}
+Now apply 10's Complement subtraction.
+`;
+
+  workingNum1 = abs2;
+  workingNum2 = abs1;
+
+}
+else if(!neg1 && neg2){
+
+  const abs2 =
+    num2.slice(1);
+
+  const add =
+    addInBase(
+      num1,
+      abs2,
+      10
+    );
+
+  result =
+    add.result;
+
+  steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${num1} + ${abs2}
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+else if(neg1 && !neg2){
+
+  const abs1 =
+    num1.slice(1);
+
+  const add =
+    addInBase(
+      abs1,
+      num2,
+      10
+    );
+
+  result =
+    '-' + add.result;
+
+  steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - ${num2} = -(${abs1} + ${num2})
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+  break;
+
+}
+
+  const fracLen =
+    Math.max(
+      (workingNum1.split('.')[1] || '').length,
+      (workingNum2.split('.')[1] || '').length
+    );
+
+  const n1 =
+    fracLen
+      ? Number(workingNum1).toFixed(fracLen)
+      : workingNum1;
+
+  const n2 =
+    fracLen
+      ? Number(workingNum2).toFixed(fracLen)
+      : workingNum2;
+
+  const intDigits =
+    Math.max(
+      n1.split('.')[0].length,
+      n2.split('.')[0].length
+    );
+
+
+
+    let paddedN1;
+
+if(fracLen){
+
+  const parts =
+    n1.split('.');
+
+  paddedN1 =
+    parts[0]
+      .padStart(
+        intDigits,
+        '0'
+      )
+    +
+    '.'
+    +
+    parts[1];
+
+}
+else{
+
+  paddedN1 =
+    n1.padStart(
+      intDigits,
+      '0'
+    );
+
+}
+
+
+
+  let paddedN2;
+
+  if(fracLen){
+
+    const parts =
+      n2.split('.');
+
+    paddedN2 =
+      parts[0]
+        .padStart(
+          intDigits,
+          '0'
+        )
+      +
+      '.'
+      +
+      parts[1];
+
+  }
+
+  else{
+
+    paddedN2 =
+      n2.padStart(
+        intDigits,
+        '0'
+      );
+
+  }
+
+  const nineComp =
+    paddedN2
+      .split('')
+      .map(
+        ch =>
+          ch === '.'
+            ? '.'
+            : (
+                9 -
+                parseInt(ch)
+              )
+      )
+      .join('');
+
+  const increment =
+    fracLen
+      ? (
+          '0.' +
+          '0'.repeat(
+            fracLen - 1
+          ) +
+          '1'
+        )
+      : '1';
+
+const tenCompAdd =
+  addInBase(
+    nineComp,
+    increment,
+    10
+  );
+
+let tenComp =
+  tenCompAdd.result;
+
+if(
+  tenComp.length >
+  paddedN2.length
+){
+
+  tenComp =
+    tenComp.slice(1);
+
+}
+
+  const addRes =
+    addInBase(
+      paddedN1,
+      tenComp,
+      10
+    );
+
+  const sum10 =
+    addRes.result;
+
+  result = '';
+
+  let finalStep = '';
+
+const carry =
+  addRes.result.split('.')[0].length >
+  intDigits;
+
+  if(carry){
+
+    let withoutCarry;
+
+    if(sum10.includes('.')){
+
+      const parts =
+        sum10.split('.');
+
+      withoutCarry =
+        parts[0].slice(1)
+        +
+        '.'
+        +
+        parts[1];
+
+    }
+
+    else{
+
+      withoutCarry =
+        sum10.slice(1);
+
+    }
+
+    result =
+      withoutCarry;
+
+    finalStep =
+`
+Step 3: D has End-around Carry? Yes
+-----------------------------------
+a) Discard the End-around Carry from D: ${withoutCarry}
+b) Result is positive`;
+
+  }
+
+  else{
+
+    const ninesForSum =
+      sum10.replace(
+        /[0-9]/g,
+        '9'
+      );
+
+    const comp =
+      sum10
+        .split('')
+        .map(
+          ch =>
+            ch === '.'
+              ? '.'
+              : (
+                  9 -
+                  parseInt(ch)
+                )
+        )
+        .join('');
+
+    const tenCompResult =
+      addInBase(
+        comp,
+        increment,
+        10
+      );
+
+      let magnitudeResult =
+  tenCompResult.result;
+
+if(
+  magnitudeResult.length >
+  comp.length
+){
+
+  magnitudeResult =
+    magnitudeResult.slice(1);
+
+}
+
+
+
+ result =
+  /^0*\.?0*$/.test(magnitudeResult)
+    ? '0'
+    : '-' + magnitudeResult;
+
+    finalStep =
+`
+Step 3: D has End-around Carry? No
+----------------------------------
+a) Find E = 10's Complement of D
+  ${ninesForSum
+      .split('')
+      .join(' ')}
+- ${sum10
+      .split('')
+      .join(' ')}
+${'-'.repeat(
+  sum10.length * 2 + 2
+)}
+  ${comp
+      .split('')
+      .join(' ')}
++ ${increment
+      .padStart(comp.length,' ')
+      .split('')
+      .join(' ')}
+${'-'.repeat(comp.length * 2 + 2)}
+  ${magnitudeResult
+      .padStart(comp.length,'0')
+      .split('')
+      .join(' ')}
+b) Add a negative sign to E: ${result}`;
+
+  }
+
+  steps =
+`${signStep}Finding ${paddedN1} - ${paddedN2} using 10's Complement →
+
+Let A = ${paddedN1}
+Let B = ${paddedN2}
+
+Step 1: Find C = 10's Complement of B
+-------------------------------------
+a) Find 9's Complement of B
+
+  ${paddedN2
+      .replace(/[0-9]/g,'9')
+      .split('')
+      .join(' ')}
+- ${paddedN2
+      .split('')
+      .join(' ')}
+${'-'.repeat(
+  paddedN2.length * 2 + 2
+)}
+  ${nineComp
+      .split('')
+      .join(' ')}
+
+b) Add 1 to LSD
+${tenCompAdd.visual}
+C = ${tenComp}
+Step 2: Find D = A + C
+----------------------
+${addRes.visual}
+
+D = ${sum10}
+${finalStep}
+
+Answer = ${result}
+`;
+
+  break;
+
+  }
 
 
 
@@ -10121,7 +11777,6 @@ Answer = ${resultNum}
 
 }
 
-
 case 'Bitwise AND (&)':{
 
   if(
@@ -10243,6 +11898,15 @@ case 'Zero Fill Right Shift (>>>)':{
 
   }
 
+  if(num2.startsWith('-')){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be a Non-Negative Integer';
+
+    return;
+
+  }
+
   const n =
     parseInt(num1);
 
@@ -10310,6 +11974,16 @@ case 'Right Shift (>>)':{
 
     stepsDiv.innerHTML =
       'Shift operations support integers only.';
+
+    return;
+
+  }
+
+
+if(num2.startsWith('-')){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be a Non-Negative Integer';
 
     return;
 
@@ -10413,6 +12087,15 @@ case 'Left Shift (<<)':{
 
     stepsDiv.innerHTML =
       'Shift operations support integers only.';
+
+    return;
+
+  }
+
+  if(num2.startsWith('-')){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be a Non-Negative Integer';
 
     return;
 
