@@ -280,6 +280,106 @@
 
     }
 
+
+    .mode-selector{
+
+  display:flex;
+
+  justify-content:center;
+  align-items:center;
+
+  gap:30px;
+
+  flex-wrap:wrap;
+
+  margin-bottom:20px;
+
+}
+
+
+
+.mode-selector{
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  gap:12px;
+
+  margin-bottom:20px;
+
+  flex-wrap:wrap;
+
+}
+
+.mode-selector .mode-btn{
+
+  min-width:160px;
+
+  padding:12px 24px;
+
+  border:none;
+
+  border-radius:12px;
+
+  background:#1e293b;
+
+  color:#cbd5e1;
+
+  cursor:pointer;
+
+  font-size:15px;
+
+  font-weight:600;
+
+  transition:all .25s ease;
+
+}
+
+.mode-selector .mode-btn:hover{
+
+  background:#334155;
+
+  transform:translateY(-2px);
+
+}
+
+.mode-selector .mode-btn.active{
+
+  background:#38bdf8;
+
+  color:#000;
+
+  box-shadow:
+    0 0 15px rgba(56,189,248,.35);
+
+}
+
+.mode-selector .mode-btn:active{
+
+  transform:translateY(1px);
+
+}
+
+
+.mode-selector .mode-btn.active{
+
+  background:
+    linear-gradient(
+      135deg,
+      #38bdf8,
+      #0ea5e9
+    );
+
+  color:white;
+
+  box-shadow:
+    0 4px 16px
+    rgba(56,189,248,.35);
+
+}
     
   #globalResult{
 
@@ -320,6 +420,32 @@
 
   }
 
+  .base-banner{
+
+  width:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+
+  padding:14px;
+
+  margin-bottom:18px;
+
+  border-radius:12px;
+
+  background:#1e293b;
+
+  border:1px solid #334155;
+
+  color:#38bdf8;
+
+  font-size:18px;
+  font-weight:600;
+
+}
       
     @media(max-width:900px){
 
@@ -410,6 +536,80 @@
     }
 
   }
+
+
+  #globalResult{
+
+  width:100%;
+
+  min-height:90px;
+
+  max-height:180px;
+
+  resize:none;
+
+  overflow:auto;
+
+  border:none;
+  outline:none;
+
+  border-radius:12px;
+
+  background:#000;
+
+  color:#00ff66;
+
+  font-size:32px;
+  font-weight:700;
+
+  font-family:monospace;
+
+  text-align:center;
+
+  padding:18px;
+
+}
+
+
+.mode-btn{
+
+  min-width:180px;
+
+  padding:14px 28px;
+
+  border:none;
+
+  border-radius:12px;
+
+  background:#172554;
+
+  color:#ffffff;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+  transition:.25s;
+
+}
+
+.mode-btn:hover{
+
+  transform:translateY(-2px);
+
+}
+
+.mode-btn.active{
+
+  background:#ffffff;
+
+  color:#000000;
+
+  box-shadow:
+    0 0 12px rgba(255,255,255,.7),
+    0 0 25px rgba(255,255,255,.4);
+
+}
     </style>
   </head>
 
@@ -516,7 +716,7 @@
 
           <div class="ns-tabs">
 
-             <button class="ns-tab"
+             <button class="ns-tab active"
           data-tab="binary">
     Binary Number System
   </button>
@@ -548,7 +748,7 @@
 
       
 
-<div class="ns-card tab-content hidden"
+<div class="ns-card tab-content"
      id="binary">
 
     <!-- RADIO BUTTONS -->
@@ -559,6 +759,14 @@
         margin-bottom:20px;
         flex-wrap:wrap;
     ">
+
+<div class="base-banner"
+     id="binaryBaseBanner">
+
+  Binary Number System (Base 2)
+
+</div>
+
 
       <label>
         <input type="radio"
@@ -756,7 +964,12 @@
         margin-bottom:20px;
         flex-wrap:wrap;
     ">
+<div class="base-banner"
+     id="decimalBaseBanner">
 
+  Decimal Number System (Base 10)
+
+</div>
       <label>
         <input type="radio"
               name="decimalMode"
@@ -784,7 +997,7 @@
 
       <div class="ns-input-group">
 
-        <label>Enter Number</label>
+        <label>Enter Decimal Number</label>
 
         <input type="text"
               id="decimalConvertInput">
@@ -939,6 +1152,13 @@
         flex-wrap:wrap;
     ">
 
+
+<div class="base-banner"
+     id="octalBaseBanner">
+
+  Octal Number System (Base 8)
+
+</div>
       <label>
         <input type="radio"
               name="octalMode"
@@ -966,7 +1186,7 @@
 
       <div class="ns-input-group">
 
-        <label>Enter Number</label>
+        <label>Enter Octal Number</label>
 
         <input type="text"
               id="octalConvertInput">
@@ -1118,23 +1338,37 @@
         flex-wrap:wrap;
     ">
 
-      <label>
-        <input type="radio"
-              name="hexMode"
-              checked
-              onclick="toggleHexMode('conversion')">
 
-        Representations
-      </label>
+<div class="base-banner"
+     id="hexBaseBanner">
 
-      <label>
-        <input type="radio"
-              name="hexMode"
-              onclick="toggleHexMode('arithmetic')">
+  Hexadecimal Number System (Base 16)
 
-        Operations
-      </label>
+</div>
 
+<div class="mode-selector">
+
+  <button
+    type="button"
+    class="mode-btn active"
+    id="hexConversionBtn"
+    onclick="toggleHexMode('conversion')">
+
+    Representations
+
+  </button>
+
+  <button
+    type="button"
+    class="mode-btn"
+    id="hexArithmeticBtn"
+    onclick="toggleHexMode('arithmetic')">
+
+    Operations
+
+  </button>
+
+</div>
     </div>
 
     <!-- ================================= -->
@@ -1145,7 +1379,7 @@
 
       <div class="ns-input-group">
 
-        <label>Enter Number</label>
+        <label>Enter Hexadecimal Number</label>
 
         <input type="text"
               id="hexConvertInput">
@@ -1297,7 +1531,7 @@
 
 
 
-          <div class="ns-card tab-content"
+          <div class="ns-card tab-content" hidden
       id="convert">
 
     <div class="ns-input-group">
@@ -1924,12 +2158,13 @@
 
           <div class="ns-output global-output">
 
-    <div class="ns-result"
-        id="globalResult">
+   <textarea
+  id="globalResult"
+  readonly>
 
-      Ready
+Ready
 
-    </div>
+</textarea>
 
     <div class="ns-steps"
         id="globalSteps">

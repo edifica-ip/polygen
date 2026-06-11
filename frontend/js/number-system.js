@@ -4698,16 +4698,6 @@ function toggleBinaryMode(mode){
 }
 
 
-
-
-
-
-
-
-/* =========================================
-DECIMAL TAB TOGGLE
-========================================= */
-
 function toggleOctalMode(mode){
 
   const conversion =
@@ -4766,6 +4756,16 @@ function toggleHexMode(mode){
       'hexArithmeticGroup'
     );
 
+  const conversionBtn =
+    document.getElementById(
+      'hexConversionBtn'
+    );
+
+  const arithmeticBtn =
+    document.getElementById(
+      'hexArithmeticBtn'
+    );
+
   if(mode === 'conversion'){
 
     conversion.style.display =
@@ -4773,6 +4773,14 @@ function toggleHexMode(mode){
 
     arithmetic.style.display =
       'none';
+
+    conversionBtn.classList.add(
+      'active'
+    );
+
+    arithmeticBtn.classList.remove(
+      'active'
+    );
 
     document
       .getElementById(
@@ -4790,6 +4798,14 @@ function toggleHexMode(mode){
     arithmetic.style.display =
       'block';
 
+    arithmeticBtn.classList.add(
+      'active'
+    );
+
+    conversionBtn.classList.remove(
+      'active'
+    );
+
     document
       .getElementById(
         'hexNum1'
@@ -4799,7 +4815,6 @@ function toggleHexMode(mode){
   }
 
 }
-
 
 function toggleDecimalMode(mode){
 
@@ -4900,6 +4915,151 @@ function twosComplementBinary(value){
   ).result;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function updateUnaryOperationUI(
+  operationId,
+  input1Id,
+  input2Id
+){
+
+  const operation =
+    document.getElementById(
+      operationId
+    );
+
+  const input1 =
+    document.getElementById(
+      input1Id
+    );
+
+  const input2 =
+    document.getElementById(
+      input2Id
+    );
+
+  if(
+    !operation ||
+    !input2
+  ) return;
+
+  const unaryOperations = [
+
+    'Bitwise NOT (~)'
+
+  ];
+
+  if(
+    unaryOperations.includes(
+      operation.value
+    )
+  ){
+
+    input2.disabled = true;
+
+    input2.value = '';
+
+    input2.placeholder =
+      'Not Required';
+
+    input2.style.opacity =
+      '0.5';
+
+  }
+
+  else{
+
+    input2.disabled = false;
+
+    input2.placeholder =
+      '';
+
+    input2.style.opacity =
+      '1';
+
+  }
+  input1.focus();
+
+}
+
+document
+  .getElementById(
+    'binaryOperation'
+  )
+  ?.addEventListener(
+    'change',
+    () => {
+
+      updateUnaryOperationUI(
+        'binaryOperation', 'binaryNum1',
+        'binaryNum2'
+      );
+
+    }
+  );
+
+  document
+  .getElementById(
+    'decimalOperation'
+  )
+  ?.addEventListener(
+    'change',
+    () => {
+
+      updateUnaryOperationUI(
+        'decimalOperation', 'decimalNum1',
+        'decimalNum2'
+      );
+
+    }
+  );
+
+document
+  .getElementById(
+    'octalOperation'
+  )
+  ?.addEventListener(
+    'change',
+    () => {
+
+      updateUnaryOperationUI(
+        'octalOperation', 'octalNum1',
+        'octalNum2'
+      );
+
+    }
+  );
+
+
+
+document
+  .getElementById(
+    'hexOperation'
+  )
+  ?.addEventListener(
+    'change',
+    () => {
+
+      updateUnaryOperationUI(
+        'hexOperation', 'hexNum1',
+        'hexNum2'
+      );
+
+    }
+  );
+
 
 
 
@@ -8380,152 +8540,6 @@ Answer = ${result}
 
 
 //#endregion
-
-
-
-
-
-
-
-
-
-function updateUnaryOperationUI(
-  operationId,
-  input1Id,
-  input2Id
-){
-
-  const operation =
-    document.getElementById(
-      operationId
-    );
-
-  const input1 =
-    document.getElementById(
-      input1Id
-    );
-
-  const input2 =
-    document.getElementById(
-      input2Id
-    );
-
-  if(
-    !operation ||
-    !input2
-  ) return;
-
-  const unaryOperations = [
-
-    'Bitwise NOT (~)'
-
-  ];
-
-  if(
-    unaryOperations.includes(
-      operation.value
-    )
-  ){
-
-    input2.disabled = true;
-
-    input2.value = '';
-
-    input2.placeholder =
-      'Not Required';
-
-    input2.style.opacity =
-      '0.5';
-
-  }
-
-  else{
-
-    input2.disabled = false;
-
-    input2.placeholder =
-      '';
-
-    input2.style.opacity =
-      '1';
-
-  }
-  input1.focus();
-
-}
-
-document
-  .getElementById(
-    'binaryOperation'
-  )
-  ?.addEventListener(
-    'change',
-    () => {
-
-      updateUnaryOperationUI(
-        'binaryOperation', 'binaryNum1',
-        'binaryNum2'
-      );
-
-    }
-  );
-
-  document
-  .getElementById(
-    'decimalOperation'
-  )
-  ?.addEventListener(
-    'change',
-    () => {
-
-      updateUnaryOperationUI(
-        'decimalOperation', 'decimalNum1',
-        'decimalNum2'
-      );
-
-    }
-  );
-
-document
-  .getElementById(
-    'octalOperation'
-  )
-  ?.addEventListener(
-    'change',
-    () => {
-
-      updateUnaryOperationUI(
-        'octalOperation', 'octalNum1',
-        'octalNum2'
-      );
-
-    }
-  );
-
-
-
-document
-  .getElementById(
-    'hexOperation'
-  )
-  ?.addEventListener(
-    'change',
-    () => {
-
-      updateUnaryOperationUI(
-        'hexOperation', 'hexNum1',
-        'hexNum2'
-      );
-
-    }
-  );
-
-
-
-
-
-
-
 
 
 
@@ -12339,12 +12353,6 @@ Answer: ${resultNum}`;
 
 
 
-
-
-
-
-
-
 //#region Octal Conversions & Arithmetic
 
 function generateOctalToBinarySteps(
@@ -15964,13 +15972,6 @@ Answer = ${resultOctal}₈`;
 
 
 //#endregion
-
-
-
-
-
-
-
 
 
 
