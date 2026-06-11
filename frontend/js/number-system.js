@@ -103,6 +103,32 @@ setTimeout(() => {
 }
 
 
+case 'hex':{
+
+  const arithmeticVisible =
+    document.getElementById(
+      'hexArithmeticGroup'
+    ).style.display === 'block';
+
+  if(arithmeticVisible){
+
+    document.getElementById(
+      'hexNum1'
+    )?.focus();
+
+  }
+
+  else{
+
+    document.getElementById(
+      'hexConvertInput'
+    )?.focus();
+
+  }
+
+  break;
+}
+
 
     case 'decimal':{
 
@@ -4728,6 +4754,52 @@ function toggleOctalMode(mode){
 
 }
 
+function toggleHexMode(mode){
+
+  const conversion =
+    document.getElementById(
+      'hexConversionGroup'
+    );
+
+  const arithmetic =
+    document.getElementById(
+      'hexArithmeticGroup'
+    );
+
+  if(mode === 'conversion'){
+
+    conversion.style.display =
+      'block';
+
+    arithmetic.style.display =
+      'none';
+
+    document
+      .getElementById(
+        'hexConvertInput'
+      )
+      .focus();
+
+  }
+
+  else{
+
+    conversion.style.display =
+      'none';
+
+    arithmetic.style.display =
+      'block';
+
+    document
+      .getElementById(
+        'hexNum1'
+      )
+      .focus();
+
+  }
+
+}
+
 
 function toggleDecimalMode(mode){
 
@@ -8432,7 +8504,21 @@ document
 
 
 
+document
+  .getElementById(
+    'hexOperation'
+  )
+  ?.addEventListener(
+    'change',
+    () => {
 
+      updateUnaryOperationUI(
+        'hexOperation', 'hexNum1',
+        'hexNum2'
+      );
+
+    }
+  );
 
 
 
@@ -12261,10 +12347,6 @@ Answer: ${resultNum}`;
 
 //#region Octal Conversions & Arithmetic
 
-
-
-
-
 function generateOctalToBinarySteps(
   value
 ){
@@ -12655,36 +12737,40 @@ break;
 
 case 'BCD (Binary Coded Decimal)': {
 
+const decimalValue =
+  convertToDecimal(
+    absValue,
+    8
+  ).toString();
+
 let bcd = '';
 
 let bcdSteps =
 `BCD Representation of ${absValue}₈ →
 
-Step 1: Separate each octal digit from left to right
-----------------------------------------------------
+Step 1: Convert Octal to Decimal
+--------------------------------
+${absValue}₈ = ${decimalValue}₁₀
+
+Step 2: Separate Decimal Digits
+-------------------------------
 `;
 
-let octDigits = [];
+const digits =
+  decimalValue
+    .replace('.','')
+    .split('');
 
-for(let d of absValue){
-
-  if(d === '.')
-    continue;
-
-  octDigits.push(d);
-
-}
-
-bcdSteps += octDigits.join(', ');
+bcdSteps += digits.join(', ');
 
 bcdSteps +=
 `
 
-Step 2: Find 4-bit binary code (nibble) of each octal digit
------------------------------------------------------------
+Step 3: Convert each Decimal Digit into BCD
+-------------------------------------------
 `;
 
-for(let d of absValue){
+for(let d of decimalValue){
 
   if(d === '.'){
 
@@ -12698,14 +12784,14 @@ for(let d of absValue){
   }
 
   const code =
-    parseInt(d,8)
+    parseInt(d,10)
       .toString(2)
       .padStart(4,'0');
 
   bcd += code + ' ';
 
   bcdSteps +=
-`${d}₈ → ${code}\n`;
+`${d} → ${code}\n`;
 
 }
 
@@ -12715,10 +12801,10 @@ result =
 steps =
 `${bcdSteps}
 
-Step 3: Combine all the 4-bit nibbles side-by-side
---------------------------------------------------
+Step 4: Combine all BCD nibbles
+-------------------------------
 ${result}
---------------------------------------------------
+-------------------------------
 `;
 
 if(isNegative)
@@ -12728,7 +12814,8 @@ if(isNegative){
 
 steps =
 `Input Number = ${value}
-(Please Note: Since the number is negative, we convert the magnitude ${absValue} into its BCD form and prefix '1101' as sign block.)
+
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into Decimal, then into BCD, and prefix '1101' as sign block.)
 
 ${steps}
 
@@ -12737,71 +12824,65 @@ Final Answer = ${result}`;
 }
 
 break;
+
 }
 
-
 case 'Excess 3': {
+
+const decimalValue =
+  convertToDecimal(
+    absValue,
+    8
+  ).toString();
 
 let excess3 = '';
 
 let excessSteps =
 `Excess-3 Representation of ${absValue}₈ →
 
-Step 1: Separate each octal digit from left to right
-----------------------------------------------------
+Step 1: Convert Octal to Decimal
+--------------------------------
+${absValue}₈ = ${decimalValue}₁₀
+
+Step 2: Separate Decimal Digits
+-------------------------------
 `;
 
-let digits = [];
-
-for(let d of absValue){
-
-  if(d === '.')
-    continue;
-
-  digits.push(d);
-
-}
+const digits =
+  decimalValue
+    .replace('.','')
+    .split('');
 
 excessSteps += digits.join(', ');
 
 excessSteps +=
 `
 
-Step 2: Add 3 to each octal digit
----------------------------------
+Step 3: Add 3 to each Decimal Digit
+-----------------------------------
 `;
 
-let excessDigits = [];
-
-for(let d of absValue){
+for(let d of decimalValue){
 
   if(d === '.')
     continue;
 
   const digit =
-    parseInt(d,8);
-
-  const digitPlus3 =
-    digit + 3;
-
-  excessDigits.push(digitPlus3);
+    parseInt(d,10);
 
   excessSteps +=
-`${digit} + 3 = ${digitPlus3}\n`;
+`${digit} + 3 = ${digit + 3}\n`;
 
 }
 
 excessSteps +=
-`\nExcess-3 digits are:\n${excessDigits.join(', ')}`;
-
-excessSteps +=
 `
 
-Step 3: Convert each Excess-3 digit into 4-bit binary
------------------------------------------------------
+Step 4: Convert each result into 4-bit Binary
+---------------------------------------------
 `;
 
-for(let d of absValue){
+for(let d of decimalValue){
 
   if(d === '.'){
 
@@ -12815,20 +12896,17 @@ for(let d of absValue){
   }
 
   const digit =
-    parseInt(d,8);
-
-  const digitPlus3 =
-    digit + 3;
+    parseInt(d,10);
 
   const code =
-    digitPlus3
+    (digit + 3)
       .toString(2)
       .padStart(4,'0');
 
   excess3 += code + ' ';
 
   excessSteps +=
-`${digitPlus3} → ${code}\n`;
+`${digit + 3} → ${code}\n`;
 
 }
 
@@ -12838,10 +12916,10 @@ result =
 steps =
 `${excessSteps}
 
-Step 4: Combine all the 4-bit nibbles side-by-side
---------------------------------------------------
+Step 5: Combine all Excess-3 nibbles
+------------------------------------
 ${result}
---------------------------------------------------
+------------------------------------
 `;
 
 if(isNegative)
@@ -12851,7 +12929,8 @@ if(isNegative){
 
 steps =
 `Input Number = ${value}
-(Please Note: Since the number is negative, we convert the magnitude ${absValue} into its Excess-3 form and prefix '1101' as sign block.)
+
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into Decimal, then into Excess-3, and prefix '1101' as sign block.)
 
 ${steps}
 
@@ -12860,7 +12939,8 @@ Final Answer = ${result}`;
 }
 
 break;
-  }
+
+}
 
 
 case 'Gray':{
@@ -13537,15 +13617,11 @@ ${result}
 
 }
 
-
-
-
 function isIntegerOctal(value){
 
   return /^-?[0-7]+$/.test(value);
 
 }
-
 function octalToSignedInt(value){
 
   return parseInt(
@@ -13560,7 +13636,6 @@ function octalToSignedInt(value){
   );
 
 }
-
 
 function normalizeOctal(value){
 
@@ -14932,12 +15007,6 @@ Answer = ${result}
 
 }
 
-
-
-
-
-
-
 case 'Bitwise AND (&)':{
 
   if(
@@ -15893,5 +15962,3694 @@ Answer = ${resultOctal}₈`;
 
 }
 
+
+//#endregion
+
+
+
+
+
+
+
+
+
+
+//#region Hex Conversions and Arithmetic
+
+
+
+function isHexNumber(value){
+
+  return /^-?[0-9A-F]+(\.[0-9A-F]+)?$/i
+    .test(value);
+
+}
+function hexDigitToValue(ch){
+
+  return parseInt(
+    ch,
+    16
+  );
+
+}
+function valueToHexDigit(v){
+
+  return v
+    .toString(16)
+    .toUpperCase();
+
+}
+function hexToBinaryString(value){
+
+  let binary = '';
+
+  for(let ch of value.toUpperCase()){
+
+    if(ch === '.'){
+
+      binary += '.';
+      continue;
+
+    }
+
+    binary +=
+      parseInt(ch,16)
+      .toString(2)
+      .padStart(4,'0');
+
+  }
+
+  return binary;
+
+}
+
+function hexToNumber(hex){
+
+  const negative =
+    hex.startsWith('-');
+
+  const value =
+    convertToDecimal(
+      hex.replace('-',''),
+      16
+    );
+
+  return negative
+    ? -value
+    : value;
+
+}
+function hexAbs(hex){
+
+  return hex.replace(
+    /^-/,
+    ''
+  ).toUpperCase();
+
+}
+function isNegativeHex(hex){
+
+  return hex.startsWith('-');
+
+}
+
+function isIntegerHex(hex){
+
+  return /^-?[0-9A-F]+$/i
+    .test(hex);
+
+}
+
+function hexToSignedInt(hex){
+
+  let value =
+    parseInt(
+      hex.replace('-',''),
+      16
+    );
+
+  if(
+    !hex.startsWith('-')
+    &&
+    value > 0x7FFFFFFF
+  ){
+
+    value =
+      value - 0x100000000;
+
+  }
+
+  return hex.startsWith('-')
+    ? -value
+    : value;
+
+}
+
+function findHexConversion(){
+
+  let value =
+    document.getElementById(
+      'hexConvertInput'
+    ).value.trim();
+
+  const type =
+    document.getElementById(
+      'hexConvertType'
+    ).value;
+
+  const resultDiv =
+    document.getElementById(
+      'globalResult'
+    );
+
+  const stepsDiv =
+    document.getElementById(
+      'globalSteps'
+    );
+
+  if(!isHexNumber(value)){
+
+    resultDiv.innerHTML =
+      '❌ Invalid Hexadecimal Number';
+
+    stepsDiv.innerHTML = '';
+
+    return;
+
+  }
+
+  const isNegative =
+    value.startsWith('-');
+
+  const absValue =
+    value.replace(
+      /^-/,
+      ''
+    );
+
+  let result = '';
+  let steps = '';
+
+  switch(type){
+
+    case 'Binary':{
+
+      let binary = '';
+
+      for(let ch of value.toUpperCase()){
+
+        if(ch === '.'){
+
+          binary += '.';
+          continue;
+
+        }
+
+        if(ch === '-'){
+
+          binary += '-';
+          continue;
+
+        }
+
+        binary +=
+          parseInt(ch,16)
+            .toString(2)
+            .padStart(
+              4,
+              '0'
+            );
+
+      }
+
+      result = binary;
+
+      steps =
+`Hexadecimal to Binary Conversion of ${value}
+
+Step 1: Convert every hexadecimal digit into 4-bit binary
+---------------------------------------------------------
+`;
+
+      for(let ch of value.toUpperCase()){
+
+        if(ch === '.'){
+
+          steps +=
+`Decimal Point(.)\n`;
+
+          continue;
+
+        }
+
+        if(ch === '-'){
+
+          steps +=
+`Minus Sign(-)\n`;
+
+          continue;
+
+        }
+
+        steps +=
+`${ch}₁₆ → ${
+  parseInt(ch,16)
+    .toString(2)
+    .padStart(4,'0')
+}\n`;
+
+      }
+
+      steps +=
+`
+Step 2: Combine all binary groups
+---------------------------------
+${binary}
+
+Answer = ${binary}₂
+`;
+
+      break;
+
+    }
+
+    case 'Octal':{
+
+      const decimal =
+        convertToDecimal(
+          absValue,
+          16
+        );
+
+      result =
+        convertFromDecimal(
+          decimal,
+          8
+        );
+
+      if(isNegative){
+
+        result =
+          '-' + result;
+
+      }
+
+      steps =
+        generateCrossGroupingSteps(
+          absValue,
+          16,
+          8
+        );
+
+      if(isNegative){
+
+        steps =
+`Input Number = ${value}
+
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} and prefix '-' to the final answer)
+
+${steps}
+
+Final Answer = ${result}`;
+
+      }
+
+      break;
+
+    }
+
+    case 'Decimal':{
+
+      const decimal =
+        convertToDecimal(
+          absValue,
+          16
+        );
+
+      result = decimal;
+
+      if(isNegative){
+
+        result =
+          '-' + result;
+
+      }
+
+      steps =
+        generateAnyToDecimalSteps(
+          absValue,
+          16
+        );
+
+      if(isNegative){
+
+        steps =
+`Input Number = ${value}
+
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} and prefix '-' to the result)
+
+${steps}
+
+Final Answer = ${result}`;
+
+      }
+
+      break;
+
+    }
+
+
+case '15s complement':{
+
+let originalValue = value;
+
+value = absValue.toUpperCase();
+
+result =
+  value
+    .split('')
+    .map(ch => {
+
+      if(ch === '.')
+        return '.';
+
+      return valueToChar(
+        15 -
+        charToValue(ch)
+      );
+
+    })
+    .join('');
+
+const fifteens =
+  value.replace(
+    /[0-9A-F]/g,
+    'F'
+  );
+
+steps =
+`Finding 15's Complement of ${value} →
+
+Step 1: Subtract all digits from F
+----------------------------------
+
+  ${fifteens.split('').join(' ')}
+- ${value.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+  ${result.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+`;
+
+if(isNegative){
+
+steps =
+`Input Number = ${originalValue}
+
+(Please Note: 15's Complement representation of a negative hexadecimal number is obtained by finding the 15's Complement of its magnitude.)
+
+Magnitude = ${absValue}
+
+${steps}`;
+
+}
+
+break;
+
+}
+
+case '16s complement':{
+
+let originalValue = value;
+
+value =
+  absValue.toUpperCase();
+
+const fifteenComp =
+  value
+    .split('')
+    .map(ch => {
+
+      if(ch === '.')
+        return '.';
+
+      return valueToChar(
+        15 -
+        charToValue(ch)
+      );
+
+    })
+    .join('');
+
+const increment =
+  value.includes('.')
+    ? '0.' +
+      '0'.repeat(
+        value.split('.')[1].length - 1
+      ) +
+      '1'
+    : '1';
+
+const addRes =
+  addInBase(
+    fifteenComp,
+    increment,
+    16
+  );
+
+result =
+  addRes.result;
+
+const fs =
+  value.replace(
+    /[0-9A-F]/g,
+    'F'
+  );
+
+const displayIncrement =
+  increment.padStart(
+    fifteenComp.length,
+    ' '
+  );
+
+steps =
+`Finding 16's Complement of ${value} →
+
+Step 1: Subtract all digits from F
+----------------------------------
+
+  ${fs.split('').join(' ')}
+- ${value.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+  ${fifteenComp.split('').join(' ')}
+
+Step 2: Add 1 to the LSD (Least Significant Digit)
+--------------------------------------------------
+
+  ${fifteenComp.split('').join(' ')}
++ ${displayIncrement.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+  ${result.split('').join(' ')}
+${'-'.repeat(
+  value.length * 2 + 2
+)}
+`;
+
+if(isNegative){
+
+steps =
+`Input Number = ${originalValue}
+
+(Please Note: 16's Complement representation of a negative hexadecimal number is obtained by finding the 16's Complement of its magnitude.)
+
+Magnitude = ${absValue}
+
+${steps}`;
+
+}
+
+break;
+
+}
+
+case 'Excess 3': {
+
+const decimalValue =
+  convertToDecimal(
+    absValue,
+    16
+  ).toString();
+
+let excess3 = '';
+
+let excessSteps =
+`Excess-3 Representation of ${absValue.toUpperCase()}₁₆ →
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${absValue.toUpperCase()}₁₆ = ${decimalValue}₁₀
+
+Step 2: Separate Decimal Digits
+-------------------------------
+`;
+
+const digits =
+  decimalValue
+    .replace('.','')
+    .split('');
+
+excessSteps += digits.join(', ');
+
+excessSteps +=
+`
+
+Step 3: Add 3 to each Decimal Digit
+-----------------------------------
+`;
+
+for(let d of decimalValue){
+
+  if(d === '.')
+    continue;
+
+  const digit =
+    parseInt(d,10);
+
+  excessSteps +=
+`${digit} + 3 = ${digit + 3}\n`;
+
+}
+
+excessSteps +=
+`
+
+Step 4: Convert each result into 4-bit Binary
+---------------------------------------------
+`;
+
+for(let d of decimalValue){
+
+  if(d === '.'){
+
+    excess3 += '. ';
+
+    excessSteps +=
+`Decimal Point(.)\n`;
+
+    continue;
+
+  }
+
+  const digit =
+    parseInt(d,10);
+
+  const code =
+    (digit + 3)
+      .toString(2)
+      .padStart(4,'0');
+
+  excess3 += code + ' ';
+
+  excessSteps +=
+`${digit + 3} → ${code}\n`;
+
+}
+
+result =
+  excess3.trim();
+
+steps =
+`${excessSteps}
+
+Step 5: Combine all Excess-3 nibbles
+------------------------------------
+${result}
+------------------------------------
+`;
+
+if(isNegative)
+  result = '1101     ' + result;
+
+if(isNegative){
+
+steps =
+`Input Number = ${value}
+
+(Please Note: Since the number is negative, we convert the magnitude ${absValue.toUpperCase()} into Decimal, then into Excess-3, and prefix '1101' as sign block.)
+
+${steps}
+
+Final Answer = ${result}`;
+
+}
+
+break;
+
+}
+
+case 'BCD (Binary Coded Decimal)': {
+
+const decimalValue =
+  convertToDecimal(
+    absValue,
+    16
+  ).toString();
+
+let bcd = '';
+
+let bcdSteps =
+`BCD Representation of ${absValue.toUpperCase()}₁₆ →
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${absValue.toUpperCase()}₁₆ = ${decimalValue}₁₀
+
+Step 2: Separate Decimal Digits
+-------------------------------
+`;
+
+const digits =
+  decimalValue
+    .replace('.','')
+    .split('');
+
+bcdSteps += digits.join(', ');
+
+bcdSteps +=
+`
+
+Step 3: Convert each Decimal Digit into BCD
+-------------------------------------------
+`;
+
+for(let d of decimalValue){
+
+  if(d === '.'){
+
+    bcd += '. ';
+
+    bcdSteps +=
+`Decimal Point(.)\n`;
+
+    continue;
+
+  }
+
+  const code =
+    parseInt(d,10)
+      .toString(2)
+      .padStart(4,'0');
+
+  bcd += code + ' ';
+
+  bcdSteps +=
+`${d} → ${code}\n`;
+
+}
+
+result =
+  bcd.trim();
+
+steps =
+`${bcdSteps}
+
+Step 4: Combine all BCD nibbles
+-------------------------------
+${result}
+-------------------------------
+`;
+
+if(isNegative)
+  result = '1101     ' + result;
+
+if(isNegative){
+
+steps =
+`Input Number = ${value}
+
+(Please Note: Since the number is negative, we convert the magnitude ${absValue.toUpperCase()} into Decimal, then into BCD, and prefix '1101' as sign block.)
+
+${steps}
+
+Final Answer = ${result}`;
+
+}
+
+break;
+
+}
+
+case 'Gray':{
+
+const hexBinary =
+  hexToBinaryString(
+    absValue
+  );
+
+let binaryForGray =
+  hexBinary;
+
+if(binaryForGray.includes('.')){
+
+  const parts =
+    binaryForGray.split('.');
+
+  binaryForGray =
+    parts[0]
+    + '.'
+    + parts[1]
+    + '0';
+
+}
+
+const bits =
+  binaryForGray.replace('.','');
+
+const shifted =
+  '0' + bits.slice(0,-1);
+
+let grayBits = '';
+
+let graySteps =
+`Hexadecimal to Gray Conversion of ${value} →
+
+Step 1: Convert Hexadecimal to Binary
+-------------------------------------
+${absValue.toUpperCase()}₁₆ = ${hexBinary}₂
+
+Step 2: Shift Binary Right by 1 Bit
+-----------------------------------
+${bits}
+${shifted}
+
+Step 3: XOR corresponding bits
+------------------------------
+`;
+
+for(
+  let i=0;
+  i<bits.length;
+  i++
+){
+
+  const g =
+    bits[i] === shifted[i]
+      ? '0'
+      : '1';
+
+  grayBits += g;
+
+  graySteps +=
+`${bits[i]} XOR ${shifted[i]} = ${g}\n`;
+
+}
+
+const pointPos =
+  binaryForGray.indexOf('.');
+
+let gray;
+
+if(pointPos !== -1){
+
+  gray =
+    grayBits.slice(
+      0,
+      pointPos
+    )
+    +
+    '.'
+    +
+    grayBits.slice(
+      pointPos
+    );
+
+}
+else{
+
+  gray = grayBits;
+
+}
+
+result = gray;
+
+steps =
+`${graySteps}
+
+Step 4: Combine all Gray bits
+-----------------------------
+${gray.split('').join(' ')}
+
+Gray Code = ${gray}
+-----------------------------
+`;
+
+if(isNegative)
+  result = '1     ' + result;
+
+if(isNegative){
+
+steps =
+`Input Number = ${value}
+
+(Please Note: Since the number is negative, we convert the magnitude ${absValue} into Gray Code and prefix '1' as sign bit.)
+
+${steps}
+
+Final Answer = ${result}`;
+
+}
+
+break;
+
+}
+
+
+case 'Sign Magnitude':{
+
+  const signBit =
+    isNegative ? '1' : '0';
+
+  const binaryMagnitude =
+    hexToBinaryString(
+      absValue
+    );
+
+  const isReal =
+    absValue.includes('.');
+
+  function signMagnitude(
+    totalBits
+  ){
+
+    const pureBinary =
+      binaryMagnitude.replace('.','');
+
+    if(!isReal){
+
+      const magBits =
+        totalBits - 1;
+
+      if(
+        pureBinary.length >
+        magBits
+      ){
+
+        return 'Overflow';
+
+      }
+
+      return (
+        signBit +
+        pureBinary.padStart(
+          magBits,
+          '0'
+        )
+      );
+
+    }
+
+    const parts =
+      binaryMagnitude.split('.');
+
+    const intBinary =
+      parts[0];
+
+    const fracBinary =
+      parts[1] || '';
+
+    const intBits =
+      Math.floor(
+        (totalBits - 1) / 2
+      );
+
+    const fracBits =
+      totalBits - 1 - intBits;
+
+    if(
+      intBinary.length >
+      intBits
+    ){
+
+      return 'Overflow';
+
+    }
+
+    return (
+      signBit
+      + ' '
+      + intBinary.padStart(
+          intBits,
+          '0'
+        )
+      + ' '
+      + fracBinary.padEnd(
+          fracBits,
+          '0'
+        )
+        .slice(0,fracBits)
+    );
+
+  }
+
+  const sm8 =
+    signMagnitude(8);
+
+  const sm16 =
+    signMagnitude(16);
+
+  const sm32 =
+    signMagnitude(32);
+
+  result =
+`<br>8-bit  : ${sm8}<br>
+16-bit : ${sm16}<br>
+32-bit : ${sm32}<br>`;
+
+  steps =
+`Sign Magnitude Representation of ${value}
+
+Step 1: Determine Sign Bit
+--------------------------
+${isNegative
+  ? 'Negative Number → Sign Bit = 1'
+  : 'Positive Number → Sign Bit = 0'}
+
+Step 2: Find Magnitude
+----------------------
+|${value}| = ${absValue}
+
+Step 3: Convert Hexadecimal Magnitude to Binary
+-----------------------------------------------
+${absValue.toUpperCase()}₁₆ = ${binaryMagnitude}₂
+
+Step 4: Sign Magnitude Representation
+-------------------------------------
+8-bit  : ${sm8}
+16-bit : ${sm16}
+32-bit : ${sm32}
+
+${
+  isReal
+  ?
+`Please Note:
+8-bit  = 1 Sign + 3 Integer + 4 Fraction
+16-bit = 1 Sign + 7 Integer + 8 Fraction
+32-bit = 1 Sign + 15 Integer + 16 Fraction`
+  :
+`Please Note:
+8-bit  = 1 Sign + 7 Magnitude
+16-bit = 1 Sign + 15 Magnitude
+32-bit = 1 Sign + 31 Magnitude`
+}
+`;
+
+  break;
+
+}
+
+case 'Fixed Point':{
+
+  const negative =
+    isNegative;
+
+  const parts =
+    absValue.split('.');
+
+  const hexInt =
+    parts[0];
+
+  const hexFrac =
+    parts[1] || '';
+
+  let intBinary = '';
+
+  for(
+    let ch of
+    hexInt.toUpperCase()
+  ){
+
+    intBinary +=
+      charToValue(ch)
+      .toString(2)
+      .padStart(4,'0');
+
+  }
+
+  intBinary =
+    intBinary.replace(
+      /^0+/,
+      ''
+    ) || '0';
+
+  let fracBinary = '';
+
+  for(
+    let ch of
+    hexFrac.toUpperCase()
+  ){
+
+    fracBinary +=
+      charToValue(ch)
+      .toString(2)
+      .padStart(4,'0');
+
+  }
+
+  function fixedPoint(
+    intBits,
+    fracBits
+  ){
+
+    if(
+      intBinary.length >
+      intBits
+    ){
+
+      return 'Overflow';
+
+    }
+
+    return (
+      (negative ? '-' : '')
+      +
+      intBinary.padStart(
+        intBits,
+        '0'
+      )
+      +
+      '.'
+      +
+      fracBinary
+        .padEnd(
+          fracBits,
+          '0'
+        )
+        .slice(
+          0,
+          fracBits
+        )
+    );
+
+  }
+
+  const fp8 =
+    fixedPoint(4,4);
+
+  const fp16 =
+    fixedPoint(8,8);
+
+  const fp32 =
+    fixedPoint(16,16);
+
+  result =
+`<br>8-bit  : ${fp8}<br>
+16-bit : ${fp16}<br>
+32-bit : ${fp32}<br>`;
+
+  steps =
+`Fixed Point Representation of ${value}
+
+Step 1: Separate Integer and Fraction Parts
+-------------------------------------------
+Integer Part  = ${hexInt}
+Fraction Part = ${hexFrac || '0'}
+
+Step 2: Convert Integer Part to Binary
+--------------------------------------
+${hexInt.toUpperCase()}₁₆ = ${intBinary}₂
+
+Step 3: Convert Fraction Part to Binary
+---------------------------------------
+${(hexFrac || '0').toUpperCase()}₁₆ = ${fracBinary || '0'}₂
+
+Step 4: Fixed Point Representations
+-----------------------------------
+8-bit  (4 Integer + 4 Fraction)
+${fp8}
+
+16-bit (8 Integer + 8 Fraction)
+${fp16}
+
+32-bit (16 Integer + 16 Fraction)
+${fp32}
+
+Please Note:
+------------
+Fixed Point uses a fixed radix point.
+The radix point never moves.
+`;
+
+  break;
+
+}
+
+case 'Mantissa Exponent':{
+
+  const binary =
+    hexToBinaryString(
+      absValue
+    );
+
+  if(
+    parseInt(
+      binary.replace('.',''),
+      2
+    ) === 0
+  ){
+
+    result = '0 × 2^0';
+
+    steps =
+`Mantissa-Exponent Form
+
+0 has no normalization.
+
+Answer = 0 × 2^0`;
+
+    break;
+
+  }
+
+  let exponent = 0;
+
+  let mantissa = '';
+
+  if(binary.includes('.')){
+
+    const parts =
+      binary.split('.');
+
+    const intPart =
+      parts[0];
+
+    const fracPart =
+      parts[1];
+
+    if(
+      parseInt(
+        intPart,
+        2
+      ) !== 0
+    ){
+
+      exponent =
+        intPart.length - 1;
+
+      mantissa =
+        '1.' +
+        intPart.slice(1) +
+        fracPart;
+
+    }
+
+    else{
+
+      const firstOne =
+        fracPart.indexOf('1');
+
+      exponent =
+        -(firstOne + 1);
+
+      mantissa =
+        '1.' +
+        fracPart.slice(
+          firstOne + 1
+        );
+
+    }
+
+  }
+
+  else{
+
+    exponent =
+      binary.length - 1;
+
+    mantissa =
+      '1.' +
+      binary.slice(1);
+
+  }
+
+  result =
+`${isNegative ? '-' : ''}${mantissa} × 2^${exponent}`;
+
+  steps =
+`Mantissa-Exponent Form of ${value}
+
+Step 1: Convert Hexadecimal to Binary
+-------------------------------------
+${absValue.toUpperCase()}₁₆ = ${binary}₂
+
+Step 2: Normalize Binary Number
+-------------------------------
+${result}
+
+Mantissa
+--------
+${isNegative ? '-' : ''}${mantissa}
+
+Exponent
+--------
+${exponent}
+`;
+
+  break;
+
+}
+
+case 'IEEE-754 Floating Point (32-bit)':{
+
+  const decimalValue =
+    convertToDecimal(
+      absValue,
+      16
+    );
+
+  const actualValue =
+    isNegative
+      ? -decimalValue
+      : decimalValue;
+
+  const buffer =
+    new ArrayBuffer(4);
+
+  const view =
+    new DataView(buffer);
+
+  view.setFloat32(
+    0,
+    actualValue
+  );
+
+  let bits = '';
+
+  for(let i=0;i<4;i++){
+
+    bits +=
+      view
+        .getUint8(i)
+        .toString(2)
+        .padStart(8,'0');
+
+  }
+
+  const sign =
+    bits[0];
+
+  const exponent =
+    bits.slice(1,9);
+
+  const mantissa =
+    bits.slice(9);
+
+  result =
+`${sign} ${exponent} ${mantissa}`;
+
+  steps =
+`IEEE-754 Single Precision (32-bit)
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${value.toUpperCase()}₁₆ = ${actualValue}₁₀
+
+Step 2: IEEE-754 Encoding
+-------------------------
+Sign Bit
+--------
+${sign}
+
+Exponent (8 bits)
+----------------
+${exponent}
+
+Mantissa (23 bits)
+------------------
+${mantissa}
+
+Final Representation
+--------------------
+${result}
+`;
+
+  break;
+
+}
+
+case 'IEEE-754 Floating Point (64-bit)':{
+
+  const decimalValue =
+    convertToDecimal(
+      absValue,
+      16
+    );
+
+  const actualValue =
+    isNegative
+      ? -decimalValue
+      : decimalValue;
+
+  const buffer =
+    new ArrayBuffer(8);
+
+  const view =
+    new DataView(buffer);
+
+  view.setFloat64(
+    0,
+    actualValue
+  );
+
+  let bits = '';
+
+  for(let i=0;i<8;i++){
+
+    bits +=
+      view
+        .getUint8(i)
+        .toString(2)
+        .padStart(8,'0');
+
+  }
+
+  const sign =
+    bits[0];
+
+  const exponent =
+    bits.slice(1,12);
+
+  const mantissa =
+    bits.slice(12);
+
+  result =
+`${sign} ${exponent} ${mantissa}`;
+
+  steps =
+`IEEE-754 Double Precision (64-bit)
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${value.toUpperCase()}₁₆ = ${actualValue}₁₀
+
+Step 2: IEEE-754 Encoding
+-------------------------
+Sign Bit
+--------
+${sign}
+
+Exponent (11 bits)
+-----------------
+${exponent}
+
+Mantissa (52 bits)
+------------------
+${mantissa}
+
+Final Representation
+--------------------
+${result}
+`;
+
+  break;
+
+}
+
+
+  }
+
+  resultDiv.innerHTML =
+    `Answer: ${result}`;
+
+  stepsDiv.textContent =
+    steps;
+
+}
+
+function findHexArithmetic(){
+
+  const num1 =
+    document.getElementById(
+      'hexNum1'
+    ).value.trim();
+
+  const num2 =
+    document.getElementById(
+      'hexNum2'
+    ).value.trim();
+
+  const operation =
+    document.getElementById(
+      'hexOperation'
+    ).value;
+
+  const resultDiv =
+    document.getElementById(
+      'globalResult'
+    );
+
+  const stepsDiv =
+    document.getElementById(
+      'globalSteps'
+    );
+
+  if(
+    operation ===
+    'Bitwise NOT (~)'
+  ){
+
+  }
+  else{
+
+    if(
+      !isHexNumber(num1)
+      ||
+      !isHexNumber(num2)
+    ){
+
+      resultDiv.innerHTML =
+        '❌ Invalid Hexadecimal Number';
+
+      stepsDiv.innerHTML = '';
+
+      return;
+
+    }
+
+  }
+
+  let result = '';
+  let steps = '';
+
+  switch(operation){
+
+    
+case 'Addition':{
+
+  const n1 =
+    hexToNumber(num1);
+
+  const n2 =
+    hexToNumber(num2);
+
+  const neg1 =
+    num1.startsWith('-');
+
+  const neg2 =
+    num2.startsWith('-');
+
+  if(
+    neg1 === neg2
+  ){
+
+    const add =
+      addInBase(
+        num1.replace('-',''),
+        num2.replace('-',''),
+        16
+      );
+
+    if(add.result === '0'){
+
+      result = '0';
+
+    }
+    else{
+
+      result =
+        neg1
+          ? '-' + add.result
+          : add.result;
+
+    }
+
+    steps =
+`Input Number 1 = ${num1.toUpperCase()}₁₆
+Input Number 2 = ${num2.toUpperCase()}₁₆
+
+Step 1:
+-------
+Both numbers have same sign.
+Perform Hexadecimal Addition.
+
+Step 2:
+-------
+${add.visual}
+
+Step 3:
+-------
+Apply sign.
+
+Answer = ${result.toUpperCase()}₁₆`;
+
+  }
+  else{
+
+    let big =
+      num1.replace('-','');
+
+    let small =
+      num2.replace('-','');
+
+    let resultNegative =
+      neg1;
+
+    if(
+      Math.abs(n2)
+      >
+      Math.abs(n1)
+    ){
+
+      big =
+        num2.replace('-','');
+
+      small =
+        num1.replace('-','');
+
+      resultNegative =
+        neg2;
+
+    }
+
+    const sub =
+      subtractInBase(
+        big,
+        small,
+        16
+      );
+
+    if(sub.result === '0'){
+
+      result = '0';
+
+    }
+    else{
+
+      result =
+        resultNegative
+          ? '-' + sub.result
+          : sub.result;
+
+    }
+
+    steps =
+`Input Number 1 = ${num1.toUpperCase()}₁₆
+Input Number 2 = ${num2.toUpperCase()}₁₆
+
+Step 1:
+-------
+Signs are different.
+Convert addition into subtraction.
+
+Step 2:
+-------
+${sub.visual}
+
+Step 3:
+-------
+Apply sign of larger magnitude.
+
+Answer = ${result.toUpperCase()}₁₆`;
+
+  }
+
+  break;
+}
+
+case 'Subtraction':{
+
+  const n1 =
+    hexToNumber(
+      num1
+    );
+
+  const n2 =
+    hexToNumber(
+      num2
+    );
+
+  const abs1 =
+    hexAbs(num1);
+
+  const abs2 =
+    hexAbs(num2);
+
+  const neg1 =
+    isNegativeHex(
+      num1
+    );
+
+  const neg2 =
+    isNegativeHex(
+      num2
+    );
+
+  let explanation = '';
+
+  if(neg2){
+
+    explanation =
+`The 2nd input number ${num2.toUpperCase()} is negative.
+Therefore, ${num1.toUpperCase()} - (${num2.toUpperCase()}) = ${abs1} + ${abs2}`;
+
+  }
+  else{
+
+    explanation =
+`The 1st input number ${num1.toUpperCase()} is negative.
+
+Therefore, ${num1.toUpperCase()} - ${num2.toUpperCase()} = -(${abs1} + ${abs2})`;
+
+  }
+
+  if(
+    neg1 !== neg2
+  ){
+
+    const add =
+      addInBase(
+        abs1,
+        abs2,
+        16
+      );
+
+    if(add.result === '0'){
+
+      result = '0';
+
+    }
+    else{
+
+      result =
+        neg1
+          ? '-' + add.result
+          : add.result;
+
+    }
+
+    steps =
+`Input Number 1 = ${num1.toUpperCase()}₁₆
+Input Number 2 = ${num2.toUpperCase()}₁₆
+
+Step 1:
+-------
+${explanation}
+
+Step 2:
+-------
+${add.visual}
+
+Step 3:
+-------
+${
+  neg1
+    ? 'Apply (-) sign.'
+    : 'Apply (+) sign.'
+}
+
+Answer = ${result.toUpperCase()}₁₆
+`;
+
+  }
+  else{
+
+    let bigValue =
+      n1;
+
+    let big =
+      abs1;
+
+    let small =
+      abs2;
+
+    let resultNegative =
+      false;
+
+    if(
+      Math.abs(n1)
+      >=
+      Math.abs(n2)
+    ){
+
+      resultNegative =
+        neg1;
+
+    }
+    else{
+
+      bigValue =
+        n2;
+
+      big =
+        abs2;
+
+      small =
+        abs1;
+
+      resultNegative =
+        !neg1;
+
+    }
+
+    let sameSignExplanation =
+      '';
+
+    if(
+      !neg1
+      &&
+      !neg2
+    ){
+
+      sameSignExplanation =
+`Both input numbers are positive.
+Since ${big} > ${small}, find: ${big} - ${small}
+and apply ${
+  resultNegative
+    ? '(-)'
+    : '(+)'
+} sign.`;
+
+    }
+    else{
+
+      sameSignExplanation =
+`Both input numbers are negative.
+${num1.toUpperCase()} - (${num2.toUpperCase()})
+
+Now since, ${big} > ${small}, find: ${big} - ${small}
+and apply ${
+  resultNegative
+    ? '(-)'
+    : '(+)'
+} sign.`;
+
+    }
+
+    const sub =
+      subtractInBase(
+        big,
+        small,
+        16
+      );
+
+    if(sub.result === '0'){
+
+      result = '0';
+
+    }
+    else{
+
+      result =
+        resultNegative
+          ? '-' + sub.result
+          : sub.result;
+
+    }
+
+    steps =
+`Input Number 1 = ${num1.toUpperCase()}₁₆
+Input Number 2 = ${num2.toUpperCase()}₁₆
+
+Step 1:
+-------
+${sameSignExplanation}
+
+Step 2:
+-------
+${sub.visual}
+
+Step 3:
+-------
+Apply ${
+  resultNegative
+    ? '(-)'
+    : '(+)'
+} sign.
+
+Answer = ${result.toUpperCase()}₁₆
+`;
+
+  }
+
+  break;
+}
+
+case 'Multiplication':{
+
+  const n1 =
+    hexToNumber(
+      num1
+    );
+
+  const n2 =
+    hexToNumber(
+      num2
+    );
+
+  const abs1 =
+    hexAbs(
+      num1
+    );
+
+  const abs2 =
+    hexAbs(
+      num2
+    );
+
+  const negative =
+    (n1 < 0)
+    !==
+    (n2 < 0);
+
+  const mul =
+    multiplyInBase(
+      abs1,
+      abs2,
+      16
+    );
+
+  if(mul.result === '0'){
+
+    result = '0';
+
+  }
+  else{
+
+    result =
+      negative
+        ? '-' + mul.result
+        : mul.result;
+
+  }
+
+  steps =
+`Input Number 1 = ${num1.toUpperCase()}₁₆
+Input Number 2 = ${num2.toUpperCase()}₁₆
+
+Step 1: Determine Sign of the Answer
+------------------------------------
+Number 1: ${n1 < 0 ? '(- ve)' : '(+ ve)'}
+Number 2: ${n2 < 0 ? '(- ve)' : '(+ ve)'}
+
+${
+  negative
+  ? 'Signs are different → Answer will be negative (- ve)'
+  : 'Signs are same → Answer will be positive (+ ve)'
+}
+
+Step 2: Multiply Magnitudes
+---------------------------
+${mul.visual}
+
+Step 3: Apply Sign
+------------------
+Answer = ${result.toUpperCase()}₁₆
+`;
+
+  break;
+
+}
+
+
+
+
+case 'Subtraction (15s Complement)':{
+
+  let signStep = '';
+
+  let workingNum1 = num1;
+  let workingNum2 = num2;
+
+  const neg1 =
+    num1.startsWith('-');
+
+  const neg2 =
+    num2.startsWith('-');
+
+  if(neg1 && neg2){
+
+    const abs1 =
+      num1.slice(1);
+
+    const abs2 =
+      num2.slice(1);
+
+    signStep =
+`Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${abs2} - ${abs1}
+
+Now apply 15's Complement subtraction.
+`;
+
+    workingNum1 = abs2;
+    workingNum2 = abs1;
+
+  }
+  else if(!neg1 && neg2){
+
+    const abs2 =
+      num2.slice(1);
+
+    const add =
+      addInBase(
+        num1,
+        abs2,
+        16
+      );
+
+    result =
+      add.result;
+
+    steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${num1} + ${abs2}
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+    break;
+
+  }
+  else if(neg1 && !neg2){
+
+    const abs1 =
+      num1.slice(1);
+
+    const add =
+      addInBase(
+        abs1,
+        num2,
+        16
+      );
+
+    result =
+      '-' + add.result;
+
+    steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - ${num2} = -(${abs1} + ${num2})
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+    break;
+
+  }
+
+  const fracLen =
+    Math.max(
+      (workingNum1.split('.')[1] || '').length,
+      (workingNum2.split('.')[1] || '').length
+    );
+
+  const intDigits =
+    Math.max(
+      workingNum1.split('.')[0]
+        .replace('-','')
+        .length,
+      workingNum2.split('.')[0]
+        .replace('-','')
+        .length
+    );
+
+  let paddedN1;
+  let paddedN2;
+
+  if(fracLen){
+
+    const p1 =
+      workingNum1.split('.');
+
+    const fracPart1 =
+      (p1[1] || '')
+        .padEnd(
+          fracLen,
+          '0'
+        );
+
+    paddedN1 =
+      p1[0]
+        .padStart(
+          intDigits,
+          '0'
+        )
+      +
+      '.'
+      +
+      fracPart1;
+
+    const p2 =
+      workingNum2.split('.');
+
+    const fracPart2 =
+      (p2[1] || '')
+        .padEnd(
+          fracLen,
+          '0'
+        );
+
+    paddedN2 =
+      p2[0]
+        .padStart(
+          intDigits,
+          '0'
+        )
+      +
+      '.'
+      +
+      fracPart2;
+
+  }
+  else{
+
+    paddedN1 =
+      workingNum1.padStart(
+        intDigits,
+        '0'
+      );
+
+    paddedN2 =
+      workingNum2.padStart(
+        intDigits,
+        '0'
+      );
+
+  }
+
+  const fifteenComp =
+    paddedN2
+      .toUpperCase()
+      .split('')
+      .map(
+        ch =>
+          ch === '.'
+            ? '.'
+            : valueToHexDigit(
+                15 -
+                hexDigitToValue(ch)
+              )
+      )
+      .join('');
+
+  const addRes =
+    addInBase(
+      paddedN1,
+      fifteenComp,
+      16
+    );
+
+  const sum15 =
+    addRes.result;
+
+  let finalStep = '';
+
+  const carry =
+    sum15.split('.')[0].length >
+    intDigits;
+
+  if(carry){
+
+    let withoutCarry;
+
+    if(sum15.includes('.')){
+
+      const p =
+        sum15.split('.');
+
+      withoutCarry =
+        p[0].slice(1)
+        +
+        '.'
+        +
+        p[1];
+
+    }
+    else{
+
+      withoutCarry =
+        sum15.slice(1);
+
+    }
+
+    const increment =
+      fracLen
+        ? (
+            '0.'
+            +
+            '0'.repeat(
+              fracLen - 1
+            )
+            +
+            '1'
+          )
+        : '1';
+
+    const finalAdd =
+      addInBase(
+        withoutCarry,
+        increment,
+        16
+      );
+
+    result =
+      finalAdd.result;
+
+    finalStep =
+`
+Step 3: D has End-around Carry? Yes
+-----------------------------------
+a) Discard the End-around Carry from D
+
+${withoutCarry}
+
+b) Find E = Add 1 to LSD of D
+
+${finalAdd.visual}
+`;
+
+  }
+  else{
+
+    const comp =
+      sum15
+        .split('')
+        .map(
+          ch =>
+            ch === '.'
+              ? '.'
+              : valueToHexDigit(
+                  15 -
+                  hexDigitToValue(ch)
+                )
+        )
+        .join('');
+
+    const fsForSum =
+      sum15.replace(
+        /[0-9A-F]/gi,
+        'F'
+      );
+
+    result =
+      /^0*\.?0*$/i.test(comp)
+        ? '0'
+        : '-' + comp;
+
+    finalStep =
+`
+Step 3: D has End-around Carry? No
+----------------------------------
+a) Find E = 15's Complement of D
+
+  ${fsForSum.split('').join(' ')}
+- ${sum15.split('').join(' ')}
+${'-'.repeat(sum15.length * 2 + 2)}
+  ${comp.split('').join(' ')}
+
+b) Add a negative sign to E
+
+${result}
+`;
+
+  }
+
+  steps =
+`${signStep}Finding ${paddedN1} - ${paddedN2} using 15's Complement →
+
+Let A = ${paddedN1}
+Let B = ${paddedN2}
+
+Step 1: Find C = 15's Complement of B
+-------------------------------------
+
+  ${paddedN2
+      .replace(/[0-9A-F]/gi,'F')
+      .split('')
+      .join(' ')}
+
+- ${paddedN2
+      .split('')
+      .join(' ')}
+
+${'-'.repeat(
+  paddedN2.length * 2 + 2
+)}
+
+  ${fifteenComp
+      .split('')
+      .join(' ')}
+
+Step 2: Find D = A + C
+----------------------
+
+${addRes.visual}
+
+${finalStep}
+
+Answer = ${result}
+`;
+
+  break;
+}
+
+
+
+
+case 'Subtraction (16s Complement)':{
+
+  let signStep = '';
+
+  let workingNum1 = num1;
+  let workingNum2 = num2;
+
+  const neg1 =
+    num1.startsWith('-');
+
+  const neg2 =
+    num2.startsWith('-');
+
+  if(neg1 && neg2){
+
+    const abs1 =
+      num1.slice(1);
+
+    const abs2 =
+      num2.slice(1);
+
+    signStep =
+`Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${abs2} - ${abs1}
+Now apply 16's Complement subtraction.
+`;
+
+    workingNum1 = abs2;
+    workingNum2 = abs1;
+
+  }
+  else if(!neg1 && neg2){
+
+    const abs2 =
+      num2.slice(1);
+
+    const add =
+      addInBase(
+        num1,
+        abs2,
+        16
+      );
+
+    result =
+      add.result;
+
+    steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - (${num2}) = ${num1} + ${abs2}
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+    break;
+
+  }
+  else if(neg1 && !neg2){
+
+    const abs1 =
+      num1.slice(1);
+
+    const add =
+      addInBase(
+        abs1,
+        num2,
+        16
+      );
+
+    result =
+      '-' + add.result;
+
+    steps =
+`Finding ${num1} - ${num2}
+
+Step 0: Simplify Signs
+----------------------
+${num1} - ${num2} = -(${abs1} + ${num2})
+
+${add.visual}
+
+Answer = ${result}
+`;
+
+    break;
+
+  }
+
+  const fracLen =
+    Math.max(
+      (workingNum1.split('.')[1] || '').length,
+      (workingNum2.split('.')[1] || '').length
+    );
+
+  const intDigits =
+    Math.max(
+      workingNum1.split('.')[0]
+        .replace('-','')
+        .length,
+      workingNum2.split('.')[0]
+        .replace('-','')
+        .length
+    );
+
+  let paddedN1;
+  let paddedN2;
+
+  if(fracLen){
+
+    const p1 =
+      workingNum1.split('.');
+
+    const fracPart1 =
+      (p1[1] || '')
+        .padEnd(
+          fracLen,
+          '0'
+        );
+
+    paddedN1 =
+      p1[0]
+        .padStart(
+          intDigits,
+          '0'
+        )
+      +
+      '.'
+      +
+      fracPart1;
+
+    const p2 =
+      workingNum2.split('.');
+
+    const fracPart2 =
+      (p2[1] || '')
+        .padEnd(
+          fracLen,
+          '0'
+        );
+
+    paddedN2 =
+      p2[0]
+        .padStart(
+          intDigits,
+          '0'
+        )
+      +
+      '.'
+      +
+      fracPart2;
+
+  }
+  else{
+
+    paddedN1 =
+      workingNum1.padStart(
+        intDigits,
+        '0'
+      );
+
+    paddedN2 =
+      workingNum2.padStart(
+        intDigits,
+        '0'
+      );
+
+  }
+
+  const fifteenComp =
+    paddedN2
+      .toUpperCase()
+      .split('')
+      .map(
+        ch =>
+          ch === '.'
+            ? '.'
+            : valueToHexDigit(
+                15 -
+                hexDigitToValue(ch)
+              )
+      )
+      .join('');
+
+  const increment =
+    fracLen
+      ? (
+          '0.' +
+          '0'.repeat(
+            fracLen - 1
+          ) +
+          '1'
+        )
+      : '1';
+
+  const sixteenCompAdd =
+    addInBase(
+      fifteenComp,
+      increment,
+      16
+    );
+
+  let sixteenComp =
+    sixteenCompAdd.result;
+
+  if(
+    sixteenComp.length >
+    paddedN2.length
+  ){
+
+    sixteenComp =
+      sixteenComp.slice(1);
+
+  }
+
+  const addRes =
+    addInBase(
+      paddedN1,
+      sixteenComp,
+      16
+    );
+
+  const sum16 =
+    addRes.result;
+
+  result = '';
+
+  let finalStep = '';
+
+  const carry =
+    addRes.result
+      .split('.')[0]
+      .length >
+    intDigits;
+
+  if(carry){
+
+    let withoutCarry;
+
+    if(sum16.includes('.')){
+
+      const parts =
+        sum16.split('.');
+
+      withoutCarry =
+        parts[0].slice(1)
+        +
+        '.'
+        +
+        parts[1];
+
+    }
+    else{
+
+      withoutCarry =
+        sum16.slice(1);
+
+    }
+
+    result =
+      withoutCarry;
+
+    finalStep =
+`
+Step 3: D has End-around Carry? Yes
+-----------------------------------
+a) Discard the End-around Carry from D
+
+${withoutCarry}
+
+b) Result is positive
+`;
+
+  }
+  else{
+
+    const fsForSum =
+      sum16.replace(
+        /[0-9A-F]/gi,
+        'F'
+      );
+
+    const comp =
+      sum16
+        .split('')
+        .map(
+          ch =>
+            ch === '.'
+              ? '.'
+              : valueToHexDigit(
+                  15 -
+                  hexDigitToValue(ch)
+                )
+        )
+        .join('');
+
+    const sixteenCompResult =
+      addInBase(
+        comp,
+        increment,
+        16
+      );
+
+    let magnitudeResult =
+      sixteenCompResult.result;
+
+    if(
+      magnitudeResult.length >
+      comp.length
+    ){
+
+      magnitudeResult =
+        magnitudeResult.slice(1);
+
+    }
+
+    result =
+      /^0*\.?0*$/i.test(
+        magnitudeResult
+      )
+        ? '0'
+        : '-' + magnitudeResult;
+
+    finalStep =
+`
+Step 3: D has End-around Carry? No
+----------------------------------
+a) Find E = 16's Complement of D
+
+  ${fsForSum
+      .split('')
+      .join(' ')}
+
+- ${sum16
+      .split('')
+      .join(' ')}
+
+${'-'.repeat(
+  sum16.length * 2 + 2
+)}
+
+  ${comp
+      .split('')
+      .join(' ')}
+
++ ${increment
+      .padStart(
+        comp.length,
+        ' '
+      )
+      .split('')
+      .join(' ')}
+
+${'-'.repeat(
+  comp.length * 2 + 2
+)}
+
+  ${magnitudeResult
+      .padStart(
+        comp.length,
+        '0'
+      )
+      .split('')
+      .join(' ')}
+
+b) Add a negative sign to E: ${result}
+`;
+
+  }
+
+  steps =
+`${signStep}Finding ${paddedN1} - ${paddedN2} using 16's Complement →
+
+Let A = ${paddedN1}
+Let B = ${paddedN2}
+
+Step 1: Find C = 16's Complement of B
+-------------------------------------
+a) Find 15's Complement of B
+
+  ${paddedN2
+      .replace(
+        /[0-9A-F]/gi,
+        'F'
+      )
+      .split('')
+      .join(' ')}
+
+- ${paddedN2
+      .split('')
+      .join(' ')}
+
+${'-'.repeat(
+  paddedN2.length * 2 + 2
+)}
+
+  ${fifteenComp
+      .split('')
+      .join(' ')}
+
+b) Add 1 to LSD
+
+${sixteenCompAdd.visual}
+
+C = ${sixteenComp}
+
+Step 2: Find D = A + C
+----------------------
+
+${addRes.visual}
+
+D = ${sum16}
+
+${finalStep}
+
+Answer = ${result}
+`;
+
+  break;
+}
+
+
+
+
+
+
+case 'Bitwise AND (&)':{
+
+  if(
+    !isIntegerHex(num1)
+    ||
+    !isIntegerHex(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Hexadecimal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer hexadecimal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    hexToSignedInt(num1);
+
+  const n2 =
+    hexToSignedInt(num2);
+
+  const resultNum =
+    n1 & n2;
+
+  const resultHex =
+    resultNum
+      .toString(16)
+      .toUpperCase();
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(
+      width,
+      '0'
+    );
+
+  const p2 =
+    b2.padStart(
+      width,
+      '0'
+    );
+
+  const p3 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(
+        width,
+        '0'
+      );
+
+  result =
+    resultHex;
+
+  steps =
+`${num1.toUpperCase()}₁₆ & ${num2.toUpperCase()}₁₆ →
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${num1.toUpperCase()}₁₆ = ${n1}₁₀
+${num2.toUpperCase()}₁₆ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise AND (&)
+-------------------------------
+  ${p1}
+& ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 4: Convert Result
+----------------------
+(${p3})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultHex})₁₆
+
+Answer = ${resultHex}₁₆
+`;
+
+  break;
+}
+
+
+
+
+case 'Bitwise OR (|)':{
+
+  if(
+    !isIntegerHex(num1)
+    ||
+    !isIntegerHex(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Hexadecimal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer hexadecimal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    hexToSignedInt(num1);
+
+  const n2 =
+    hexToSignedInt(num2);
+
+  const resultNum =
+    n1 | n2;
+
+  const resultHex =
+    resultNum
+      .toString(16)
+      .toUpperCase();
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(
+      width,
+      '0'
+    );
+
+  const p2 =
+    b2.padStart(
+      width,
+      '0'
+    );
+
+  const p3 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(
+        width,
+        '0'
+      );
+
+  result =
+    resultHex;
+
+  steps =
+`${num1.toUpperCase()}₁₆ | ${num2.toUpperCase()}₁₆ →
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${num1.toUpperCase()}₁₆ = ${n1}₁₀
+${num2.toUpperCase()}₁₆ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise OR (|)
+------------------------------
+  ${p1}
+| ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 4: Convert Result
+----------------------
+(${p3})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultHex})₁₆
+
+Answer = ${resultHex}₁₆
+`;
+
+  break;
+}
+
+
+
+case 'Bitwise XOR (^)':{
+
+  if(
+    !isIntegerHex(num1)
+    ||
+    !isIntegerHex(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Hexadecimal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer hexadecimal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    hexToSignedInt(num1);
+
+  const n2 =
+    hexToSignedInt(num2);
+
+  const resultNum =
+    n1 ^ n2;
+
+  const resultHex =
+    resultNum
+      .toString(16)
+      .toUpperCase();
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(
+      width,
+      '0'
+    );
+
+  const p2 =
+    b2.padStart(
+      width,
+      '0'
+    );
+
+  const p3 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(
+        width,
+        '0'
+      );
+
+  result =
+    resultHex;
+
+  steps =
+`${num1.toUpperCase()}₁₆ ^ ${num2.toUpperCase()}₁₆ →
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${num1.toUpperCase()}₁₆ = ${n1}₁₀
+${num2.toUpperCase()}₁₆ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise XOR (^)
+-------------------------------
+  ${p1}
+^ ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 4: Convert Result
+----------------------
+(${p3})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultHex})₁₆
+
+Answer = ${resultHex}₁₆
+`;
+
+  break;
+}
+
+
+
+case 'Bitwise XNOR':{
+
+  if(
+    !isIntegerHex(num1)
+    ||
+    !isIntegerHex(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Hexadecimal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer hexadecimal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    hexToSignedInt(num1);
+
+  const n2 =
+    hexToSignedInt(num2);
+
+  const xorResult =
+    n1 ^ n2;
+
+  const resultNum =
+    ~xorResult;
+
+  const resultHex =
+    resultNum
+      .toString(16)
+      .toUpperCase();
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(
+      width,
+      '0'
+    );
+
+  const p2 =
+    b2.padStart(
+      width,
+      '0'
+    );
+
+  const p3 =
+    (xorResult >>> 0)
+      .toString(2)
+      .padStart(
+        width,
+        '0'
+      );
+
+  const p4 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(
+        width,
+        '0'
+      );
+
+  result =
+    resultHex;
+
+  steps =
+`${num1.toUpperCase()}₁₆ XNOR ${num2.toUpperCase()}₁₆ →
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${num1.toUpperCase()}₁₆ = ${n1}₁₀
+${num2.toUpperCase()}₁₆ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise XOR (^)
+-------------------------------
+  ${p1}
+^ ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 4: Apply NOT (~)
+---------------------
+~${p3}
+${'-'.repeat(width)}
+${p4}
+
+Step 5: Convert Result
+----------------------
+(${p4})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultHex})₁₆
+
+Answer = ${resultHex}₁₆
+`;
+
+  break;
+}
+
+
+
+case 'Bitwise NAND':{
+
+  if(
+    !isIntegerHex(num1)
+    ||
+    !isIntegerHex(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Hexadecimal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer hexadecimal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    hexToSignedInt(num1);
+
+  const n2 =
+    hexToSignedInt(num2);
+
+  const andResult =
+    n1 & n2;
+
+  const resultNum =
+    ~andResult;
+
+  const resultHex =
+    resultNum
+      .toString(16)
+      .toUpperCase();
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(width,'0');
+
+  const p2 =
+    b2.padStart(width,'0');
+
+  const p3 =
+    (andResult >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  const p4 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  result =
+    resultHex;
+
+  steps =
+`${num1.toUpperCase()}₁₆ NAND ${num2.toUpperCase()}₁₆ →
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${num1.toUpperCase()}₁₆ = ${n1}₁₀
+${num2.toUpperCase()}₁₆ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise AND (&)
+-------------------------------
+  ${p1}
+& ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 4: Apply NOT (~)
+---------------------
+~${p3}
+${'-'.repeat(width)}
+${p4}
+
+Step 5: Convert Result
+----------------------
+(${p4})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultHex})₁₆
+
+Answer = ${resultHex}₁₆
+`;
+
+  break;
+
+}
+
+
+
+
+case 'Bitwise NOR':{
+
+  if(
+    !isIntegerHex(num1)
+    ||
+    !isIntegerHex(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Hexadecimal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise operations support integer hexadecimal numbers only.';
+
+    return;
+
+  }
+
+  const n1 =
+    hexToSignedInt(num1);
+
+  const n2 =
+    hexToSignedInt(num2);
+
+  const orResult =
+    n1 | n2;
+
+  const resultNum =
+    ~orResult;
+
+  const resultHex =
+    resultNum
+      .toString(16)
+      .toUpperCase();
+
+  const b1 =
+    (n1 >>> 0)
+      .toString(2);
+
+  const b2 =
+    (n2 >>> 0)
+      .toString(2);
+
+  const width =
+    Math.max(
+      b1.length,
+      b2.length
+    );
+
+  const p1 =
+    b1.padStart(width,'0');
+
+  const p2 =
+    b2.padStart(width,'0');
+
+  const p3 =
+    (orResult >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  const p4 =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(width,'0');
+
+  result =
+    resultHex;
+
+  steps =
+`${num1.toUpperCase()}₁₆ NOR ${num2.toUpperCase()}₁₆ →
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${num1.toUpperCase()}₁₆ = ${n1}₁₀
+${num2.toUpperCase()}₁₆ = ${n2}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+(${n1})₁₀ = (${p1})₂
+(${n2})₁₀ = (${p2})₂
+
+Step 3: Perform Bitwise OR (|)
+------------------------------
+  ${p1}
+| ${p2}
+${'-'.repeat(width + 2)}
+  ${p3}
+
+Step 4: Apply NOT (~)
+---------------------
+~${p3}
+${'-'.repeat(width)}
+${p4}
+
+Step 5: Convert Result
+----------------------
+(${p4})₂ = (${resultNum})₁₀
+
+(${resultNum})₁₀ = (${resultHex})₁₆
+
+Answer = ${resultHex}₁₆
+`;
+
+  break;
+
+}
+
+
+
+
+case 'Bitwise NOT (~)':{
+
+  if(
+    !isIntegerHex(num1)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Hexadecimal Only';
+
+    stepsDiv.innerHTML =
+      'Bitwise NOT supports integer hexadecimal numbers only.';
+
+    return;
+
+  }
+
+  const n =
+    hexToSignedInt(num1);
+
+  const resultNum =
+    ~n;
+
+  const resultHex =
+    resultNum
+      .toString(16)
+      .toUpperCase();
+
+  const binary =
+    (n >>> 0)
+      .toString(2)
+      .padStart(32,'0');
+
+  let complement = '';
+
+  for(let bit of binary){
+
+    complement +=
+      bit === '0'
+        ? '1'
+        : '0';
+
+  }
+
+  const formulaResult =
+    -(n + 1);
+
+  result =
+    resultHex;
+
+  steps =
+`Bitwise NOT (~)
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${num1.toUpperCase()}₁₆ = ${n}₁₀
+
+Step 2: Convert Decimal to Binary
+---------------------------------
+${binary}
+
+Step 3: Flip every bit
+----------------------
+${binary}
+${'-'.repeat(32)}
+${complement}
+
+Step 4: Interpret Result as Signed Integer
+------------------------------------------
+~${n} = -( ${n} + 1 ) = ${formulaResult}
+
+Step 5: Convert Result to Hexadecimal
+-------------------------------------
+${resultNum}₁₀ = ${resultHex}₁₆
+
+Answer = ${resultHex}₁₆
+`;
+
+  break;
+
+}
+
+
+
+case 'Zero Fill Right Shift (>>>)':{
+
+  if(
+    !isIntegerHex(num1)
+    ||
+    !isIntegerHex(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Hexadecimal Only';
+
+    stepsDiv.innerHTML =
+      'Shift operations support integer hexadecimal numbers only.';
+
+    return;
+
+  }
+
+  if(num2.startsWith('-')){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be a Non-Negative Integer';
+
+    return;
+
+  }
+
+  const n =
+    hexToSignedInt(num1);
+
+  const shift =
+    hexToSignedInt(num2);
+
+  const binary32 =
+    (n >>> 0)
+      .toString(2)
+      .padStart(32,'0');
+
+  const resultNum =
+    n >>> shift;
+
+  const shiftedBinary =
+    resultNum
+      .toString(2)
+      .padStart(32,'0');
+
+  const resultHex =
+    resultNum
+      .toString(16)
+      .toUpperCase();
+
+  result =
+    resultHex;
+
+  steps =
+`${num1.toUpperCase()}₁₆ >>> ${num2.toUpperCase()}₁₆ →
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${num1.toUpperCase()}₁₆ = ${n}₁₀
+${num2.toUpperCase()}₁₆ = ${shift}₁₀
+
+Step 2: Find 32-bit Binary Code
+-------------------------------
+(${n})₁₀ = (${binary32})₂
+
+Step 3: Zero Fill Right Shift
+-----------------------------
+${binary32}
+↓ ${shift} positions
+${shiftedBinary}
+
+(Vacant bits are filled with 0)
+
+Step 4: Convert Result
+----------------------
+${resultNum}₁₀ = ${resultHex}₁₆
+
+Answer = ${resultHex}₁₆`;
+
+  break;
+
+}
+
+
+
+
+case 'Right Shift (>>)':{
+
+  if(
+    !isIntegerHex(num1)
+    ||
+    !isIntegerHex(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Hexadecimal Only';
+
+    stepsDiv.innerHTML =
+      'Shift operations support integer hexadecimal numbers only.';
+
+    return;
+
+  }
+
+  if(num2.startsWith('-')){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be a Non-Negative Integer';
+
+    return;
+
+  }
+
+  const n =
+    hexToSignedInt(num1);
+
+  const shift =
+    hexToSignedInt(num2);
+
+  const binary32 =
+    (n >>> 0)
+      .toString(2)
+      .padStart(32,'0');
+
+  let shiftedBinary;
+  let resultNum;
+
+  if(shift >= 32){
+
+    if(n < 0){
+
+      shiftedBinary =
+        '1'.repeat(32);
+
+      resultNum = -1;
+
+    }
+    else{
+
+      shiftedBinary =
+        '0'.repeat(32);
+
+      resultNum = 0;
+
+    }
+
+  }
+  else{
+
+    resultNum =
+      n >> shift;
+
+    shiftedBinary =
+      (resultNum >>> 0)
+        .toString(2)
+        .padStart(32,'0');
+
+  }
+
+  const resultHex =
+    resultNum
+      .toString(16)
+      .toUpperCase();
+
+  result =
+    resultHex;
+
+  steps =
+`${num1.toUpperCase()}₁₆ >> ${num2.toUpperCase()}₁₆ →
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${num1.toUpperCase()}₁₆ = ${n}₁₀
+${num2.toUpperCase()}₁₆ = ${shift}₁₀
+
+Step 2: Find 32-bit Binary Code
+-------------------------------
+(${n})₁₀ = (${binary32})₂
+
+Step 3: Arithmetic Right Shift
+------------------------------
+${binary32}
+↓ ${shift} positions
+${shiftedBinary}
+
+(Sign bit is preserved)
+
+Step 4: Convert Result
+----------------------
+${resultNum}₁₀ = ${resultHex}₁₆
+
+Answer = ${resultHex}₁₆`;
+
+  break;
+
+}
+
+
+
+case 'Left Shift (<<)':{
+
+  if(
+    !isIntegerHex(num1)
+    ||
+    !isIntegerHex(num2)
+  ){
+
+    resultDiv.innerHTML =
+      '❌ Integer Hexadecimal Only';
+
+    stepsDiv.innerHTML =
+      'Shift operations support integer hexadecimal numbers only.';
+
+    return;
+
+  }
+
+  if(num2.startsWith('-')){
+
+    resultDiv.innerHTML =
+      '❌ Shift Count Must Be a Non-Negative Integer';
+
+    return;
+
+  }
+
+  const n =
+    hexToSignedInt(num1);
+
+  const shift =
+    hexToSignedInt(num2);
+
+  const binary32 =
+    (n >>> 0)
+      .toString(2)
+      .padStart(32,'0');
+
+  const resultNum =
+    n << shift;
+
+  const shiftedBinary =
+    (resultNum >>> 0)
+      .toString(2)
+      .padStart(32,'0');
+
+  const resultHex =
+    resultNum
+      .toString(16)
+      .toUpperCase();
+
+  result =
+    resultHex;
+
+  steps =
+`${num1.toUpperCase()}₁₆ << ${num2.toUpperCase()}₁₆ →
+
+Step 1: Convert Hexadecimal to Decimal
+--------------------------------------
+${num1.toUpperCase()}₁₆ = ${n}₁₀
+${num2.toUpperCase()}₁₆ = ${shift}₁₀
+
+Step 2: Find 32-bit Binary Code
+-------------------------------
+(${n})₁₀ = (${binary32})₂
+
+Step 3: Left Shift
+------------------
+${binary32}
+↓ ${shift} positions
+${shiftedBinary}
+
+(Vacant bits are filled with 0)
+
+Step 4: Convert Result
+----------------------
+${resultNum}₁₀ = ${resultHex}₁₆
+
+Answer = ${resultHex}₁₆`;
+
+  break;
+
+}
+
+
+
+
+  }
+
+  resultDiv.innerHTML =
+    `Answer: ${result}`;
+
+  stepsDiv.textContent =
+    steps;
+
+}
 
 //#endregion
