@@ -12,13 +12,13 @@ const GCC_COMPAT = `
 
 char *gets(char *s)
 {
-    putchar('\n');
+    putchar('\\n');
     fflush(stdout);
 
     char *r = fgets(s, 1000, stdin);
 
     if (r)
-        s[strcspn(s, "\n")] = '\0';
+        s[strcspn(s, "\\n")] = '\\0';
 
     return r;
 }
