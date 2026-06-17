@@ -1,4 +1,56 @@
 // cc-runner.js — C & C++ runner with CORS + WebSocket (hardened)
+
+
+const GCC_COMPAT = `
+#include <ctype.h>
+#include <string.h>
+#include <strings.h>
+
+#define strcmpi strcasecmp
+
+char *strupr(char *s)
+{
+    char *p=s;
+    while(*p)
+    {
+        *p=toupper((unsigned char)*p);
+        p++;
+    }
+    return s;
+}
+
+char *strlwr(char *s)
+{
+    char *p=s;
+    while(*p)
+    {
+        *p=tolower((unsigned char)*p);
+        p++;
+    }
+    return s;
+}
+
+char *strrev(char *s)
+{
+    int i=0;
+    int j=strlen(s)-1;
+
+    while(i<j)
+    {
+        char t=s[i];
+        s[i]=s[j];
+        s[j]=t;
+        i++;
+        j--;
+    }
+    return s;
+}
+`;
+
+
+
+
+
 import express from "express";
 import cors from "cors";
 import { WebSocketServer } from "ws";
@@ -169,7 +221,17 @@ app.post("/api/cc/prepare", async (req, res) => {
       if (!f?.path || typeof f.content !== "string") throw new Error("Bad file");
       const full = safeJoin(dir, f.path);
       await ensureDir(path.dirname(full));
-      await fs.writeFile(full, f.content, "utf8");
+      let source = f.content;
+
+if (/\.c$/i.test(f.path)) {
+  source = GCC_COMPAT + "\n\n" + source;
+}
+
+await fs.writeFile(
+  full,
+  source,
+  "utf8"
+);
     }));
 
     // Decide compiler/flags
