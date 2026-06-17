@@ -234,13 +234,6 @@ if (/\.c$/i.test(f.path)) {
   source = GCC_COMPAT + "\n\n" + source;
 }
 
-
-
-console.log("=== GENERATED SOURCE ===");
-console.log(source);
-console.log("========================");
-
-
 await fs.writeFile(
   full,
   source,

@@ -10,6 +10,9 @@ export function clearTerminal(full=false){ if(!term) return; if(full) term.reset
 export function attachInput(ws){
   if(!term) initTerminal();
   detachInput();
+
+  term.focus();
+  
   inputDisposable=term.onData(data=>ws.send(JSON.stringify({ type:'stdin', data })));
 }
 export function detachInput(){ if(inputDisposable){ try{ inputDisposable.dispose(); }catch{} inputDisposable=null; } }
