@@ -44,7 +44,7 @@
 
     padding:14px 18px;
 
-    border-radius:2px;
+    border-radius:1px;
     border:none;
 
     cursor:pointer;
@@ -87,7 +87,7 @@
       
       .ns-card{
         background:var(--panel);
-        border-radius:14px;
+        border-radius:1px;
         padding:18px;
         border:1px solid var(--border);
       }
@@ -112,7 +112,7 @@
       .ns-input-group select{
         width:100%;
         padding:12px;
-        border-radius:10px;
+        border-radius:1px;
         border:1px solid var(--border);
         background:var(--panel2);
         color:var(--text);
@@ -122,7 +122,7 @@
         width:100%;
         padding:14px;
         border:none;
-        border-radius:12px;
+        border-radius:1px;
         background:#38bdf8;
         color:#000;
         font-weight:700;
@@ -132,7 +132,7 @@
       .ns-output{
         min-height:320px;
         background:#020617;
-        border-radius:12px;
+        border-radius:1px;
         padding:18px;
         overflow:auto;
       }
@@ -162,7 +162,7 @@
 
       .topic-item{
         padding:12px;
-        border-radius:10px;
+        border-radius:1px;
         background:var(--panel2);
         border:1px solid var(--border);
       }
@@ -322,7 +322,7 @@
 
   border:none;
 
-  border-radius:12px;
+  border-radius:1px;
 
   background:#1e293b;
 
@@ -334,52 +334,16 @@
 
   font-weight:600;
 
-  transition:all .25s ease;
 
 }
 
 .mode-selector .mode-btn:hover{
 
   background:#334155;
-
-  transform:translateY(-2px);
-
-}
-
-.mode-selector .mode-btn.active{
-
-  background:#38bdf8;
-
-  color:#000;
-
-  box-shadow:
-    0 0 15px rgba(56,189,248,.35);
-
-}
-
-.mode-selector .mode-btn:active{
-
-  transform:translateY(1px);
-
 }
 
 
-.mode-selector .mode-btn.active{
 
-  background:
-    linear-gradient(
-      135deg,
-      #38bdf8,
-      #0ea5e9
-    );
-
-  color:white;
-
-  box-shadow:
-    0 4px 16px
-    rgba(56,189,248,.35);
-
-}
     
   #globalResult{
 
@@ -434,7 +398,7 @@
 
   margin-bottom:18px;
 
-  border-radius:12px;
+  border-radius:1px;
 
   background:#1e293b;
 
@@ -463,8 +427,7 @@
       margin-bottom:14px;
 
       border:none;
-      border-radius:12px;
-
+      border-radius:1px;
       background:#374151;
 
       color:#fff;
@@ -553,7 +516,7 @@
   border:none;
   outline:none;
 
-  border-radius:12px;
+  border-radius:1px;
 
   background:#000;
 
@@ -579,7 +542,7 @@
 
   border:none;
 
-  border-radius:12px;
+  border-radius:1px;
 
   background:#172554;
 
@@ -599,16 +562,371 @@
 
 }
 
-.mode-btn.active{
+
+
+
+
+
+.quick-result{
+
+  margin-top:20px;
+
+}
+
+.quick-result label{
+
+  display:block;
+
+  margin-bottom:8px;
+
+  font-weight:700;
+
+  color:#38bdf8;
+
+}
+
+.quick-result textarea{
+
+  width:100%;
+
+  min-height:80px;
+
+  max-height:120px;
+
+  resize:none;
+
+  overflow:auto;
+
+  border:none;
+
+  border-radius:1px;
+
+  background:#000;
+
+  color:#00ff66;
+
+  font-size:24px;
+
+  font-weight:700;
+
+  font-family:monospace;
+
+  text-align:center;
+
+  padding:15px;
+
+}
+
+.mode-selector{
+
+  width:100%;
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  gap:16px;
+
+  margin:10px auto;
+
+}
+
+
+
+
+#globalResult{
+
+  width:100%;
+
+  height:70px;
+
+  background:#000;
+
+  color:#fff;
+
+  border:none;
+
+  border-radius:1px;
+
+  font-size:28px;
+
+  text-align:center;
+
+  font-weight:700;
+
+}
+
+
+@media (max-width:900px){
+
+  .ns-content{
+    min-height:auto !important;
+    height:auto !important;
+  }
+
+  .tab-content{
+    min-height:auto !important;
+  }
+
+  .pane-body{
+    min-height:auto !important;
+  }
+
+}
+
+
+
+
+#globalSteps{
+
+  padding:24px;
+
+  margin:12px;
+
+  border-radius:1px;
+
+  background:#020617;
+
+  border:1px solid #1e293b;
+
+  box-sizing:border-box;
+
+  overflow:auto;
+
+  white-space:pre-wrap;
+
+  line-height:1.8;
+
+  font-size:18px;
+
+  font-family:Consolas, Monaco, monospace;
+
+}
+
+
+@media(max-width:900px){
+
+  #globalSteps{
+
+    padding:16px;
+
+    margin:8px;
+
+    font-size:16px;
+
+  }
+
+}
+
+
+#globalResult{
+
+  width:calc(100% - 24px);
+
+  margin:12px;
+
+  height:100px;
+
+  padding:20px;
+
+  box-sizing:border-box;
+
+  border-radius:1px;
+
+  border:1px solid #1e293b;
+
+  background:#020617;
+
+  color:#ffffff;
+
+  font-size:30px;
+
+  font-weight:700;
+
+  text-align:center;
+
+  outline:none;
+
+}
+
+#globalSteps{
+
+  white-space:pre;
+
+  overflow:auto;
+
+  word-wrap:normal;
+
+  overflow-wrap:normal;
+
+}
+
+.base-banner{
+
+  background:
+    linear-gradient(
+      to bottom,
+      #242830,
+      #111418,
+      #050607
+    );
+
+  border:1px solid #444c56;
+
+  color:#ffffff;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 6px 15px rgba(0,0,0,.5);
+
+}
+
+
+
+.mode-selector .mode-btn.active{
 
   background:#ffffff;
 
-  color:#000000;
+  color:#000000 !important;
+
+  box-shadow:none;
+
+  border:1px solid #d1d5db;
+
+
+}
+
+.mode-selector .mode-btn{
+
+  transition:
+    background .25s ease,
+    color .25s ease;
+
+}
+
+.mode-selector .mode-btn:hover{
+
+  background:#334155;
+
+  transform:none;
+
+}
+
+.mode-selector .mode-btn:active{
+
+  transform:none;
+
+}
+
+
+
+.error-modal{
+
+  display:none;
+
+  position:fixed;
+
+  inset:0;
+
+  background:rgba(0,0,0,.75);
+
+  z-index:9999;
+
+  align-items:center;
+
+  justify-content:center;
+
+}
+
+.error-box{
+
+  width:90%;
+
+  max-width:420px;
+
+  background:#111827;
+
+  border:1px solid #374151;
+
+  padding:24px;
+
+  text-align:center;
+
+  color:#fff;
 
   box-shadow:
-    0 0 12px rgba(255,255,255,.7),
-    0 0 25px rgba(255,255,255,.4);
+    0 10px 30px rgba(0,0,0,.6);
 
+}
+
+.error-title{
+
+  font-size:22px;
+
+  font-weight:700;
+
+  margin-bottom:16px;
+
+  color:#ef4444;
+
+}
+
+#errorMessage{
+
+  margin-bottom:20px;
+
+  line-height:1.6;
+
+}
+
+.error-box button{
+
+  padding:10px 24px;
+
+  border:none;
+
+  background:#ef4444;
+
+  color:#fff;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+}
+
+
+.panel.right{
+  display:flex;
+  flex-direction:column;
+}
+
+.panel.right .pane-scroll{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+.panel.right .pane-body{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+#globalSteps{
+  flex:1;
+  height:100%;
+  min-height:0;
+
+  padding:24px;
+  margin:12px;
+
+  background:#020617;
+  border:1px solid #1e293b;
+
+  overflow:auto;
 }
     </style>
   </head>
@@ -768,22 +1086,29 @@
 </div>
 
 
-      <label>
-        <input type="radio"
-              name="binaryMode"
-              checked
-              onclick="toggleBinaryMode('conversion')">
+       <div class="mode-selector">
 
-        Representations
-      </label>
+  <button
+    type="button"
+    class="mode-btn active"
+    id="binaryConversionBtn"
+    onclick="toggleBinaryMode('conversion')">
 
-      <label>
-        <input type="radio"
-              name="binaryMode"
-              onclick="toggleBinaryMode('arithmetic')">
+    Representations
 
-        Operations
-      </label>
+  </button>
+
+  <button
+    type="button"
+    class="mode-btn"
+    id="binaryArithmeticBtn"
+    onclick="toggleBinaryMode('arithmetic')">
+
+    Operations
+
+  </button>
+
+</div>
 
     </div>
 
@@ -846,12 +1171,18 @@
 
       </div>
 
-      <button class="ns-btn"
-              onclick="findBinaryConversion()">
+     <button
+  class="ns-btn"
+  data-mode="find"
+  onclick="
+    toggleFindReset(
+      this,
+      findBinaryConversion
+    )">
 
-        Find
+  Find
 
-      </button>
+</button>
 
     </div>
 
@@ -918,12 +1249,18 @@
 
       </div>
 
-      <button class="ns-btn"
-              onclick="findBinaryArithmetic()">
+      <button
+  class="ns-btn"
+  data-mode="find"
+  onclick="
+    toggleFindReset(
+      this,
+      findBinaryArithmetic
+    )">
 
-        Find
+  Find
 
-      </button>
+</button>
 
     </div>
 
@@ -970,22 +1307,29 @@
   Decimal Number System (Base 10)
 
 </div>
-      <label>
-        <input type="radio"
-              name="decimalMode"
-              checked
-              onclick="toggleDecimalMode('conversion')">
+      <div class="mode-selector">
 
-        Representations
-      </label>
+  <button
+    type="button"
+    class="mode-btn active"
+    id="decimalConversionBtn"
+    onclick="toggleDecimalMode('conversion')">
 
-      <label>
-        <input type="radio"
-              name="decimalMode"
-              onclick="toggleDecimalMode('arithmetic')">
+    Representations
 
-        Operations
-      </label>
+  </button>
+
+  <button
+    type="button"
+    class="mode-btn"
+    id="decimalArithmeticBtn"
+    onclick="toggleDecimalMode('arithmetic')">
+
+    Operations
+
+  </button>
+
+</div>
 
     </div>
 
@@ -1048,12 +1392,18 @@
 
       </div>
 
-      <button class="ns-btn"
-              onclick="findDecimalConversion()">
+       <button
+  class="ns-btn"
+  data-mode="find"
+  onclick="
+    toggleFindReset(
+      this,
+      findDecimalConversion
+    )">
 
-        Find
+  Find
 
-      </button>
+</button>
 
     </div>
 
@@ -1120,12 +1470,18 @@
 
       </div>
 
-      <button class="ns-btn"
-              onclick="findDecimalArithmetic()">
+      <button
+  class="ns-btn"
+  data-mode="find"
+  onclick="
+    toggleFindReset(
+      this,
+      findDecimalArithmetic
+    )">
 
-        Find
+  Find
 
-      </button>
+</button>
 
     </div>
 
@@ -1159,22 +1515,29 @@
   Octal Number System (Base 8)
 
 </div>
-      <label>
-        <input type="radio"
-              name="octalMode"
-              checked
-              onclick="toggleOctalMode('conversion')">
+      <div class="mode-selector">
 
-        Representations
-      </label>
+  <button
+    type="button"
+    class="mode-btn active"
+    id="octalConversionBtn"
+    onclick="toggleOctalMode('conversion')">
 
-      <label>
-        <input type="radio"
-              name="octalMode"
-              onclick="toggleOctalMode('arithmetic')">
+    Representations
 
-        Operations
-      </label>
+  </button>
+
+  <button
+    type="button"
+    class="mode-btn"
+    id="octalArithmeticBtn"
+    onclick="toggleOctalMode('arithmetic')">
+
+    Operations
+
+  </button>
+
+</div>
 
     </div>
 
@@ -1237,12 +1600,18 @@
 
       </div>
 
-      <button class="ns-btn"
-              onclick="findOctalConversion()">
+     <button
+  class="ns-btn"
+  data-mode="find"
+  onclick="
+    toggleFindReset(
+      this,
+      findOctalConversion
+    )">
 
-        Find
+  Find
 
-      </button>
+</button>
 
     </div>
 
@@ -1309,12 +1678,18 @@
 
       </div>
 
-      <button class="ns-btn"
-              onclick="findOctalArithmetic()">
+      <button
+  class="ns-btn"
+  data-mode="find"
+  onclick="
+    toggleFindReset(
+      this,
+      findOctalArithmetic
+    )">
 
-        Find
+  Find
 
-      </button>
+</button>
 
     </div>
 
@@ -1430,12 +1805,18 @@
 
       </div>
 
-      <button class="ns-btn"
-              onclick="findHexConversion()">
+      <button
+  class="ns-btn"
+  data-mode="find"
+  onclick="
+    toggleFindReset(
+      this,
+      findHexConversion
+    )">
 
-        Find
+  Find
 
-      </button>
+</button>
 
     </div>
 
@@ -1502,12 +1883,18 @@
 
       </div>
 
-      <button class="ns-btn"
-              onclick="findHexArithmetic()">
+      <button
+  class="ns-btn"
+  data-mode="find"
+  onclick="
+    toggleFindReset(
+      this,
+      findHexArithmetic
+    )">
 
-        Find
+  Find
 
-      </button>
+</button>
 
     </div>
 
@@ -2070,7 +2457,7 @@
                           background:#111827;
                           color:#fff;
                           border:1px solid var(--border);
-                          border-radius:10px;
+                          border-radius:1px;
                           padding:12px;
                           font-family:monospace;">
 
@@ -2143,7 +2530,21 @@
     <!-- RIGHT PANEL -->
     <!-- ===================================== -->
 
+
     <section class="panel right">
+
+      <div class="pane-head">
+        <strong>💡 Answer</strong>
+      </div>
+  <div class="answer-box">
+
+    <input
+      id="globalResult"
+      readonly
+      value="">
+
+  </div>
+
 
       <div class="pane-head">
         <strong>📖 Explanation</strong>
@@ -2156,15 +2557,7 @@
 
 
 
-          <div class="ns-output global-output">
-
-   <textarea
-  id="globalResult"
-  readonly>
-
-Ready
-
-</textarea>
+        
 
     <div class="ns-steps"
         id="globalSteps">
@@ -2185,6 +2578,9 @@ Ready
     </section>
 
   </div>
+
+
+
 
   </main>
 
@@ -2233,6 +2629,27 @@ Ready
     </div>
 
   </footer>
+
+    <div id="errorModal" class="error-modal">
+
+  <div class="error-box">
+
+    <div class="error-title">
+      ⚠ Invalid Input
+    </div>
+
+    <div id="errorMessage">
+    </div>
+
+    <button onclick="closeError()">
+      OK
+    </button>
+
+  </div>
+
+</div>
+
+
 
   <script src="./js/number-system.js"></script>
 

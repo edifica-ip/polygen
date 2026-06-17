@@ -28,6 +28,18 @@ tabButtons.forEach(btn => {
 
   btn.addEventListener('click', () => {
 
+
+     resetAllFindButtons();
+
+  document.getElementById(
+    'globalResult'
+  ).value = '';
+
+  document.getElementById(
+    'globalSteps'
+  ).textContent = '';
+
+
     document.getElementById(
   'globalResult'
 ).innerHTML = '';
@@ -950,10 +962,9 @@ stepsDiv.innerHTML =
 
   catch(err){
 
-    resultDiv.innerHTML =
-      "❌ Invalid Input";
+        showError("Invalid Input");
+    return false;
 
-    stepsDiv.innerHTML = "";
 
   }
 
@@ -4653,6 +4664,7 @@ if(
 
 function toggleBinaryMode(mode){
 
+  resetAllFindButtons();
   const conversion =
     document.getElementById(
       'binaryConversionGroup'
@@ -4663,6 +4675,17 @@ function toggleBinaryMode(mode){
       'binaryArithmeticGroup'
     );
 
+    const conversionBtn =
+    document.getElementById(
+      'binaryConversionBtn'
+    );
+
+  const arithmeticBtn =
+    document.getElementById(
+      'binaryArithmeticBtn'
+    );
+
+
   if(mode === 'conversion'){
 
     conversion.style.display =
@@ -4670,6 +4693,15 @@ function toggleBinaryMode(mode){
 
     arithmetic.style.display =
       'none';
+
+        conversionBtn.classList.add(
+      'active'
+    );
+
+    arithmeticBtn.classList.remove(
+      'active'
+    );
+
 
     document
       .getElementById(
@@ -4687,6 +4719,16 @@ function toggleBinaryMode(mode){
     arithmetic.style.display =
       'block';
 
+
+        arithmeticBtn.classList.add(
+      'active'
+    );
+
+    conversionBtn.classList.remove(
+      'active'
+    );
+
+
     document
       .getElementById(
         'binaryNum1'
@@ -4699,7 +4741,7 @@ function toggleBinaryMode(mode){
 
 
 function toggleOctalMode(mode){
-
+resetAllFindButtons();
   const conversion =
     document.getElementById(
       'octalConversionGroup'
@@ -4710,6 +4752,19 @@ function toggleOctalMode(mode){
       'octalArithmeticGroup'
     );
 
+
+    
+  const conversionBtn =
+    document.getElementById(
+      'octalConversionBtn'
+    );
+
+  const arithmeticBtn =
+    document.getElementById(
+      'octalArithmeticBtn'
+    );
+
+
   if(mode === 'conversion'){
 
     conversion.style.display =
@@ -4717,6 +4772,14 @@ function toggleOctalMode(mode){
 
     arithmetic.style.display =
       'none';
+
+      conversionBtn.classList.add(
+      'active'
+    );
+
+    arithmeticBtn.classList.remove(
+      'active'
+    );
 
     document
       .getElementById(
@@ -4734,6 +4797,14 @@ function toggleOctalMode(mode){
     arithmetic.style.display =
       'block';
 
+       arithmeticBtn.classList.add(
+      'active'
+    );
+
+    conversionBtn.classList.remove(
+      'active'
+    );
+
     document
       .getElementById(
         'octalNum1'
@@ -4746,6 +4817,8 @@ function toggleOctalMode(mode){
 
 function toggleHexMode(mode){
 
+
+  resetAllFindButtons();
   const conversion =
     document.getElementById(
       'hexConversionGroup'
@@ -4818,6 +4891,7 @@ function toggleHexMode(mode){
 
 function toggleDecimalMode(mode){
 
+  resetAllFindButtons();
   const conversion =
     document.getElementById(
       'decimalConversionGroup'
@@ -4827,6 +4901,17 @@ function toggleDecimalMode(mode){
     document.getElementById(
       'decimalArithmeticGroup'
     );
+ const conversionBtn =
+    document.getElementById(
+      'decimalConversionBtn'
+    );
+
+  const arithmeticBtn =
+    document.getElementById(
+      'decimalArithmeticBtn'
+    );
+
+
 
   if(mode === 'conversion'){
 
@@ -4835,6 +4920,16 @@ function toggleDecimalMode(mode){
 
     arithmetic.style.display =
       'none';
+
+        conversionBtn.classList.add(
+      'active'
+    );
+
+    arithmeticBtn.classList.remove(
+      'active'
+    );
+
+
 document
     .getElementById('decimalConvertInput')
     .focus();
@@ -4847,6 +4942,14 @@ document
 
     arithmetic.style.display =
       'block';
+
+         arithmeticBtn.classList.add(
+      'active'
+    );
+
+    conversionBtn.classList.remove(
+      'active'
+    );
 
       document
     .getElementById('decimalNum1')
@@ -5099,12 +5202,10 @@ function findBinaryConversion(){
 
   if(!isBinaryNumber(value)){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Binary Number';
-
-    stepsDiv.innerHTML = '';
-
-    return;
+    showError(
+    'Please enter a valid Binary Number.'
+  );
+    return false;
 
   }
 
@@ -6270,11 +6371,14 @@ ${result}`;
 }
   }
 
-  resultDiv.innerHTML =
-    `Answer: ${result}`;
+  resultDiv.value =
+    `${result}`;
 
   stepsDiv.textContent =
     steps;
+
+
+    return true;
 }
 
 function binaryToTwosComplement(
@@ -6539,12 +6643,9 @@ if(
 
   if(!isBinaryNumber(num1)){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Binary Number';
+    showError('Invalid Binary Number');
 
-    stepsDiv.innerHTML = '';
-
-    return;
+    return false;
 
   }
 
@@ -6553,12 +6654,8 @@ else{
 
   if(!isBinaryNumber(num1)){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Binary Number';
-
-    stepsDiv.innerHTML = '';
-
-    return;
+    showError('Invalid Binary Number');
+   return false;
 
   }
 
@@ -6582,12 +6679,9 @@ else{
 
     if(!isDecimalNumber(num2)){
 
-      resultDiv.innerHTML =
-        '❌ Invalid Shift Count';
+     showError('Invalid Shift Count');
 
-      stepsDiv.innerHTML = '';
-
-      return;
+      return false;
 
     }
 
@@ -6596,12 +6690,11 @@ else{
 
     if(!isBinaryNumber(num2)){
 
-      resultDiv.innerHTML =
-        '❌ Invalid Binary Number';
+      showError('Invalid Binary Number');
 
       stepsDiv.innerHTML = '';
 
-      return;
+      return false;
 
     }
 
@@ -7533,12 +7626,8 @@ case 'Bitwise NOT (~)':{
     !isBinaryNumber(num1)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Binary Number';
-
-    stepsDiv.innerHTML = '';
-
-    return;
+    showError(' Invalid Binary Number');
+return false;
 
   }
 
@@ -7610,10 +7699,9 @@ case 'Left Shift (<<)':{
 
   if(!isIntegerNumber(num2) || num2.startsWith('-')){
 
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
+    showError(' Shift Count Must Be a Non-Negative Integer');
 
-    return;
+    return false;
 
   }
 
@@ -7670,10 +7758,9 @@ case 'Right Shift (>>)':{
 
   if(!isIntegerNumber(num2) || num2.startsWith('-')){
 
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
+    showError(' Shift Count Must Be a Non-Negative Integer');
 
-    return;
+    return false;
 
   }
 
@@ -7766,10 +7853,9 @@ case 'Zero Fill Right Shift (>>>)':{
 
   if(!isIntegerNumber(num2) || num2.startsWith('-')){
 
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
+    showError('Shift Count Must Be a Non-Negative Integer');
 
-    return;
+    return false;
 
   }
 
@@ -8531,8 +8617,8 @@ Answer = ${result}
 
   }
 
-  resultDiv.innerHTML =
-    `Answer: ${result}`;
+  resultDiv.value =
+    `${result}`;
 
   stepsDiv.textContent =
     steps;
@@ -8582,12 +8668,11 @@ function findDecimalConversion(){
 
   if(!isDecimalNumber(value)){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Decimal Number';
+    showError(' Invalid Decimal Number');
 
     stepsDiv.innerHTML = '';
 
-    return;
+    return false;
 
   }
 
@@ -9178,12 +9263,11 @@ break;
 
   if(!isDecimalNumber(value)){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Decimal Number';
+   showError(' Invalid Decimal Number');
 
     stepsDiv.innerHTML = '';
 
-    return;
+    return false;
 
   }
 
@@ -9754,8 +9838,8 @@ Unlike IEEE Floating Point, the radix point never moves.
 }
   }
 
-  resultDiv.innerHTML =
-    `Answer: ${result}`;
+  resultDiv.value =
+    `${result}`;
 
   stepsDiv.textContent =
     steps;
@@ -9804,12 +9888,11 @@ else{
     !isDecimalNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Decimal Number';
+    showError(' Invalid Decimal Number');
 
     stepsDiv.innerHTML = '';
 
-    return;
+    return false;
 
   }}
 
@@ -10193,12 +10276,11 @@ case 'Subtraction (91s Complement)':{
     !isDecimalNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Decimal Number';
+    showError(' Invalid Decimal Number');
 
     stepsDiv.innerHTML = '';
 
-    return;
+    return false;
 
   }
 
@@ -10208,13 +10290,9 @@ case 'Subtraction (91s Complement)':{
   num2.startsWith('-')
 ){
 
-  resultDiv.innerHTML =
-    '❌ Positive numbers only';
+  showError("9's Complement subtraction supports positive numbers only. Please enter positive numbers only");
 
-  stepsDiv.innerHTML =
-    "9's Complement subtraction supports positive numbers only.";
-
-  return;
+  return false;
 
 }
 
@@ -10460,12 +10538,11 @@ case 'Subtraction (9s Complement)':{
     !isDecimalNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Decimal Number';
+    showError(' Invalid Decimal Number');
 
     stepsDiv.innerHTML = '';
 
-    return;
+    return false;
 
   }
 
@@ -10844,12 +10921,11 @@ case 'Subtraction (100s Complement)':{
     !isDecimalNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Decimal Number';
+    showError(' Invalid Decimal Number');
 
     stepsDiv.innerHTML = '';
 
-    return;
+    return false;
 
   }
 
@@ -10859,13 +10935,9 @@ case 'Subtraction (100s Complement)':{
   num2.startsWith('-')
 ){
 
-  resultDiv.innerHTML =
-    '❌ Positive numbers only';
+      showError("10s complement supports positive numbers only. Please provide correct input");
+    return false;
 
-  stepsDiv.innerHTML =
-    "10's Complement subtraction supports positive numbers only.";
-
-  return;
 
 }
 
@@ -11134,12 +11206,11 @@ case 'Subtraction (10s Complement)':{
     !isDecimalNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Decimal Number';
+    showError(' Invalid Decimal Number');
 
     stepsDiv.innerHTML = '';
 
-    return;
+    return false;
 
   }
 
@@ -11557,13 +11628,9 @@ Answer = ${result}
     !isIntegerNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Only';
+        showError("Bitwise operations support integer numbers only. Please provide correct input!");
+    return false;
 
-    stepsDiv.innerHTML =
-      'Bitwise NAND supports integers only.';
-
-    return;
 
   }
 
@@ -11611,13 +11678,8 @@ case 'Bitwise NOR':{
     !isIntegerNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Only';
-
-    stepsDiv.innerHTML =
-      'Bitwise NOR supports integers only.';
-
-    return;
+   showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
@@ -11664,13 +11726,8 @@ case 'Bitwise XNOR':{
     !isIntegerNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Only';
-
-    stepsDiv.innerHTML =
-      'Bitwise XNOR supports integers only.';
-
-    return;
+    showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
@@ -11715,13 +11772,8 @@ case 'Bitwise NOT (~)':{
     !isIntegerNumber(num1)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Only';
-
-    stepsDiv.innerHTML =
-      'Bitwise NOT supports integers only.';
-
-    return;
+    showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
@@ -11791,13 +11843,8 @@ case 'Bitwise XOR (^)':{
   !isIntegerNumber(num2)
 ){
 
-  resultDiv.innerHTML =
-    '❌ Integer Only';
-
-  stepsDiv.innerHTML =
-    'Bitwise operations support integers only.';
-
-  return;
+  showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
 }
   const n1 =
@@ -11874,13 +11921,8 @@ case 'Bitwise OR (|)':{
   !isIntegerNumber(num2)
 ){
 
-  resultDiv.innerHTML =
-    '❌ Integer Only';
-
-  stepsDiv.innerHTML =
-    'Bitwise operations support integers only.';
-
-  return;
+  showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
 }
 
@@ -11955,13 +11997,8 @@ case 'Bitwise AND (&)':{
   !isIntegerNumber(num2)
 ){
 
-  resultDiv.innerHTML =
-    '❌ Integer Only';
-
-  stepsDiv.innerHTML =
-    'Bitwise operations support integers only.';
-
-  return;
+showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
 }
 
@@ -12058,22 +12095,16 @@ case 'Zero Fill Right Shift (>>>)':{
     !isIntegerNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Only';
-
-    stepsDiv.innerHTML =
-      'Shift operations support integers only.';
-
-    return;
+    showError("Shift operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
   if(num2.startsWith('-')){
 
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
+    showError('Shift Count Must Be a Non-Negative Integer');
 
-    return;
+    return false;
 
   }
 
@@ -12139,23 +12170,16 @@ case 'Right Shift (>>)':{
     !isIntegerNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Only';
-
-    stepsDiv.innerHTML =
-      'Shift operations support integers only.';
-
-    return;
+    showError("Shift operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
 
 if(num2.startsWith('-')){
 
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
-
-    return;
+    showError("Shift Count must be a positive integer. Please provide correct input");
+    return false;
 
   }
 
@@ -12252,22 +12276,15 @@ case 'Left Shift (<<)':{
     !isIntegerNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Only';
-
-    stepsDiv.innerHTML =
-      'Shift operations support integers only.';
-
-    return;
+   showError("Shift operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
   if(num2.startsWith('-')){
 
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
-
-    return;
+   showError("Shfit Count must be a positive integer. Please provide correct input");
+    return false;
 
   }
 
@@ -12340,8 +12357,8 @@ Answer: ${resultNum}`;
 
 }
 
-  resultDiv.innerHTML =
-    `Answer: ${result}`;
+  resultDiv.value =
+    `${result}`;
 
   stepsDiv.textContent =
     steps;
@@ -12472,12 +12489,8 @@ function findOctalConversion(){
 
   if(!isOctalNumber(value)){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Octal Number';
-
-    stepsDiv.innerHTML = '';
-
-    return;
+    showError("Invalid Octal Number. Please provide correct input");
+    return false;
 
   }
 
@@ -13617,8 +13630,8 @@ ${result}
 
   }
 
-  resultDiv.innerHTML =
-    `Answer: ${result}`;
+  resultDiv.value =
+    `${result}`;
 
   stepsDiv.textContent =
     steps;
@@ -13777,12 +13790,11 @@ function findOctalArithmetic(){
       !isOctalNumber(num2)
     ){
 
-      resultDiv.innerHTML =
-        '❌ Invalid Octal Number';
+      showError(' Invalid Octal Number');
 
       stepsDiv.innerHTML = '';
 
-      return;
+      return false;
 
     }
 
@@ -14221,12 +14233,11 @@ case 'Subtraction (7s Complement)':{
     !isOctalNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Octal Number';
+    showError(' Invalid Octal Number');
 
     stepsDiv.innerHTML = '';
 
-    return;
+    return false;
 
   }
 
@@ -14583,12 +14594,11 @@ case 'Subtraction (8s Complement)':{
     !isOctalNumber(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Octal Number';
+   showError(' Invalid Octal Number');
 
     stepsDiv.innerHTML = '';
 
-    return;
+    return false;
 
   }
 
@@ -15023,13 +15033,8 @@ case 'Bitwise AND (&)':{
     !isIntegerOctal(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Octal Only';
-
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer octal numbers only.';
-
-    return;
+    showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
@@ -15113,13 +15118,8 @@ case 'Bitwise OR (|)':{
     !isIntegerOctal(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Octal Only';
-
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer octal numbers only.';
-
-    return;
+    showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
@@ -15204,13 +15204,8 @@ case 'Bitwise XOR (^)':{
     !isIntegerOctal(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Octal Only';
-
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer octal numbers only.';
-
-    return;
+    showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
@@ -15295,13 +15290,8 @@ case 'Bitwise XNOR':{
     !isIntegerOctal(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Octal Only';
-
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer octal numbers only.';
-
-    return;
+   showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
@@ -15400,14 +15390,8 @@ case 'Bitwise NAND':{
     !isIntegerOctal(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Octal Only';
-
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer octal numbers only.';
-
-    return;
-
+   showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
   }
 
   const n1 =
@@ -15505,13 +15489,8 @@ case 'Bitwise NOR':{
     !isIntegerOctal(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Octal Only';
-
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer octal numbers only.';
-
-    return;
+  showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
@@ -15608,13 +15587,8 @@ case 'Bitwise NOT (~)':{
     !isIntegerOctal(num1)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Octal Only';
-
-    stepsDiv.innerHTML =
-      'Bitwise NOT supports integer octal numbers only.';
-
-    return;
+   showError("Bitwise operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
@@ -15695,22 +15669,15 @@ case 'Zero Fill Right Shift (>>>)':{
     !isIntegerOctal(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Octal Only';
-
-    stepsDiv.innerHTML =
-      'Shift operations support integer octal numbers only.';
-
-    return;
+    showError("Shift operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
   if(num2.startsWith('-')){
 
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
-
-    return;
+    showError("Shift Count must be a positive integer. Please provide correct input");
+    return false;
 
   }
 
@@ -15777,22 +15744,15 @@ case 'Right Shift (>>)':{
     !isIntegerOctal(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Octal Only';
-
-    stepsDiv.innerHTML =
-      'Shift operations support integer octal numbers only.';
-
-    return;
+    showError("Shift operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
   if(num2.startsWith('-')){
 
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
-
-    return;
+    showError("Shift Count must be a positive integer. Please provide correct input");
+    return false;
 
   }
 
@@ -15886,22 +15846,14 @@ case 'Left Shift (<<)':{
     !isIntegerOctal(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Octal Only';
-
-    stepsDiv.innerHTML =
-      'Shift operations support integer octal numbers only.';
-
-    return;
+   showError("Shift operations support integer numbers only. Please provide correct input");
+    return false;
 
   }
 
   if(num2.startsWith('-')){
-
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
-
-    return;
+showError("Shift Count must be a positive integer. Please provide correct input");
+    return false;
 
   }
 
@@ -15962,8 +15914,8 @@ Answer = ${resultOctal}₈`;
 
   }
 
-  resultDiv.innerHTML =
-    `Answer: ${result}`;
+  resultDiv.value =
+    `${result}`;
 
   stepsDiv.textContent =
     steps;
@@ -16110,12 +16062,11 @@ function findHexConversion(){
 
   if(!isHexNumber(value)){
 
-    resultDiv.innerHTML =
-      '❌ Invalid Hexadecimal Number';
+    showError(' Invalid Hexadecimal Number');
 
     stepsDiv.innerHTML = '';
 
-    return;
+    return false;
 
   }
 
@@ -17345,8 +17296,9 @@ ${result}
 
   }
 
-  resultDiv.innerHTML =
-    `Answer: ${result}`;
+
+  resultDiv.value =
+    `${result}`;
 
   stepsDiv.textContent =
     steps;
@@ -17394,12 +17346,11 @@ function findHexArithmetic(){
       !isHexNumber(num2)
     ){
 
-      resultDiv.innerHTML =
-        '❌ Invalid Hexadecimal Number';
+      showError(' Invalid Hexadecimal Number');
 
       stepsDiv.innerHTML = '';
 
-      return;
+      return false;
 
     }
 
@@ -18631,13 +18582,9 @@ case 'Bitwise AND (&)':{
     !isIntegerHex(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Hexadecimal Only';
-
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer hexadecimal numbers only.';
-
-    return;
+    
+    showError("Bitwise operations support integer hexadecimal numbers only. Please input Integer Hexadecimal Only");
+    return false;
 
   }
 
@@ -18735,13 +18682,9 @@ case 'Bitwise OR (|)':{
     !isIntegerHex(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Hexadecimal Only';
+        showError("Bitwise operations support integer hexadecimal numbers only. Please input Integer Hexadecimal Only");
+    return false;
 
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer hexadecimal numbers only.';
-
-    return;
 
   }
 
@@ -18838,13 +18781,9 @@ case 'Bitwise XOR (^)':{
     !isIntegerHex(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Hexadecimal Only';
+      showError("Bitwise operations support integer hexadecimal numbers only. Please input Integer Hexadecimal Only");
+    return false;
 
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer hexadecimal numbers only.';
-
-    return;
 
   }
 
@@ -18941,13 +18880,9 @@ case 'Bitwise XNOR':{
     !isIntegerHex(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Hexadecimal Only';
+       showError("Bitwise operations support integer hexadecimal numbers only. Please input Integer Hexadecimal Only");
+    return false;
 
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer hexadecimal numbers only.';
-
-    return;
 
   }
 
@@ -19061,13 +18996,9 @@ case 'Bitwise NAND':{
     !isIntegerHex(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Hexadecimal Only';
+        showError("Bitwise operations support integer hexadecimal numbers only. Please input Integer Hexadecimal Only");
+    return false;
 
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer hexadecimal numbers only.';
-
-    return;
 
   }
 
@@ -19171,13 +19102,9 @@ case 'Bitwise NOR':{
     !isIntegerHex(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Hexadecimal Only';
+        showError("Bitwise operations support integer hexadecimal numbers only. Please input Integer Hexadecimal Only");
+    return false;
 
-    stepsDiv.innerHTML =
-      'Bitwise operations support integer hexadecimal numbers only.';
-
-    return;
 
   }
 
@@ -19279,13 +19206,9 @@ case 'Bitwise NOT (~)':{
     !isIntegerHex(num1)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Hexadecimal Only';
+      showError("Bitwise operations support integer hexadecimal numbers only. Please input Integer Hexadecimal Only");
+    return false;
 
-    stepsDiv.innerHTML =
-      'Bitwise NOT supports integer hexadecimal numbers only.';
-
-    return;
 
   }
 
@@ -19364,23 +19287,18 @@ case 'Zero Fill Right Shift (>>>)':{
     !isIntegerHex(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Hexadecimal Only';
+       showError("Shift operations support integer hexadecimal numbers only. Please input Integer Hexadecimal Only");
+    return false;
 
-    stepsDiv.innerHTML =
-      'Shift operations support integer hexadecimal numbers only.';
-
-    return;
 
   }
 
   if(num2.startsWith('-')){
 
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
+        showError("Shift Count must be a Positive Integer");
+    return false;
 
-    return;
-
+    
   }
 
   const n =
@@ -19451,22 +19369,17 @@ case 'Right Shift (>>)':{
     !isIntegerHex(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Hexadecimal Only';
+        showError("Shift operations support integer hexadecimal numbers only. Please input Integer Hexadecimal Only");
+    return false;
 
-    stepsDiv.innerHTML =
-      'Shift operations support integer hexadecimal numbers only.';
-
-    return;
 
   }
 
   if(num2.startsWith('-')){
 
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
+       showError("Shift Count must be a Positive Integer");
+    return false;
 
-    return;
 
   }
 
@@ -19564,22 +19477,16 @@ case 'Left Shift (<<)':{
     !isIntegerHex(num2)
   ){
 
-    resultDiv.innerHTML =
-      '❌ Integer Hexadecimal Only';
+        showError("Shift operations support integer hexadecimal numbers only. Please input Integer Hexadecimal Only");
+    return false;
 
-    stepsDiv.innerHTML =
-      'Shift operations support integer hexadecimal numbers only.';
-
-    return;
 
   }
 
   if(num2.startsWith('-')){
 
-    resultDiv.innerHTML =
-      '❌ Shift Count Must Be a Non-Negative Integer';
-
-    return;
+        showError("Shift Count must be a Positive Integer");
+    return false;
 
   }
 
@@ -19646,7 +19553,7 @@ Answer = ${resultHex}₁₆`;
   }
 
   resultDiv.innerHTML =
-    `Answer: ${result}`;
+    `${result}`;
 
   stepsDiv.textContent =
     steps;
@@ -19654,3 +19561,220 @@ Answer = ${resultHex}₁₆`;
 }
 
 //#endregion
+
+
+
+window.addEventListener('load', () => {
+
+  setTimeout(() => {
+
+    const box =
+      document.getElementById(
+        'binaryConvertInput'
+      );
+
+    if(box){
+      box.focus();
+      box.click();
+    }
+
+  }, 100);
+
+});
+
+
+
+
+
+function resetAllFindButtons(){
+
+  document
+    .querySelectorAll('.reset-btn')
+    .forEach(btn => {
+
+      const panel =
+        btn.closest('.tab-content');
+
+      panel
+        .querySelectorAll(
+          'input, select, textarea'
+        )
+        .forEach(el => {
+
+          el.disabled = false;
+
+          if(
+            el.tagName === 'INPUT' &&
+            el.type !== 'radio'
+          ){
+            el.value = '';
+          }
+
+        });
+
+      btn.textContent = 'Find';
+
+      btn.dataset.mode = 'find';
+
+      btn.classList.remove(
+        'reset-btn'
+      );
+
+    });
+
+  document.getElementById(
+    'globalResult'
+  ).value = '';
+
+  document.getElementById(
+    'globalSteps'
+  ).textContent = '';
+
+}
+function toggleFindReset(btn, actionFn){
+
+  if(btn.dataset.mode !== 'reset'){
+
+     const success =
+    actionFn();
+
+  if(success === false){
+    return;
+  }
+
+
+    const panel =
+      btn.closest('.tab-content');
+
+    panel.querySelectorAll(
+      'input, select, textarea'
+    ).forEach(el => {
+
+      el.disabled = true;
+
+    });
+
+    btn.disabled = false;
+
+    btn.textContent = 'Reset';
+
+    btn.dataset.mode = 'reset';
+
+    btn.classList.add(
+      'reset-btn'
+    );
+
+  }
+
+  else{
+
+    const panel =
+      btn.closest('.tab-content');
+
+    panel.querySelectorAll(
+      'input, select, textarea'
+    ).forEach(el => {
+
+      el.disabled = false;
+
+      if(
+        el.tagName === 'INPUT' &&
+        el.type !== 'radio'
+      ){
+        el.value = '';
+      }
+
+      if(
+        el.tagName === 'TEXTAREA'
+      ){
+        el.value = '';
+      }
+
+    });
+
+    document.getElementById(
+      'globalResult'
+    ).value = '';
+
+    document.getElementById(
+      'globalSteps'
+    ).textContent = '';
+
+    btn.textContent = 'Find';
+
+    btn.dataset.mode = 'find';
+
+    btn.classList.remove(
+      'reset-btn'
+    );
+
+    /* ==========================
+       AUTO FOCUS FIRST INPUT
+       ========================== */
+
+    const visibleInputs =
+  [...panel.querySelectorAll(
+    'input[type="text"], input[type="number"]'
+  )];
+
+const firstInput =
+  visibleInputs.find(el =>
+    el.offsetParent !== null
+  );
+
+if(firstInput){
+
+  setTimeout(()=>{
+
+    firstInput.focus();
+
+    firstInput.select?.();
+
+  },10);
+
+}
+
+  }
+
+}
+
+
+
+function showError(msg){
+
+  document.getElementById(
+    'errorMessage'
+  ).textContent = msg;
+
+  document.getElementById(
+    'errorModal'
+  ).style.display = 'flex';
+
+}
+function closeError(){
+
+  document.getElementById(
+    'errorModal'
+  ).style.display = 'none';
+
+  const activeTab =
+    document.querySelector(
+      '.tab-content:not(.hidden)'
+    );
+
+  const firstInput =
+    [...activeTab.querySelectorAll(
+      'input[type="text"], input[type="number"]'
+    )]
+    .find(el => el.offsetParent !== null);
+
+  if(firstInput){
+
+    setTimeout(()=>{
+      firstInput.focus();
+      firstInput.select?.();
+    },10);
+
+  }
+
+}
