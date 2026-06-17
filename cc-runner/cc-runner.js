@@ -5,8 +5,25 @@ const GCC_COMPAT = `
 #include <ctype.h>
 #include <string.h>
 #include <strings.h>
-
+#include <stdio.h>
 #define strcmpi strcasecmp
+
+
+
+
+
+char *gets(char *s)
+{
+    if (fgets(s, 1000, stdin) == NULL)
+        return NULL;
+
+    size_t len = strlen(s);
+
+    if (len > 0 && s[len - 1] == '\n')
+        s[len - 1] = '\0';
+
+    return s;
+}
 
 char *strupr(char *s)
 {
