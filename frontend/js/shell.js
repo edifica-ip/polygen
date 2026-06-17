@@ -1256,6 +1256,7 @@ const lang = (() => {
   if (label.includes('python'))    return 'python';
   if (label.includes('java'))      return 'java';
   if (label.includes('sql'))       return 'sql';
+  if (label === 'q-basic')          return 'vb';
   if (label.includes('html') || label.includes('css') || label.includes('js') || label.includes('web'))
                                    return 'web';
 
