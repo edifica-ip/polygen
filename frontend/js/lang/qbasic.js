@@ -9,17 +9,35 @@ class GotoSignal {
   }
 
 }
+class ReturnSignal {}
+class ExitDoSignal {}
+class ExitForSignal {}
 
 export class QBasicInterpreter {
 
   constructor() {
+
+    this.dataValues = [];
+this.dataPointer = 0;
+this.arrays = {};
+this.callStack = [];
+this.subs = {};
+this.functions = {};
+this.byRefMap = {};
+
     this.lastRnd = 0;
+    this.randomSeed =
+  Date.now();
+
+
     this.vars = {};
     this.output = [];
      this.currentLine = "";
     this.labels = {};
 this.labelsBuilt = false;
 this.stepCount = 0;
+this.executionTrace = [];
+this.firstExecutionTrace = [];
 
 this.reservedWords = new Set([
   'LEN','ABS','SQR','INT',
@@ -33,8 +51,7 @@ this.reservedWords = new Set([
   'RND','DATE$','TIME$',
   'CINT','SGN','FIX',
   'INSTR',
-  'HEX$','OCT$','BIN$' , 'CINT',
-'SGN','FIX','INSTR','HEX$','OCT$','BIN$'
+  'HEX$','OCT$','BIN$'
 ]);
   }
 
@@ -42,10 +59,19 @@ this.reservedWords = new Set([
 
     this.labelsBuilt = false;
 this.stepCount = 0;
-
+this.executionTrace = [];
+this.firstExecutionTrace = [];
     this.vars = {};
+    this.arrays = {};
+    this.subs = {};
+this.functions = {};
+
     this.output = [];
-    
+    this.dataValues = [];
+this.dataPointer = 0;
+
+
+
 this.currentLine = "";
 
     const lines =
@@ -56,6 +82,17 @@ this.currentLine = "";
 
  
 this.programLines = lines;
+
+this.buildDataTable(
+  lines
+);
+this.buildSubTable(lines);
+this.buildFunctionTable(
+  lines
+);
+
+
+
 this.executeBlock(lines);
 
 
@@ -71,11 +108,136 @@ if (
     return this.output.join('\n');
   }
 
+
+
+
+
+buildFunctionTable(lines){
+
+  this.functions = {};
+
+  for(
+    let i=0;
+    i<lines.length;
+    i++
+  ){
+
+    const m =
+      lines[i].match(
+        /^FUNCTION\s+([A-Z][A-Z0-9_\$]*)(?:\((.*)\))?/i
+      );
+
+    if(m){
+
+      this.functions[
+  m[1].toUpperCase()
+] = {
+  pos:i,
+  params:
+    m[2]
+      ? m[2]
+          .split(",")
+          .map(
+            x =>
+              x.trim()
+               .toUpperCase()
+          )
+      : []
+};
+    }
+  }
+}
+buildSubTable(lines){
+
+  this.subs = {};
+
+  for(
+    let i=0;
+    i<lines.length;
+    i++
+  ){
+
+    const m =
+      lines[i].match(
+        /^SUB\s+([A-Z][A-Z0-9_]*)(?:\((.*)\))?/i
+      );
+
+    if(m){
+
+      this.subs[
+        m[1].toUpperCase()
+      ] = {
+
+        pos:i,
+
+        params:
+          m[2]
+            ? m[2]
+                .split(",")
+                .map(
+                  x =>
+                    x.trim()
+                     .toUpperCase()
+                )
+            : []
+      };
+    }
+  }
+}
+buildDataTable(lines){
+
+  this.dataValues = [];
+
+  for(
+    const line of lines
+  ){
+
+    const m =
+      line.match(
+        /^DATA\s+(.+)$/i
+      );
+
+    if(!m)
+      continue;
+
+    const parts =
+      this.splitArguments(
+        m[1]
+      );
+
+    for(
+      const part of parts
+    ){
+
+      const value =
+        part.trim();
+
+      if(
+        /^".*"$/.test(
+          value
+        )
+      ){
+
+        this.dataValues.push(
+          value.slice(
+            1,
+            -1
+          )
+        );
+
+      }else{
+
+        this.dataValues.push(
+          Number(value)
+        );
+      }
+    }
+  }
+}
 executeBlock(lines) {
 
   // build labels
 
- 
 
 
   if (!this.labelsBuilt) {
@@ -111,13 +273,132 @@ executeBlock(lines) {
 
       if (this.stepCount > 100000) {
 
-        throw new Error(
-          "Program terminated. Possible infinite loop."
-        );
-      }
+ let report =
+
+  "Program terminated.\n\n" +
+
+  "Possible Infinite Loop Detected\n\n" +
+
+  "Execution Started As:\n\n";
+  for(
+  const item of
+  this.firstExecutionTrace
+){
+
+  report +=
+    item.line +
+    "\n";
+
+  const keys =
+    Object.keys(
+      item.vars
+    );
+
+  if(keys.length){
+
+    report +=
+      "Variables: " +
+
+      keys
+        .map(
+          k =>
+            k +
+            "=" +
+            item.vars[k]
+        )
+        .join(", ")
+
+      + "\n";
+  }
+
+  report += "\n";
+}
+
+report +=
+  "\nRecent Execution:\n\n";
+
+
+   for(
+    const item of
+    this.executionTrace
+  ){
+
+    report +=
+
+      item.line +
+
+      "\n";
+
+    const keys =
+      Object.keys(
+        item.vars
+      );
+
+    if(keys.length){
+
+      report +=
+
+        "Variables: " +
+
+        keys
+          .map(
+            k =>
+              k +
+              "=" +
+              item.vars[k]
+          )
+          .join(", ")
+
+        + "\n";
+    }
+
+    report += "\n";
+  }
+
+  throw new Error(
+    report
+  );
+}
 
       let line =
         lines[i].trim();
+
+
+if(
+  this.firstExecutionTrace.length < 10
+){
+
+  this.firstExecutionTrace.push({
+
+    line,
+
+    vars:{
+      ...this.vars
+    }
+
+  });
+
+}
+
+
+        this.executionTrace.push({
+
+  line,
+
+  vars: {
+    ...this.vars
+  }
+
+});
+
+if(
+  this.executionTrace.length > 50
+){
+
+  this.executionTrace.shift();
+
+}
+
 
       if (!line) {
 
@@ -164,6 +445,196 @@ executeBlock(lines) {
 
       }
 
+
+
+
+if(
+  /^GOSUB\b/i
+    .test(line)
+){
+
+  const label =
+
+    line
+      .replace(
+        /^GOSUB\s+/i,
+        ''
+      )
+      .trim()
+      .toUpperCase();
+
+  if(
+    !(label in this.labels)
+  ){
+
+    throw new Error(
+      "Unknown label: " +
+      label
+    );
+  }
+
+  this.callStack.push(
+    i + 1
+  );
+
+  i =
+    this.labels[label];
+
+  continue;
+}
+
+
+
+if(
+  /^RETURN$/i
+    .test(line)
+){
+
+  if(
+    !this.callStack.length
+  ){
+
+    throw new Error(
+      "RETURN without GOSUB"
+    );
+  }
+
+  i =
+    this.callStack.pop();
+
+  continue;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if(
+  /^FUNCTION\b/i.test(line)
+){
+
+  let depth = 0;
+
+  while(
+    i < lines.length
+  ){
+
+    const current =
+      lines[i]
+        .trim()
+        .toUpperCase();
+
+    if(
+      /^FUNCTION\b/
+        .test(current)
+    ){
+      depth++;
+    }
+
+    else if(
+      /^END\s+FUNCTION$/
+        .test(current)
+    ){
+
+      depth--;
+
+      if(depth===0){
+
+        i++;
+        break;
+      }
+    }
+
+    i++;
+  }
+
+  continue;
+}
+
+
+      // GOTO
+
+if(
+  /^ON\s+/i
+    .test(line)
+){
+
+  const m =
+    line.match(
+      /^ON\s+(.+)\s+(GOTO|GOSUB)\s+(.+)$/i
+    );
+
+  if(m){
+
+    const index =
+      Number(
+        this.evaluate(
+          m[1]
+        )
+      );
+
+    const mode =
+      m[2]
+        .toUpperCase();
+
+    const labels =
+      m[3]
+        .split(",")
+        .map(
+          x =>
+            x.trim()
+             .toUpperCase()
+        );
+
+    if(
+      index >= 1 &&
+      index <= labels.length
+    ){
+
+      const label =
+        labels[
+          index - 1
+        ];
+
+      if(
+        mode === "GOTO"
+      ){
+
+        throw new GotoSignal(
+          label
+        );
+      }
+
+      // GOSUB
+
+      this.callStack.push(
+        i + 1
+      );
+
+      i =
+        this.labels[
+          label
+        ];
+
+      continue;
+    }
+  }
+
+  i++;
+  continue;
+}
+
+
       // GOTO
       if (/^GOTO\b/i.test(line)) {
 
@@ -177,6 +648,191 @@ executeBlock(lines) {
 
       }
 
+
+
+
+
+
+
+
+      if(
+  /^SUB\b/i.test(line)
+){
+
+  let depth = 0;
+
+  while(i < lines.length){
+
+    const current =
+      lines[i]
+        .trim()
+        .toUpperCase();
+
+    if(
+      /^SUB\b/.test(current)
+    ){
+      depth++;
+    }
+
+    else if(
+      /^END\s+SUB$/
+        .test(current)
+    ){
+
+      depth--;
+
+      if(depth===0){
+
+        i++;
+        break;
+      }
+    }
+
+    i++;
+  }
+
+  continue;
+}
+
+
+
+if(
+  /^CALL\b/i
+    .test(line)
+){
+
+ const m =
+  line.match(
+    /^CALL\s+([A-Z][A-Z0-9_]*)(?:\((.*)\))?$/i
+  );
+
+if(!m){
+  throw new Error(
+    "Invalid CALL"
+  );
+}
+
+const name =
+  m[1]
+    .toUpperCase();
+
+const rawArgs =
+  m[2]
+    ? this.splitArguments(
+        m[2]
+      )
+    : [];
+
+const args =
+  rawArgs.map(
+    x =>
+      this.evaluate(x)
+  );
+
+this.callSub(
+  name,
+  args,
+  rawArgs
+);
+
+  i++;
+  continue;
+}
+
+      if(
+  /^RANDOMIZE\b/i
+    .test(line)
+){
+
+  const m =
+    line.match(
+      /^RANDOMIZE\s*(.*)$/i
+    );
+
+  if(
+    m &&
+    m[1].trim()
+  ){
+
+    this.randomSeed =
+      Number(
+        this.evaluate(
+          m[1]
+        )
+      );
+
+  }else{
+
+    this.randomSeed =
+      Date.now();
+  }
+
+  i++;
+  continue;
+}
+
+
+if(
+  /^RESTORE$/i
+    .test(line)
+){
+
+  this.dataPointer = 0;
+
+  i++;
+  continue;
+}
+
+
+if(
+  /^READ\b/i
+    .test(line)
+){
+
+  const vars =
+    line
+      .replace(
+        /^READ\s+/i,
+        ''
+      )
+      .split(",");
+
+  for(
+    const v of vars
+  ){
+
+    const name =
+      v.trim()
+       .toUpperCase();
+
+    if(
+      this.dataPointer >=
+      this.dataValues.length
+    ){
+
+      throw new Error(
+        "Out of DATA"
+      );
+    }
+
+    this.vars[name] =
+      this.dataValues[
+        this.dataPointer++
+      ];
+  }
+
+  i++;
+  continue;
+}
+
+if(
+  /^DATA\b/i
+    .test(line)
+){
+
+  i++;
+  continue;
+}
 
       if (/^INPUT\b/i.test(line)) {
 
@@ -199,8 +855,15 @@ executeBlock(lines) {
 }
 
 
+if (
+  /^EXIT\s+DO$/i
+    .test(line)
+) {
 
-if (/^DO$/i.test(line)) {
+  throw new ExitDoSignal();
+}
+
+if (/^DO\b/i.test(line)) {
 
   i =
     this.handleDoLoop(
@@ -231,6 +894,8 @@ if (/^DO$/i.test(line)) {
 
      // PRINT
 
+// PRINT
+
 if (/^PRINT\b/i.test(line)) {
 
   let expr =
@@ -251,32 +916,24 @@ if (/^PRINT\b/i.test(line)) {
 
   let result = "";
 
-  // PRINT A,B,C
+  const semiParts =
+    this.splitPrintArguments(
+      expr,
+      ';'
+    );
+
+  const commaParts =
+    this.splitPrintArguments(
+      expr,
+      ','
+    );
+
+  // ------------------
+  // PRINT A;B;C
+  // ------------------
 
   if (
-    expr.includes(",")
-  ) {
-
-    const parts =
-      this.splitPrintArguments(
-        expr,
-        ','
-      );
-
-    result =
-      parts
-        .map(
-          p => String(
-            this.evaluate(p)
-          )
-        )
-        .join(" ");
-  }
-
-  // PRINT A;B;C
-
-  else if (
-    expr.includes(";")
+    semiParts.length > 1
   ) {
 
     const trailing =
@@ -327,7 +984,23 @@ if (/^PRINT\b/i.test(line)) {
     continue;
   }
 
-  // normal PRINT
+  // ------------------
+  // PRINT A,B,C
+  // ------------------
+
+ else if (
+  commaParts.length > 1
+) {
+
+  result =
+    this.buildPrintZones(
+      commaParts
+    );
+}
+
+  // ------------------
+  // PRINT expression
+  // ------------------
 
   else {
 
@@ -352,6 +1025,20 @@ if (/^PRINT\b/i.test(line)) {
 
 
 
+if(
+  /^DIM\b/i
+    .test(line)
+){
+
+  this.handleDim(
+    line
+  );
+
+  i++;
+  continue;
+}
+
+
       // LET
       if (/^LET\b/i.test(line)) {
 
@@ -369,9 +1056,9 @@ if (/^PRINT\b/i.test(line)) {
 
       // direct assignment
       if (
-        /^[A-Z][A-Z0-9_\$]*\s*=/i
-          .test(line)
-      ) {
+  /^[A-Z][A-Z0-9_\$]*(\(.+\))?\s*=/i
+    .test(line)
+){
 
         this.handleAssignment(
           line
@@ -394,6 +1081,16 @@ if (/^PRINT\b/i.test(line)) {
         continue;
 
       }
+
+
+      if (
+  /^EXIT\s+FOR$/i
+    .test(line)
+) {
+
+  throw new ExitForSignal();
+}
+
 
       // FOR
       if (/^FOR\b/i.test(line)) {
@@ -459,6 +1156,58 @@ if (/^PRINT\b/i.test(line)) {
   if (pos < 0)
     return;
 
+
+
+  const arrayMatch =
+  line.match(
+    /^([A-Z][A-Z0-9_\$]*)\((.+)\)\s*=\s*(.+)$/i
+  );
+
+if(arrayMatch){
+
+  const name =
+    arrayMatch[1]
+      .toUpperCase();
+
+const indices =
+  this.splitArguments(
+    arrayMatch[2]
+  ).map(
+    x =>
+      Number(
+        this.evaluate(x)
+      )
+  );
+
+  const value =
+  this.evaluate(
+    arrayMatch[3]
+  );
+
+  if(
+  !(name in this.arrays)
+){
+  throw new Error(
+    "Array not DIMed: " +
+    name
+  );
+}
+
+this.checkArrayBounds(
+  name,
+  indices
+);
+
+const key =
+  indices.join(",");
+
+this.arrays[name]
+  .data[key] =
+    value;
+
+  return;
+}
+
   const name =
     line.substring(0, pos)
       .trim()
@@ -471,13 +1220,6 @@ if (/^PRINT\b/i.test(line)) {
   // String variable validation
 
   if (name.endsWith('$')) {
-
-    const isQuoted =
-      /^".*"$/.test(expr);
-
-    const isStringVar =
-      /^[A-Z][A-Z0-9_]*\$$/i
-        .test(expr);
 
     const value =
   this.evaluate(expr);
@@ -704,15 +1446,29 @@ for (
         this.vars[varName] = v;
 
        try{
-   this.executeBlock(block);
+
+  this.executeBlock(
+    block
+  );
+
 }
 catch(err){
 
-   if(err instanceof GotoSignal){
-      throw err;
-   }
+  if(
+    err instanceof ExitForSignal
+  ){
 
-   throw err;
+    return nextPos + 1;
+  }
+
+  if(
+    err instanceof GotoSignal
+  ){
+
+    throw err;
+  }
+
+  throw err;
 }
       }
 
@@ -731,7 +1487,15 @@ catch(err){
 }
 catch(err){
 
-   if(err instanceof GotoSignal){
+   if(
+     err instanceof ExitForSignal
+   ){
+      return nextPos + 1;
+   }
+
+   if(
+     err instanceof GotoSignal
+   ){
       throw err;
    }
 
@@ -764,65 +1528,104 @@ if (single) {
       single[1]
     );
 
-  if (condition) {
+  const statementText =
+    single[2];
 
-    const stmt =
-      single[2].trim();
+  let thenPart =
+    statementText;
 
-    // IF ... THEN GOTO label
+  let elsePart =
+    "";
 
-    if (/^GOTO\b/i.test(stmt)) {
+  const elseMatch =
+    statementText.match(
+      /^(.*?)\s+ELSE\s+(.+)$/i
+    );
 
-      const label =
-        stmt
-          .replace(/^GOTO\s+/i,'')
-          .trim()
-          .toUpperCase();
+  if(elseMatch){
 
-      throw new GotoSignal(label);
-    }
+    thenPart =
+      elseMatch[1]
+        .trim();
 
-    // IF ... THEN LET ...
+    elsePart =
+      elseMatch[2]
+        .trim();
+  }
 
-    if (/^LET\b/i.test(stmt)) {
+  const stmt =
+    condition
+      ? thenPart
+      : elsePart;
 
-      this.handleAssignment(
-        stmt.replace(
-          /^LET\s+/i,
+  if(!stmt){
+
+    return start + 1;
+  }
+
+  // IF ... THEN GOTO
+
+  if(/^GOTO\b/i.test(stmt)){
+
+    const label =
+      stmt
+        .replace(
+          /^GOTO\s+/i,
           ''
         )
-      );
+        .trim()
+        .toUpperCase();
 
-      return start + 1;
-    }
-
-    // IF ... THEN PRINT ...
-
-    if (/^PRINT\b/i.test(stmt)) {
-
-      const expr =
-        stmt.replace(
-          /^PRINT\s+/i,
-          ''
-        );
-
-      this.output.push(
-        this.evaluate(expr)
-      );
-
-      return start + 1;
-    }
-
-    // generic fallback
-
-    this.executeBlock([
-      stmt
-    ]);
+    throw new GotoSignal(
+      label
+    );
   }
+
+  // IF ... THEN LET
+
+  if(/^LET\b/i.test(stmt)){
+
+    this.handleAssignment(
+      stmt.replace(
+        /^LET\s+/i,
+        ''
+      )
+    );
+
+    return start + 1;
+  }
+
+  if(
+  /^[A-Z][A-Z0-9_\$]*\s*=/i
+    .test(stmt)
+){
+
+  this.handleAssignment(
+    stmt
+  );
 
   return start + 1;
 }
 
+  // IF ... THEN PRINT
+
+  if(/^PRINT\b/i.test(stmt)){
+
+    this.executeBlock([
+      stmt
+    ]);
+
+    return start + 1;
+  }
+
+  // Generic statement
+
+  this.executeBlock([
+    stmt
+  ]);
+
+  return start + 1;
+}
   // ----------------------------
   // Multi-line IF
   // ----------------------------
@@ -843,6 +1646,8 @@ let elsePos = -1;
 let endPos = -1;
 let depth = 0;
 
+const elseIfs = [];
+
 for (
   let i = start + 1;
   i < lines.length;
@@ -851,24 +1656,22 @@ for (
 
   const current =
     lines[i]
-      .trim()
-      .toUpperCase();
+      .trim();
 
-  // nested IF
+  const upper =
+    current.toUpperCase();
 
   if (
-    /^IF\b/.test(current) &&
-    /THEN$/.test(current)
+    /^IF\b/.test(upper) &&
+    /THEN$/.test(upper)
   ) {
 
     depth++;
     continue;
   }
 
-  // END IF
-
   if (
-    /^END\s*IF$/.test(current)
+    /^END\s*IF$/.test(upper)
   ) {
 
     if (depth === 0) {
@@ -883,10 +1686,16 @@ for (
     }
   }
 
-  // ELSE belonging to THIS IF
+  if (
+    /^ELSEIF\b/i.test(current) &&
+    depth === 0
+  ) {
+
+    elseIfs.push(i);
+  }
 
   if (
-    /^ELSE$/.test(current) &&
+    /^ELSE$/i.test(current) &&
     depth === 0
   ) {
 
@@ -897,72 +1706,129 @@ for (
   if (endPos < 0)
     return start + 1;
 
-  if (condition) {
+const sections = [];
 
-    const block =
-      lines.slice(
-        start + 1,
-        elsePos >= 0
-          ? elsePos
-          : endPos
-      );
+sections.push({
+  condition: m[1],
+  start: start + 1
+});
 
-    try {
+for (
+  let x = 0;
+  x < elseIfs.length;
+  x++
+) {
 
-    this.executeBlock(block);
+  const lineText =
+    lines[
+      elseIfs[x]
+    ];
 
-  }
-  catch(err){
+  const mm =
+    lineText.match(
+      /^ELSEIF\s+(.+)\s+THEN$/i
+    );
 
-    if(err instanceof GotoSignal){
+  if (!mm)
+    continue;
 
-      throw err;
+  sections.push({
+    condition: mm[1],
+    start:
+      elseIfs[x] + 1
+  });
+}
 
-    }
+for (
+  let x = 0;
+  x < sections.length;
+  x++
+) {
 
-    throw err;
-  }
+  let blockEnd;
 
+  if (
+    x < sections.length - 1
+  ) {
+
+    blockEnd =
+      elseIfs[x];
 
   } else {
 
-    if (elsePos >= 0) {
-
-      const block =
-        lines.slice(
-          elsePos + 1,
-          endPos
-        );
-
-      try {
-
-    this.executeBlock(block);
-
-  }
-  catch(err){
-
-    if(err instanceof GotoSignal){
-
-      throw err;
-
-    }
-
-    throw err;
+    blockEnd =
+      elsePos >= 0
+        ? elsePos
+        : endPos;
   }
 
-    }
+  if (
+    this.evaluateCondition(
+      sections[x].condition
+    )
+  ) {
+
+    const block =
+      lines.slice(
+        sections[x].start,
+        blockEnd
+      );
+
+    this.executeBlock(
+      block
+    );
+
+    return endPos + 1;
   }
+}
+
+if (
+  elsePos >= 0
+) {
+
+  const block =
+    lines.slice(
+      elsePos + 1,
+      endPos
+    );
+
+  this.executeBlock(
+    block
+  );
+}
 
   return endPos + 1;
 }
 
 handleDoLoop(lines,start){
 
-  let endPos = -1;
+   let endPos = -1;
   let condition = "";
   let mode = "UNTIL";
 
+  let entryMode = "";
+  let entryCondition = "";
+
   let depth = 0;
+
+  const firstLine =
+  lines[start]
+    .trim();
+
+const entryMatch =
+  firstLine.match(
+    /^DO\s+(WHILE|UNTIL)\s+(.+)$/i
+  );
+
+if(entryMatch){
+
+  entryMode =
+    entryMatch[1]
+      .toUpperCase();
+
+  entryCondition =
+    entryMatch[2];
+}
 
   for(
     let i = start + 1;
@@ -978,42 +1844,60 @@ handleDoLoop(lines,start){
     // nested DO
 
     if(
-      current === "DO"
-    ){
+  /^DO\b/i.test(current)
+){
 
       depth++;
       continue;
     }
 
-    const m =
-      current.match(
-        /^LOOP\s+(UNTIL|WHILE)\s+(.+)$/
-      );
+const m =
+  current.match(
+    /^LOOP\s+(UNTIL|WHILE)\s+(.+)$/
+  );
 
-    if(m){
+if(m){
 
-      if(depth === 0){
+  if(depth === 0){
 
-        endPos = i;
+    endPos = i;
 
-        mode =
-          m[1]
-            .toUpperCase();
+    mode =
+      m[1]
+        .toUpperCase();
 
-        condition =
-          lines[i]
-            .replace(
-              /^LOOP\s+(UNTIL|WHILE)\s+/i,
-              ''
-            );
+    condition =
+      lines[i]
+        .replace(
+          /^LOOP\s+(UNTIL|WHILE)\s+/i,
+          ''
+        );
 
-        break;
+    break;
 
-      }else{
+  }else{
 
-        depth--;
-      }
-    }
+    depth--;
+  }
+}
+
+else if(
+  current === "LOOP"
+){
+
+  if(depth === 0){
+
+    endPos = i;
+
+    mode = "FOREVER";
+
+    break;
+
+  }else{
+
+    depth--;
+  }
+}
   }
 
   if(endPos < 0)
@@ -1025,44 +1909,103 @@ handleDoLoop(lines,start){
       endPos
     );
 
+
+
+    if(
+  entryMode === "WHILE" &&
+  !this.evaluateCondition(
+    entryCondition
+  )
+){
+  return endPos + 1;
+}
+
+if(
+  entryMode === "UNTIL" &&
+  this.evaluateCondition(
+    entryCondition
+  )
+){
+  return endPos + 1;
+}
+
   while(true){
 
     try{
 
-      this.executeBlock(
-        block
-      );
+  this.executeBlock(
+    block
+  );
 
-    }
-    catch(err){
+}
+catch(err){
 
-      if(
-        err instanceof GotoSignal
-      ){
-        throw err;
-      }
+  if(
+    err instanceof ExitDoSignal
+  ){
 
-      throw err;
-    }
+    break;
+  }
+
+  if(
+    err instanceof GotoSignal
+  ){
+
+    throw err;
+  }
+
+  throw err;
+}
 
     const result =
       this.evaluateCondition(
         condition
       );
 
-    if(
-      mode === "UNTIL" &&
-      result
-    ){
-      break;
-    }
 
-    if(
-      mode === "WHILE" &&
-      !result
-    ){
-      break;
-    }
+
+if(
+  mode !== "FOREVER"
+){
+
+  const result =
+    this.evaluateCondition(
+      condition
+    );
+
+  if(
+    mode === "UNTIL" &&
+    result
+  ){
+    break;
+  }
+
+  if(
+    mode === "WHILE" &&
+    !result
+  ){
+    break;
+  }
+}
+
+if(
+  entryMode === "WHILE" &&
+  !this.evaluateCondition(
+    entryCondition
+  )
+){
+  break;
+}
+
+if(
+  entryMode === "UNTIL" &&
+  this.evaluateCondition(
+    entryCondition
+  )
+){
+  break;
+}
+
   }
 
   return endPos + 1;
@@ -1387,6 +2330,398 @@ handleSelectCase(
   return endPos + 1;
 }
 
+checkArrayBounds(
+  name,
+  indices
+){
+
+  const arr =
+    this.arrays[name];
+
+  if(!arr){
+
+    throw new Error(
+      "Array not DIMed: " +
+      name
+    );
+  }
+
+  if(
+    indices.length !==
+    arr.dims.length
+  ){
+
+    throw new Error(
+      "Wrong number of subscripts"
+    );
+  }
+
+  for(
+    let i=0;
+    i<indices.length;
+    i++
+  ){
+
+    const index =
+      indices[i];
+
+    const max =
+      arr.dims[i];
+
+    if(
+      index < 0 ||
+      index > max
+    ){
+
+      throw new Error(
+        "Subscript out of range"
+      );
+    }
+  }
+}
+handleDim(line){
+
+  const text =
+    line.replace(
+      /^DIM\s+/i,
+      ''
+    );
+
+  const vars =
+  this.splitArguments(
+    text
+  );
+
+  for(
+    const item of vars
+  ){
+
+   const m =
+  item.trim()
+    .match(
+      /^([A-Z][A-Z0-9_\$]*)\((.+)\)$/i
+    );
+
+if(!m)
+  continue;
+
+const name =
+  m[1]
+    .toUpperCase();
+
+const dims =
+  m[2]
+    .split(",")
+    .map(
+      x =>
+        Number(
+          x.trim()
+        )
+    );
+
+this.arrays[name] = {
+
+  dims,
+
+  data:{}
+
+};
+  }
+}
+
+callSub(
+  name,
+  args=[],
+  rawArgs=[]
+){
+
+  const sub =
+    this.subs[name];
+
+  if(!sub){
+
+    throw new Error(
+      "Unknown SUB: " +
+      name
+    );
+  }
+
+  const pos =
+    sub.pos;
+
+  let endPos = pos;
+
+  while(
+    endPos <
+    this.programLines.length
+  ){
+
+    if(
+      /^END\s+SUB$/i.test(
+        this.programLines[
+          endPos
+        ]
+      )
+    ){
+      break;
+    }
+
+    endPos++;
+  }
+
+  const block =
+    this.programLines.slice(
+      pos + 1,
+      endPos
+    );
+
+  const oldVars = {
+    ...this.vars
+  };
+
+  this.vars = {
+    ...this.vars
+  };
+
+
+  const byRefMap = {};
+
+  for(
+  let i=0;
+  i<sub.params.length;
+  i++
+){
+
+  const param =
+    sub.params[i];
+
+  this.vars[param] =
+    args[i];
+
+  const original =
+    rawArgs[i]
+      ?.trim()
+      .toUpperCase();
+
+  if(
+    original &&
+    /^[A-Z][A-Z0-9_\$]*$/
+      .test(original)
+  ){
+
+    byRefMap[param] =
+      original;
+  }
+}
+
+  try{
+
+    this.executeBlock(
+      block
+    );
+
+  }
+  catch(err){
+
+    if(
+      err instanceof GotoSignal
+    ){
+
+      const localLabels = {};
+
+      for(
+        let i = 0;
+        i < block.length;
+        i++
+      ){
+
+        const m =
+          block[i].match(
+            /^([A-Z][A-Z0-9_\$]*)\s*:$/i
+          );
+
+        if(m){
+
+          localLabels[
+            m[1]
+              .toUpperCase()
+          ] = i;
+        }
+      }
+
+      const jumpPos =
+        localLabels[
+          err.label
+        ];
+
+      if(
+        jumpPos === undefined
+      ){
+
+        throw new Error(
+          "Unknown label: " +
+          err.label
+        );
+      }
+
+      this.executeBlock(
+        block.slice(
+          jumpPos
+        )
+      );
+
+    }
+    else{
+
+      throw err;
+    }
+  }
+  finally{
+
+    for(
+  const param in byRefMap
+){
+
+  const original =
+    byRefMap[param];
+
+  oldVars[
+    original
+  ] =
+    this.vars[param];
+}
+
+
+
+    this.vars =
+      oldVars;
+  }
+}
+
+
+callFunction(
+  name,
+  args=[],
+  rawArgs=[]
+){
+
+  const fn =
+  this.functions[name];
+
+if(!fn){
+
+  throw new Error(
+    "Unknown FUNCTION: " +
+    name
+  );
+}
+
+const pos =
+  fn.pos;
+
+  if(
+    pos === undefined
+  ){
+
+    throw new Error(
+      "Unknown FUNCTION: " +
+      name
+    );
+  }
+
+  let endPos = pos;
+
+  while(
+    endPos <
+    this.programLines.length
+  ){
+
+    if(
+      /^END\s+FUNCTION$/i
+      .test(
+        this.programLines[
+          endPos
+        ]
+      )
+    ){
+      break;
+    }
+
+    endPos++;
+  }
+
+  const block =
+    this.programLines.slice(
+      pos + 1,
+      endPos
+    );
+
+  const oldVars =
+  { ...this.vars };
+
+this.vars = {
+  ...this.vars
+};
+
+const byRefMap = {};
+
+
+for(
+  let i=0;
+  i<fn.params.length;
+  i++
+){
+
+  const param =
+    fn.params[i];
+
+  this.vars[param] =
+    args[i];
+
+  const original =
+    rawArgs[i]
+      ?.trim()
+      .toUpperCase();
+
+  if(
+    original &&
+    /^[A-Z][A-Z0-9_\$]*$/
+      .test(original)
+  ){
+
+    byRefMap[param] =
+      original;
+  }
+}
+
+
+  this.executeBlock(
+    block
+  );
+
+  const result =
+  this.vars[
+    name.toUpperCase()
+  ];
+
+for(
+  const param in byRefMap
+){
+
+  const original =
+    byRefMap[param];
+
+  oldVars[
+    original
+  ] =
+    this.vars[param];
+}
+
+this.vars =
+  oldVars;
+
+return result;
+}
 
 
 
@@ -1398,11 +2733,57 @@ handleSelectCase(
 
 
 
+buildPrintZones(parts){
 
+  let result = "";
 
+  let position = 0;
 
+  for(
+    let i=0;
+    i<parts.length;
+    i++
+  ){
 
+    const text =
+      String(
+        this.evaluate(
+          parts[i]
+        )
+      );
 
+    result += text;
+
+    position +=
+      text.length;
+
+    if(
+      i <
+      parts.length - 1
+    ){
+
+      const nextZone =
+
+        Math.floor(
+          position / 14
+        ) * 14 + 14;
+
+      result +=
+        " ".repeat(
+          Math.max(
+            1,
+            nextZone -
+            position
+          )
+        );
+
+      position =
+        nextZone;
+    }
+  }
+
+  return result;
+}
 
 
 
@@ -1664,18 +3045,20 @@ while(true){
 }
   evaluate(expr) {
 
+   
     expr = expr.trim();
+
+   
 
     // string literal
     if (
-      /^".*"$/.test(expr)
-    ) {
-
-      return expr.slice(
-        1,
-        -1
-      );
-    }
+  /^"[^"]*"$/.test(expr)
+) {
+  return expr.slice(
+    1,
+    -1
+  );
+}
 
 
      
@@ -1815,6 +3198,45 @@ expr =
       )
   );
 
+
+  expr =
+  this.replaceFunction(
+    expr,
+    "SPC",
+    s =>
+
+      JSON.stringify(
+
+        " ".repeat(
+
+          Number(
+            this.evaluate(s)
+          )
+
+        )
+
+      )
+  );
+
+
+  expr =
+  this.replaceFunction(
+    expr,
+    "TAB",
+    s =>
+
+      JSON.stringify(
+
+        " ".repeat(
+
+          Number(
+            this.evaluate(s)
+          )
+
+        )
+
+      )
+  );
 
   
 
@@ -2149,7 +3571,31 @@ expr =
 
 
 
+expr =
+  expr.replace(
+    /(?<![A-Z0-9_])RND(?![A-Z0-9_\(])/gi,
+    () => {
 
+      this.randomSeed =
+
+        (this.randomSeed *
+         9301 +
+         49297)
+
+        % 233280;
+
+      const value =
+        this.randomSeed /
+        233280;
+
+      this.lastRnd =
+        value;
+
+      return String(
+        value
+      );
+    }
+  );
 
 expr =
   this.replaceFunction(
@@ -2298,6 +3744,130 @@ expr =
 
 
 
+expr =
+  expr.replace(
+    /([A-Z][A-Z0-9_\$]*)\(([^()]+)\)/gi,
+    (match,name,indexExpr)=>{
+
+      const key =
+        name.toUpperCase();
+
+      if(
+        !(key in this.arrays)
+      ){
+        return match;
+      }
+
+      const indices =
+  this.splitArguments(
+    indexExpr
+  ).map(
+    x =>
+      Number(
+        this.evaluate(x)
+      )
+  );
+
+this.checkArrayBounds(
+  key,
+  indices
+);
+  
+const lookupKey =
+  indices.join(",");
+
+const value =
+  this.arrays[key]
+      .data[
+        lookupKey
+      ];
+
+      if(
+        typeof value ===
+        "string"
+      ){
+        return JSON.stringify(
+          value
+        );
+      }
+
+      return String(
+        value ?? 0
+      );
+    }
+  );
+
+
+
+for(
+  const fnName of
+  Object.keys(
+    this.functions
+  )
+){
+
+  expr =
+    this.replaceFunction(
+      expr,
+      fnName,
+      s => {
+
+        const rawArgs =
+          this.splitArguments(
+            s
+          );
+
+        const args =
+          rawArgs.map(
+            x =>
+              this.evaluate(x)
+          );
+
+        return JSON.stringify(
+
+          this.callFunction(
+            fnName,
+            args,
+            rawArgs
+          )
+
+        );
+      }
+    );
+}
+
+
+
+
+
+ const stringLiterals = [];
+
+expr =
+  expr.replace(
+    /"[^"]*"/g,
+    match => {
+
+      const token =
+        `§STR${stringLiterals.length}§`;
+
+      stringLiterals.push(
+        match
+      );
+
+      return token;
+    }
+  );
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2353,20 +3923,26 @@ if(reserved.has(key))
 
 
  
-   
+   expr =
+  expr.replace(
+    /§STR(\d+)§/g,
+    (_, n) =>
+      stringLiterals[
+        Number(n)
+      ]
+  );
 
     try {
- alert(expr);
       return Function(
         `"use strict";
-         return ("***" + ${expr});
+         return (${expr});
         `
       )();
 
     } catch {
 
-      alert(err);
-      return "***"+expr;
+      
+      return expr;
     }
   }
 }

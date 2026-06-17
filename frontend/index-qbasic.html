@@ -746,22 +746,37 @@ window.runLang = async function(){
 
   setConsole('');
 
-  const code =
-    window.editor.getValue();
+  try{
 
-  const qb =
-    new window.QBasicInterpreter();
+    const code =
+      window.editor.getValue();
 
-  const result =
-    qb.run(code);
+    const qb =
+      new window.QBasicInterpreter();
 
-  setConsole(result);
+    const result =
+      qb.run(code);
 
-  window.PolyShell?.setStatus(
-    'Execution Completed',
-    'ok'
-  );
+    setConsole(result);
 
+    window.PolyShell?.setStatus(
+      'Execution Completed',
+      'ok'
+    );
+
+  }
+  catch(err){
+
+    setConsole(
+      err?.message ||
+      String(err)
+    );
+
+    window.PolyShell?.setStatus(
+      'Executed with Error',
+      'error'
+    );
+  }
 };
 
 
