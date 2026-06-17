@@ -8,7 +8,7 @@ const GCC_COMPAT = `
 #include <stdio.h>
 
 #define strcmpi strcasecmp
-#define gets(s) (fgets((s),1000,stdin) ? strtok((s),"\\n") : NULL)
+#define gets(s) fgets((s),1000,stdin)
 
 
 
