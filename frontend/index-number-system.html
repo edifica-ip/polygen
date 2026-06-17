@@ -928,6 +928,58 @@
 
   overflow:auto;
 }
+
+
+
+.topic-list details{
+
+  background:var(--panel2);
+
+  border:1px solid var(--border);
+
+  margin-bottom:10px;
+
+}
+
+.topic-list summary{
+
+  padding:12px;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+  list-style:none;
+
+}
+
+.topic-list summary::-webkit-details-marker{
+
+  display:none;
+
+}
+
+.topic-list summary::after{
+
+  content:' ▼';
+
+  float:right;
+
+}
+
+.topic-list details[open] summary::after{
+
+  content:' ▲';
+
+}
+
+.topic-list .topic-item{
+
+  border:none;
+
+  margin:0;
+
+}
     </style>
   </head>
 
@@ -985,16 +1037,286 @@
 
         <div class="pane-body">
 
-          <div class="topic-list">
+        <div class="topic-list">
 
-            <div class="topic-item">Decimal System</div>
-            <div class="topic-item">Binary System</div>
-            <div class="topic-item">Octal System</div>
-            <div class="topic-item">Hexadecimal</div>
-            <div class="topic-item">Complements</div>
-            <div class="topic-item">Bitwise Operations</div>
+  <details>
 
-          </div>
+    <summary>📘 Number System Theory</summary>
+
+    <div class="topic-item">
+
+      • Binary (Base 2): 0,1<br>
+• Octal (Base 8): 0-7<br>
+• Decimal (Base 10): 0-9<br>
+• Hexadecimal (Base 16): 0-9,A-F<br><br>
+
+Position Value = Digit × Baseⁿ<br><br>
+
+Used in computer arithmetic,
+coding, memory and digital systems.
+
+<br><br>
+
+<strong>What is a Number System?</strong><br><br>
+
+A Number System is a method of representing and expressing numbers using a set of symbols called digits. Every number system is defined by its Base (Radix), which specifies the total number of unique digits available.
+
+<br><br>
+
+Examples:<br>
+Decimal → Base 10 → Digits 0-9<br>
+Binary → Base 2 → Digits 0,1<br>
+Octal → Base 8 → Digits 0-7<br>
+Hexadecimal → Base 16 → Digits 0-9,A-F
+
+<br><br>
+
+<strong>Base or Radix</strong><br><br>
+
+The base of a number system indicates the number of distinct symbols used to represent numbers.
+
+<br><br>
+
+Base 2 → Binary<br>
+Base 8 → Octal<br>
+Base 10 → Decimal<br>
+Base 16 → Hexadecimal
+
+<br><br>
+
+<strong>Positional Number System</strong><br><br>
+
+Most modern number systems are positional. The value of a digit depends on:
+
+1. The digit itself<br>
+2. Its position in the number
+
+<br><br>
+
+Value = Digit × Baseⁿ
+
+<br><br>
+
+Example:
+
+(345)₁₀
+
+= 3×10² + 4×10¹ + 5×10⁰
+
+= 300 + 40 + 5
+
+= 345
+
+<br><br>
+
+<strong>Binary Number System</strong><br><br>
+
+Binary is the fundamental language of computers.
+
+Digits Used: 0 and 1
+
+Example:
+
+(1011)₂
+
+= 1×2³ + 0×2² + 1×2¹ + 1×2⁰
+
+= 8 + 0 + 2 + 1
+
+= 11₁₀
+
+<br><br>
+
+Advantages:
+
+• Simple electronic implementation<br>
+• Reliable storage and transmission<br>
+• Directly compatible with digital circuits
+
+<br><br>
+
+<strong>Octal Number System</strong><br><br>
+
+Base = 8
+
+Digits = 0 to 7
+
+Each Octal Digit represents exactly 3 Binary Bits.
+
+Example:
+
+563₈ = 101110011₂
+
+<br><br>
+
+Used to shorten long binary numbers.
+
+<br><br>
+
+<strong>Decimal Number System</strong><br><br>
+
+Base = 10
+
+Digits = 0 to 9
+
+Most commonly used number system in daily life.
+
+Example:
+
+528₁₀
+
+= 5×10² + 2×10¹ + 8×10⁰
+
+<br><br>
+
+<strong>Hexadecimal Number System</strong><br><br>
+
+Base = 16
+
+Digits:
+
+0 1 2 3 4 5 6 7 8 9 A B C D E F
+
+Where:
+
+A = 10<br>
+B = 11<br>
+C = 12<br>
+D = 13<br>
+E = 14<br>
+F = 15
+
+<br><br>
+
+Each Hex Digit represents exactly 4 Binary Bits.
+
+Example:
+
+FA₁₆
+
+= 11111010₂
+
+<br><br>
+
+Widely used in:
+
+• Memory Addressing<br>
+• Programming<br>
+• Machine Language<br>
+• Color Codes (#FFFFFF)
+
+<br><br>
+
+<strong>Why Computers Use Binary?</strong><br><br>
+
+Electronic circuits naturally have two stable states:
+
+ON / OFF<br>
+HIGH / LOW<br>
+TRUE / FALSE
+
+These are represented as:
+
+1 / 0
+
+Hence computers process all information using binary digits.
+
+<br><br>
+
+<strong>Number System Conversions</strong><br><br>
+
+Common conversions include:
+
+• Binary ↔ Decimal<br>
+• Binary ↔ Octal<br>
+• Binary ↔ Hexadecimal<br>
+• Decimal ↔ Octal<br>
+• Decimal ↔ Hexadecimal
+
+<br><br>
+
+<strong>Complements</strong><br><br>
+
+Complements simplify subtraction operations.
+
+Examples:
+
+1's Complement<br>
+2's Complement<br>
+7's Complement<br>
+8's Complement<br>
+9's Complement<br>
+10's Complement
+
+<br><br>
+
+<strong>Digital Codes</strong><br><br>
+
+Special coding schemes used in digital electronics:
+
+• BCD (Binary Coded Decimal)<br>
+• Excess-3 Code<br>
+• Gray Code
+
+<br><br>
+
+<strong>Signed Number Representation</strong><br><br>
+
+Negative numbers can be represented using:
+
+• Sign Magnitude<br>
+• 1's Complement<br>
+• 2's Complement
+
+<br><br>
+
+<strong>Floating Point Representation</strong><br><br>
+
+Real numbers are represented using:
+
+• Fixed Point Format<br>
+• Floating Point Format<br>
+• IEEE-754 Standard
+
+<br><br>
+
+<strong>Important Exam Facts</strong><br><br>
+
+• Binary uses 2 symbols.<br>
+• Octal uses 8 symbols.<br>
+• Decimal uses 10 symbols.<br>
+• Hexadecimal uses 16 symbols.<br>
+• 1 Octal Digit = 3 Bits.<br>
+• 1 Hex Digit = 4 Bits.<br>
+• Base is also called Radix.<br>
+• 2's Complement is most commonly used for signed integers.<br>
+• IEEE-754 is the standard floating-point representation.<br>
+• Gray Code changes only one bit between consecutive values.
+
+<br><br>
+
+<strong>Applications of Number Systems</strong><br><br>
+
+• Computer Architecture<br>
+• Digital Electronics<br>
+• Programming Languages<br>
+• Networking<br>
+• Data Communication<br>
+• Embedded Systems<br>
+• Microprocessors<br>
+• Memory Management<br>
+• Operating Systems<br>
+• Scientific Computing
+
+    </div>
+
+  </details>
+
+</div>
+
+
+
+
 
         </div>
 
