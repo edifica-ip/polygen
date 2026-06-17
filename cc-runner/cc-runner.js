@@ -6,6 +6,7 @@ const GCC_COMPAT = `
 #include <string.h>
 #include <strings.h>
 #include <stdio.h>
+
 #define strcmpi strcasecmp
 
 
@@ -19,8 +20,8 @@ char *gets(char *s)
 
     size_t len = strlen(s);
 
-    if (len > 0 && s[len - 1] == '\n')
-        s[len - 1] = '\0';
+    if (len > 0 && s[len - 1] == '\\n')
+        s[len - 1] = '\\0';
 
     return s;
 }
