@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+
+  <title>Polygen | C</title>
+  
+ <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+ <link rel="icon" href="./assets/logo.png" />
+  <link rel="stylesheet" href="./css/shell.css" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta name="color-scheme" content="dark light" />
+
+  <style>
+    /* Match Java input-row look */
+    #consoleRow span{ background:transparent!important; padding:0!important; border-radius:0!important }
+    #consoleInput{
+      display:inline-block; min-width:5ch; background:transparent; border:0; outline:0; box-shadow:none;
+      caret-color: currentColor; user-select:text; -webkit-user-modify: read-write-plaintext-only;
+    }
+    #consoleInput:focus{ outline:0 }
+    #consoleInput::selection{ background:rgba(255,255,255,.15) }
+
+    .btn[disabled], .btn.attn[disabled]{ animation:none!important }
+    .pane-foot .msg{ white-space:nowrap }
+    .panel .pane-head{ display:flex; align-items:center }
+
+    /* Overlay (same style as Java) */
+    #runnerOverlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.45); z-index:9999; }
+    #runnerOverlay[aria-hidden="false"]{ display:flex }
+    #runnerCard{ min-width:280px; max-width:420px; padding:16px 18px; border-radius:12px; background:var(--panel,#111); color:inherit; box-shadow:0 6px 24px rgba(0,0,0,.35); font:14px/1.4 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto }
+    #runnerBarWrap{ height:8px; background:rgba(255,255,255,.15); border-radius:999px; overflow:hidden }
+    #runnerBar{ height:100%; width:18%; background:currentColor; opacity:.9; transform-origin:left center }
+
+    /* Footer/icon hygiene (prevents cropping) */
+    .site-footer{ overflow:visible }
+    .footer-grid{ align-items:center }
+    .site-footer .footer-center{ display:flex; align-items:center; gap:8px; line-height:1 }
+    .site-footer .footer-center .label{ margin-right:6px }
+    .site-footer .footer-center .social{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:28px; height:28px; margin:0 4px; vertical-align:middle;
+    }
+    .site-footer .footer-center .social svg{ width:18px; height:18px }
+    #output{ overflow:auto }
+    .pane-foot{ display:flex; align-items:center; height:28px; padding:0 10px; border-top:1px solid var(--border,#2b2f34) }
+    .pane-foot .msg{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+
+
+    /* --- image preview (non-breaking) --- */
+.img-strip{ display:flex; flex-wrap:wrap; gap:12px; margin-top:8px }
+.thumb,.ppm-canvas{
+  max-height:160px; border-radius:8px;
+  box-shadow:0 1px 6px rgba(0,0,0,.2);
+  background:#fff; object-fit:contain;
+}
+.ppm-wrap{ display:flex; flex-direction:column; align-items:center; gap:6px }
+.ppm-caption{ font-size:12px; opacity:.7 }
+@media (prefers-color-scheme: dark){
+  .thumb,.ppm-canvas{ background:#111 }
+}
+
+
+
+
+
+     @media (max-width: 900px){
+
+    body{
+      height:auto !important;
+      overflow:auto !important;
+    }
+
+    .stage{
+      height:auto !important;
+      min-height:100vh;
+      overflow:auto !important;
+      padding-bottom:80px;
+    }
+
+    .app{
+      height:auto !important;
+      min-height:auto !important;
+
+      display:flex;
+      flex-direction:column;
+
+      overflow:visible !important;
+      gap:16px;
+    }
+
+    .panel{
+      min-height:auto !important;
+      height:auto !important;
+
+      overflow:visible !important;
+    }
+
+    .pane-scroll{
+      overflow:visible !important;
+      max-height:none !important;
+    }
+
+  }
+
+    
+
+   
+  </style>
+</head>
+<body class="page-fade">
+  <!-- Header -->
+  <header class="site-header">
+    <div class="brand-wrap">
+      <div class="brand-grid">
+        <img src="./assets/PC-Logo.png" alt="polygen" class="brand-logo" loading="lazy" decoding="async" />
+        <div class="brand-title2">polygen</div>
+        <div class="brand-tagline2">next-gen<span class="dot">.</span>learning<span class="dot">.</span>system</div>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="./index.html">Home</a>
+      <a href="./about.html">About</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <!-- App -->
+ <main class="stage" role="main">
+    <div class="app">
+
+      <button class="chevron-tab left" id="btnLeftToggle"
+            title="Toggle Reference Panel" aria-controls="leftPanel" aria-label="Toggle Reference Panel"  aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9.29 6.71a1 1 0 011.42 0L15 11l-4.29 4.29a1 1 0 11-1.42-1.42L12.17 11 9.29 8.12a1 1 0 010-1.41z"/>
+      </svg>
+    </button>
+
+    <button class="chevron-tab right" id="btnRightToggle"
+            title="Toggle Output Console" aria-controls="rightPanel" aria-label="Toggle Output Console" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9.29 6.71a1 1 0 011.42 0L15 11l-4.29 4.29a1 1 0 11-1.42-1.42L12.17 11 9.29 8.12a1 1 0 010-1.41z"/>
+      </svg>
+    </button>
+
+      
+      <!-- LEFT -->
+      <section class="panel left" id="leftPanel">
+        <div class="pane-head">
+          <select id="langSelect" class="select" aria-label="Choose language" onchange="location.href=this.value" disabled> 
+            <option value="./index-c.html" selected>C</option>
+            <option value="./index-cpp.html">C++</option>
+            <option value="./index-web.html">HTML/CSS/JS</option>
+            <option value="./index-java.html">Java</option>
+            <option value="./index-python.html">Python</option>
+            <option value="scratch">Scratch</option>
+            <option value="./index-sql.html">SQL (MySQL/SQLite)</option>
+          </select>
+           <div class="right-controls">
+      <!-- existing left controls… -->
+      <button class="btn expander" onclick="toggleExpand('left', this)" aria-pressed="false" title="Expand Left panel">⤢</button>
+    </div>
+        </div>
+        <div class="pane-scroll">
+        <div class="pane-body"><div id="leftContent" style="margin-top:12px;"></div></div>
+        <div class="pane-foot"><span class="msg" id="leftFoot">About C</span></div>
+        </div>
+      </section>
+
+  
+      <!-- CENTER (Monaco) -->
+      <section class="panel center" id="centerPanel">
+        <div class="pane-head">
+
+           <button id="btnToggleLeft"  class="btn btn-toggle" aria-pressed="false"  title="Show/Hide Left Panel">
+  <!-- sidebar-left icon -->
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <rect x="3" y="4" width="6" height="16" rx="1" />
+    <rect x="10" y="4" width="11" height="16" rx="1" fill="none" stroke="currentColor" stroke-width="2"/>
+  </svg>
+</button>
+
+          
+          <button id="themeToggle" class="btn theme-btn" title="Toggle theme" aria-label="Toggle theme">
+            <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          </button>
+             <div class="right-controls" style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+
+
+<button id="btnToggleRight" class="btn btn-toggle" aria-pressed="true"  title="Show/Hide Output Panel" hidden>
+  <!-- terminal/output icon -->
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M7 9l3 3-3 3M12 15h5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+            
+          <button id="btnSaveFile" class="btn" title="Capture & Share (Ctrl/Cmd+S)" aria-label="Capture & Share">
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <!-- camera frame -->
+    <rect x="3" y="6" width="18" height="13" rx="2" ry="2"
+          fill="none" stroke="currentColor" stroke-width="2"/>
+    <!-- top bar / notch -->
+    <path d="M9 6l1.5-2h3L15 6" fill="none" stroke="currentColor" stroke-width="2"/>
+    <!-- focus dot -->
+    <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+  </svg>
+</button>
+
+            <button id="btnSharePdf" class="btn" title="Download PDF" aria-label="Download PDF">
+              <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM7 9h4V3h2v6h4l-5 5-5-5z" fill="currentColor"/></svg>
+            </button>
+            <button id="btnRun" class="btn primary attn" title="Execute (Click or Press F9)" aria-label="Run">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="pane-scroll">
+        <div id="editor"></div>
+        <div class="pane-foot"><span class="msg" id="centerFoot">Ready for Execution</span></div>
+        </div>
+      </section>
+
+      
+
+      <!-- RIGHT (Console) -->
+      <section class="panel right" id="rightPanel">
+        <div class="pane-head">
+          
+          <div class="right-controls" style="margin-left:auto; display:flex; align-items:center;">
+            <button class="btn expander" onclick="toggleExpand('right', this)" aria-pressed="false" title="Expand Output">⤢</button>
+            <button id="btnComplexity" class="btn" title="Analyze Time & Space" aria-label="Complexity" disabled>
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+                <path d="M9 9.5c.9-1 2-1.5 3-1.5s2.1.5 3 1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button id="btnReset" class="btn" title="Reset (Click or Press F10)" aria-label="Reset">
+              <svg viewBox="0 0 24 24"><path d="M12 6v3l4-4-4-4v3C7.58 4 4 7.58 4 12s3.58 8 8 8a8 8 0 007.39-4.91l-1.85-.77A6 6 0 1112 6z"/></svg>
+            </button>
+          </div>
+        </div>
+
+<div class="pane-scroll">
+        <div id="output" class="screen-dim" style="padding:12px;">
+          <pre id="jconsole" class="console" style="margin:0;"></pre>
+          <div id="consoleRow" style="display:none; margin-top:0; gap:4px; align-items:baseline; font:14px/1.4 ui-monospace, Menlo, Consolas, monospace;">
+            <span id="consolePrefix"></span>
+            <span id="consoleInput" contenteditable="true" spellcheck="false"></span>
+            
+           
+            
+          </div>
+           
+        
+        <pre id="stderrText" class="console-block error" aria-label="Compiler Errors"></pre>
+            <!-- NEW: explanations will be injected here -->
+            <div id="stderrExplain" class="console-explain" aria-live="polite"></div>
+        
+        </div>
+
+        <div class="pane-foot"><span class="msg" id="rightFoot">Waiting for Execution</span></div>
+        </div>
+      </section>
+    </div>
+  
+
+ </main>
+  <!-- Footer -->
+ <footer class="site-footer">
+  <div class="footer-grid">
+    <!-- Left: Edifica logo + powered + slogan -->
+    <div class="footer-left">
+      <img src="./assets/logo.png" alt="Edifica" class="footer-logo" />
+      <div class="txt">
+        <span class="powered">powered by edifica</span>
+       <span class="subline">
+  education<span class="dot">.</span>consultation<span class="dot">.</span>assistance
+</span>
+<div class="siteurl">
+  <a href="https://www.edifica.in" target="_blank" rel="noopener">www.edifica.in</a>
+</div>
+
+        
+      </div>
+    </div>
+
+    <!-- Center: Follow us + icons (auto colors by theme) -->
+    <div class="footer-center">
+      <span class="label">Follow us</span>
+      <a class="social" href="https://facebook.com/edifica.facebook" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
+        <!-- FB -->
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M22 12.07C22 6.48 17.52 2 11.93 2S2 6.48 2 12.07c0 5.01 3.66 9.16 8.44 9.93v-7.03H7.9v-2.9h2.54V9.41c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.9h-2.34v7.03C18.34 21.23 22 17.08 22 12.07z"/></svg>
+      </a>
+      <a class="social" href="https://instagram.com/edifica.ig" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+        <!-- IG -->
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM12 9.5A2.5 2.5 0 1 1 9.5 12 2.5 2.5 0 0 1 12 9.5z"/></svg>
+      </a>
+      <a class="social" href="https://youtube.com/@edifica.youtube" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube">
+        <!-- YT -->
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.4 3.5 12 3.5 12 3.5s-7.4 0-9.4.6A3 3 0 0 0 .5 6.2 31.7 31.7 0 0 0 0 12a31.7 31.7 0 0 0 .6 5.8 3 3 0 0 0 2.1 2.1c2 .6 9.3.6 9.3.6s7.4 0 9.4-.6a3 3 0 0 0 2.1-2.1c.4-1.9.6-3.9.6-5.8 0-1.9-.2-3.9-.6-5.8zM9.6 15.5V8.5L16 12l-6.4 3.5z"/></svg>
+      </a>
+    </div>
+
+    <!-- Right: legal links (now underlined) -->
+    <div class="footer-right">
+      <a href="./privacy.html">Privacy Policy</a>
+      <a href="./terms.html">Terms &amp; Conditions</a>
+      <a href="./legal.html">Legal Information</a>
+    </div>
+  </div>
+</footer>
+  <!-- Vendor -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.min.js" defer></script>
+  <script src="./js/shell.js" defer></script>
+
+  <!-- Page script -->
+  <script>
+    /* --- Sample C used in the editor --- */
+    const SAMPLE_C =
+`#include <stdio.h>
+
+int main(){
+    int n;
+    printf("Enter a number: ");
+    if (scanf("%d", &n) != 1) return 0;
+    printf("Square = %d\\n", n*n);
+    return 0;
+}`;
+
+    /* --- Bootstrap (same call pattern as Java) --- */
+    window.bootstrap = async function(){
+      await window.PolyShell.initMonaco({ value: SAMPLE_C, language: 'c' });
+      window.PolyShell.setStatus('Ready','ok');
+      window.PolyShell.loadLeftContent?.('c');
+      setComplexityEnabled(false);
+    };
+
+    /* ===== Input-wait countdown & status dots (same as Java) ===== */
+    let __inputDeadline = 0, __inputCountdownTimer = null;
+    function getCountdownText(){
+      if (!__inputDeadline) return '';
+      const ms = Math.max(0, __inputDeadline - Date.now());
+      const s  = Math.floor(ms/1000);
+      const mm = String(Math.floor(s/60)).padStart(2,'0');
+      const ss = String(s%60).padStart(2,'0');
+      return ` — ${mm}:${ss}`;
+    }
+
+
+
+
+
+
+/* --- Image preview helpers (PNG/BMP/PPM) --- */
+function showImages(urls) {
+  if (!urls || !urls.length) return;
+
+  // 👇 normalize to absolute runner URLs
+  const norm = urls.map(u => {
+    const s = String(u || "");
+    if (/^https?:\/\//i.test(s)) return s;
+    if (s.startsWith("/")) return C_API_BASE + s;   // e.g. "/artifacts/..." -> "https://polycode-cc.onrender.com/artifacts/..."
+    return s;
+  });
+
+  const out = document.getElementById('output') || document.body;
+  const strip = document.createElement('div');
+  strip.className = 'img-strip';
+
+  norm.forEach(u => {
+    if (u.toLowerCase().endsWith('.ppm')) {
+      const wrap = document.createElement('div');
+      wrap.className = 'ppm-wrap';
+      const canvas = document.createElement('canvas');
+      canvas.className = 'ppm-canvas';
+      const cap = document.createElement('div');
+      cap.className = 'ppm-caption';
+      cap.textContent = u.split('/').pop();
+      wrap.appendChild(canvas); wrap.appendChild(cap);
+      strip.appendChild(wrap);
+      renderPPMToCanvas(u, canvas).catch(err => { cap.textContent = 'PPM render failed: ' + err; });
+    } else {
+      const a = document.createElement('a');
+      a.href = u; a.target = '_blank'; a.rel = 'noopener';
+      const img = document.createElement('img');
+      img.src = u; img.className = 'thumb';
+      a.appendChild(img);
+      strip.appendChild(a);
+    }
+  });
+
+  out.appendChild(strip);
+}
+
+
+async function renderPPMToCanvas(url, canvas) {
+  const magic = await sniffMagic(url);
+  if (magic === 'P3') {
+    const txt = await fetch(url, { mode:'cors' }).then(r=>r.text());
+    const { width, height, maxval, pixels } = parsePPM_P3(txt);
+    drawPixels(canvas, width, height, maxval, pixels);
+  } else {
+    const buf = await fetch(url, { mode:'cors' }).then(r=>r.arrayBuffer());
+    const { width, height, maxval, pixels } = parsePPM_P6(buf);
+    drawPixels(canvas, width, height, maxval, pixels);
+  }
+}
+
+async function sniffMagic(url){
+  const res = await fetch(url, { mode:'cors' });
+  const reader = res.body.getReader();
+  const { value } = await reader.read();
+  reader.releaseLock();
+  const head = new TextDecoder().decode(value || new Uint8Array());
+  const m = /^\s*(P[36])/.exec(head);
+  return m ? m[1] : 'P6';
+}
+
+function parsePPM_P3(text){
+  const tokens = [];
+  text.split(/\r?\n/).forEach(line=>{
+    const s = line.replace(/#.*$/, '');
+    if (s.trim()) tokens.push(...s.trim().split(/\s+/));
+  });
+  if (tokens[0] !== 'P3') throw new Error('Not P3');
+  let i = 1;
+  const width  = parseInt(tokens[i++],10);
+  const height = parseInt(tokens[i++],10);
+  const maxval = parseInt(tokens[i++],10);
+  const need = width * height * 3;
+  if (tokens.length - i < need) throw new Error('Truncated data');
+  const pixels = new Uint32Array(need);
+  for (let k=0; k<need; k++) pixels[k] = parseInt(tokens[i++],10);
+  return { width, height, maxval, pixels };
+}
+
+function parsePPM_P6(buf){
+  const b = new Uint8Array(buf);
+  let i=0;
+  const readTok=()=>{
+    while(i<b.length){
+      const c=b[i];
+      if(c===35){ while(i<b.length && b[i++]!==10){} continue; } // '#'
+      if(/\s/.test(String.fromCharCode(c))){ i++; continue; }
+      break;
+    }
+    let s=''; while(i<b.length && !/\s/.test(String.fromCharCode(b[i]))){ s+=String.fromCharCode(b[i++]); }
+    return s;
+  };
+  if(readTok()!=='P6') throw new Error('Not P6');
+  const width  = parseInt(readTok(),10);
+  const height = parseInt(readTok(),10);
+  const maxval = parseInt(readTok(),10);
+  while(i<b.length && /\s/.test(String.fromCharCode(b[i]))) i++;
+  const need = width*height*3;
+  if (b.length - i < need) throw new Error('Truncated data');
+  const pixels = new Uint8Array(b.buffer, i, need);
+  return { width, height, maxval, pixels };
+}
+
+function drawPixels(canvas, width, height, maxval, pixels){
+  canvas.width = width; canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  const img = ctx.createImageData(width, height);
+  const scale = maxval === 255 ? 1 : (255 / maxval);
+  const N = width * height;
+
+  if (pixels instanceof Uint32Array) {
+    for (let p=0,q=0; p<N; p++, q+=4){
+      img.data[q]   = (pixels[p*3]   * scale) | 0;
+      img.data[q+1] = (pixels[p*3+1] * scale) | 0;
+      img.data[q+2] = (pixels[p*3+2] * scale) | 0;
+      img.data[q+3] = 255;
+    }
+  } else {
+    for (let p=0,q=0; p<N; p++, q+=4){
+      img.data[q]   = (pixels[p*3]   * scale) | 0;
+      img.data[q+1] = (pixels[p*3+1] * scale) | 0;
+      img.data[q+2] = (pixels[p*3+2] * scale) | 0;
+      img.data[q+3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    function startInputCountdown(ms){
+      stopInputCountdown();
+      __inputDeadline = Date.now() + Math.max(0, Number(ms) || 0);
+      __inputCountdownTimer = setInterval(()=>{}, 500); // tick piggy-backs on status dots
+    }
+    function stopInputCountdown(){
+      __inputDeadline = 0;
+      if (__inputCountdownTimer){ clearInterval(__inputCountdownTimer); __inputCountdownTimer = null; }
+    }
+
+    let __statusTimer = null, __statusBase = '';
+    function startStatusDots(baseText){
+      stopStatusDots();
+      __statusBase = baseText || 'Executing';
+      let dots = 0;
+      __statusTimer = setInterval(()=>{
+        dots = (dots+1) % 4;
+       window.PolyShell?.setStatus(__statusBase + '.'.repeat(dots) + getCountdownText(), 'busy');
+      }, 400);
+    }
+    function stopStatusDots(){ if (__statusTimer){ clearInterval(__statusTimer); __statusTimer=null; } }
+
+    /* ===== Console helpers (same semantics as Java) ===== */
+    function setConsole(text){
+      const el = document.getElementById('jconsole'); if (!el) return;
+      el.textContent = text || '';
+      document.getElementById('output')?.scrollTo({ top: 1e9 });
+    }
+    function termWrite(t){
+      const el = document.getElementById('jconsole'); if (!el) return;
+      el.textContent += t;
+      document.getElementById('output')?.scrollTo({ top: 1e9 });
+    }
+
+    /* ===== Input row (same behavior as Java) ===== */
+    let inputWaitMs = 5 * 60 * 1000;
+    function focusConsoleInput(){
+      const el = document.getElementById('consoleInput'); if (!el) return;
+      el.focus(); const r = document.createRange(); r.selectNodeContents(el); r.collapse(false);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    }
+    function showInputRow(show){
+      const row = document.getElementById('consoleRow');
+      const pre = document.getElementById('jconsole');
+      const prefix = document.getElementById('consolePrefix');
+      if (row) row.style.display = show ? 'flex' : 'none';
+
+      if (show){
+        const txt = pre.textContent; const i = txt.lastIndexOf('\n'); const tail = txt.slice(i+1);
+        if (tail && !/^\s*$/.test(tail)){ prefix.textContent = tail + ' '; pre.textContent = txt.slice(0, i+1); }
+        else { prefix.textContent = ''; }
+
+        window.PolyShell?.setRunnerPhase?.('waiting_input', { detail: getCountdownText?.() });
+        window.PolyShell?.setStatus('Waiting for User Input...', 'busy');
+        __statusBase = 'Waiting for User Input'; startStatusDots(__statusBase);
+        startInputCountdown(inputWaitMs);
+        window.PolyShell?.startInputTicker?.(getCountdownText, 500);
+
+        focusConsoleInput();
+      }else{
+        if (typeof window.wsRunInFlight !== 'undefined' && window.wsRunInFlight){
+          window.PolyShell?.setStatus('Executing...', 'busy');
+        }
+        if (prefix.textContent){ pre.textContent += prefix.textContent; prefix.textContent=''; }
+      }
+    }
+
+    document.addEventListener('keydown', (e)=>{
+      const el = document.getElementById('consoleInput');
+      if (!el || el.offsetParent === null) return;
+      if (e.target !== el) return;
+      if (e.key === 'Enter'){
+        e.preventDefault();
+        stopInputCountdown();
+        window.PolyShell?.stopInputTicker?.();
+        __statusBase = 'Executing'; startStatusDots(__statusBase);
+        window.PolyShell?.setRunnerPhase?.('running');
+
+        const pre    = document.getElementById('jconsole');
+        const prefix = document.getElementById('consolePrefix');
+        if (prefix && prefix.textContent){ pre.textContent += prefix.textContent; prefix.textContent=''; }
+
+        const line = el.textContent;
+        termWrite(line + '\n');
+        el.textContent = '';
+
+        try{
+          if (window.termWS && window.termWS.readyState === 1 && window.wsRunInFlight){
+            window.termWS.send(JSON.stringify({ type:'stdin', data: line + '\n' }));
+          }
+        }catch{}
+        focusConsoleInput();
+      }
+    }, { capture:true });
+
+    /* ===== Monaco markers ===== */
+    function clearEditorMarkers(){
+      if (!window.monaco || !window.editor) return;
+      const m = window.editor.getModel();
+      if (m) window.monaco.editor.setModelMarkers(m, 'c-compile', []);
+    }
+    function setEditorMarker(line, message){
+      if (!window.monaco || !window.editor) return;
+      const m = window.editor.getModel(); if (!m) return;
+      const maxCol = Math.max(1, m.getLineMaxColumn(line || 1));
+      window.monaco.editor.setModelMarkers(m, 'c-compile', [{
+        startLineNumber: line || 1, endLineNumber: line || 1,
+        startColumn: 1, endColumn: maxCol,
+        message: String(message || 'Error'), severity: window.monaco.MarkerSeverity.Error
+      }]);
+    }
+
+    /* ===== Helpers ===== */
+    function codeNeedsInput(src){ return /\bscanf\s*\(|\bgetchar\s*\(|\bfgets\s*\(/.test(src); }
+
+    // Overlay helpers (same naming as Java)
+    function showRunnerOverlay(msg='Connecting to C runner…', pct=10, hint='Warming up backend…'){
+      const ov=document.getElementById('runnerOverlay'); const bar=document.getElementById('runnerBar');
+      const m=document.getElementById('runnerMsg'); const h=document.getElementById('runnerHint');
+      if (!ov||!bar||!m||!h) return; ov.style.display='flex'; m.textContent=msg; h.textContent=hint;
+      bar.style.width = Math.max(5, Math.min(100, Math.floor(pct))) + '%';
+    }
+    function updateRunnerOverlay({msg, pct, hint}){
+      const m=document.getElementById('runnerMsg'); const h=document.getElementById('runnerHint');
+      const bar=document.getElementById('runnerBar'); if (msg&&m) m.textContent=msg; if (hint&&h) h.textContent=hint;
+      if (typeof pct==='number' && bar){ bar.style.width = Math.max(5, Math.min(100, Math.floor(pct))) + '%'; }
+    }
+    function hideRunnerOverlay(){ const ov=document.getElementById('runnerOverlay'); if (ov) ov.style.display='none'; }
+
+    // Complexity button toggle (match Java)
+    function setComplexityEnabled(on){
+      const b=document.getElementById('btnComplexity'); if (!b) return;
+      const was=b.disabled; b.disabled=!on;
+      if (on && was && !b.dataset.pulsedOnce){
+        b.classList.add('btn-pulse'); b.dataset.pulsedOnce='1';
+        setTimeout(()=> b.classList.remove('btn-pulse'), 1000);
+      }
+    }
+    window.setComplexityEnabled = setComplexityEnabled;
+
+    /* ===== Backend endpoints for C ===== */
+    //const C_API_BASE = 'https://polycode-cc.onrender.com';
+    //const C_WS_BASE  = 'wss://polycode-cc.onrender.com/cc';
+
+    /*async function prepare(){
+      const code = window.editor ? window.editor.getValue() : '';
+      const files = [{ path:'main.c', content:code }];
+      const res = await fetch(C_API_BASE + '/api/cc/prepare', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ lang:'c', files, entry:'main.c', output:'a.out' })
+      });
+      if (!res.ok) throw new Error('Prepare failed: ' + res.status);
+      return res.json();
+    }*/
+
+
+const C_API_BASE = 'https://polycode-cc.onrender.com';
+  const C_WS_BASE  = 'wss://polycode-cc.onrender.com/cc';
+
+  // cache after first load
+  let __GRAPHICS_H_TEXT = null;
+
+const GRAPHICS_H_FALLBACK = `/* your working graphics.h content */`;
+
+  async function loadGraphicsHeader(){
+    try{
+      const res = await fetch('/assets/headerfiles/graphics.h?v=' + Date.now(), { cache:'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const txt = await res.text();
+      return (txt && txt.trim()) ? txt : GRAPHICS_H_FALLBACK;
+    }catch(e){
+      console.warn('graphics.h fetch failed, using fallback:', e);
+      return GRAPHICS_H_FALLBACK;
+    }
+  }
+
+async function prepare(){
+  const code  = window.editor ? window.editor.getValue() : '';
+  const files = [{ path:'main.c', content: code }];
+  const headers = await loadHeaders(['graphics.h']);
+  files.push(...headers);
+
+  const res = await fetch(C_API_BASE + '/api/cc/prepare', {
+    method:'POST', headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ lang:'c', files, entry:'main.c', output:'a.out' })
+  });
+  if (!res.ok) throw new Error('Prepare failed: ' + res.status);
+  return res.json();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function showFailNotice(msg){
+
+  console.error(msg);
+
+  alert(msg);
+
+}
+
+
+    
+
+    // Parse gcc/clang error line
+    function parseCCompileErrorLine(text){
+      const m = /main\.c:(\d+):\d+:\s*error:\s*(.+)/.exec(text) || /main\.c:(\d+):\d+:\s*fatal error:\s*(.+)/.exec(text);
+      return m ? { line: Math.max(1, parseInt(m[1],10)), msg: m[2] } : null;
+    }
+
+    /* ===== Heartbeat (same cadence as Java) ===== */
+    let hbInterval=null, hbTimeout=null;
+    function startHeartbeat(ws){
+      stopHeartbeat();
+      hbInterval = setInterval(()=>{ try{
+        if (ws.readyState!==1) return;
+        ws.send(JSON.stringify({type:'ping'}));
+        clearTimeout(hbTimeout);
+        hbTimeout = setTimeout(()=>{ console.warn('Runner heartbeat missed'); }, 5000);
+      }catch{} }, 25000);
+    }
+    function stopHeartbeat(){ if (hbInterval){ clearInterval(hbInterval); hbInterval=null; } if (hbTimeout){ clearTimeout(hbTimeout); hbTimeout=null; } }
+
+    /* ===== Run flow (mirrors Java structure) ===== */
+    
+
+window.runLang = async function(){
+  // --- pre-run cleanup (same as you already do) ---
+  clearEditorMarkers();
+  setComplexityEnabled(false);
+  const prefix = document.getElementById('consolePrefix'); if (prefix) prefix.textContent = '';
+  showInputRow(false);
+  setConsole('');
+  document.getElementById('output')?.classList.remove('error');
+
+  const src = window.editor ? window.editor.getValue() : '';
+  const needsStdin = /\bscanf\s*\(|\bgetchar\s*\(|\bfgets\s*\(/.test(src);
+
+  // state used to decide success at close
+  const runState = { exitCode:null, compiled:false };
+
+  return new Promise(async (resolve, reject)=>{
+    try{
+      // ---- compile (prepare) ----
+      window.PolyShell?.setStatus('Compiling…','busy');
+      __statusBase = 'Compiling'; startStatusDots(__statusBase);
+
+      const code = window.editor ? window.editor.getValue() : '';
+      const files = [{ path:'main.c', content:code }];
+      const res = await fetch('https://polycode-cc.onrender.com/api/cc/prepare', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ lang:'c', files, entry:'main.c', output:'a.out' })
+      });
+      if (!res.ok) throw new Error('Prepare failed: ' + res.status);
+      const prep = await res.json();
+
+     /* if (!prep || !prep.ok || !prep.token){
+        // print compiler output, set Monaco markers, then REJECT
+        stopStatusDots();
+        const log = (prep && (prep.compileLog || prep.stderr || prep.stdout)) || '';
+        termWrite((log||'').trim() + '\n');
+        const m = /main\.c:(\d+):\d+:\s*(?:error|fatal error):\s*(.+)/.exec(log||'');
+        if (m){ setEditorMarker(Math.max(1,parseInt(m[1],10)), m[2]); }
+        else { setEditorMarker(1, (log.split('\n')[0] || 'Compilation failed').trim()); }
+        window.PolyShell?.setRunnerPhase?.('error');
+        window.PolyShell?.setStatus('Execution Failed','error');
+        setComplexityEnabled(false);
+       showCompileFailNotice();
+        return reject(new Error('compile_failed'));
+      }*/
+
+
+
+
+if (!prep || !prep.ok || !prep.token) {
+  stopStatusDots();
+
+  // 1) Get compiler log (stderr preferred, then stdout/aggregate)
+  const log = (prep && (prep.compileLog || prep.stderr || prep.stdout)) || '';
+  const trimmed = (log || '').trim();
+
+  // 2) Show a short note in the console (not the whole log — avoids duplication)
+  showCompileFailNotice();
+
+  // 3) Put the full log ONLY into #stderrText (single source of truth for the explainer/UI)
+  const st = document.getElementById('stderrText');
+  if (st) {
+    st.textContent = trimmed;
+    st.style.display = 'block';
+  }
+
+  // 4) Set Monaco marker from the first precise error, if present
+  const m = /main\.c:(\d+):\d+:\s*(?:error|fatal error):\s*(.+)/.exec(trimmed);
+  if (m) { setEditorMarker(Math.max(1, parseInt(m[1], 10)), m[2]); }
+  else   { setEditorMarker(1, (trimmed.split('\n')[0] || 'Compilation failed').trim()); }
+
+  // 5) Keep PolyShell cache in sync for the explainer
+  window.PolyShell?.setRawOutputs('', trimmed);
+
+  // 6) Render the friendly explanation INLINE now (no alert here to avoid double popups)
+  try { await window.refreshStderrExplanation?.({ alsoAlert: false }); } catch {}
+
+  // 7) Status/UI
+  window.PolyShell?.setRunnerPhase?.('error');
+  window.PolyShell?.setStatus('Execution Failed', 'error');
+  setComplexityEnabled(false);
+
+  // 8) Reject with a meaningful first line (so your catch has a good .message)
+  const firstLine = trimmed.split('\n').find(Boolean) || 'Compilation failed';
+   showCompileFailNotice();
+  return reject(new Error(firstLine));
+}
+
+
+
+
+
+
+
+
+      
+      runState.compiled = true;
+
+      // ---- connect ----
+      showRunnerOverlay('Connecting to C runner…', 12, 'Creating interactive session…');
+      __statusBase = 'Connecting'; startStatusDots(__statusBase);
+
+      const ws = new WebSocket('wss://polycode-cc.onrender.com/cc?token=' + encodeURIComponent(prep.token));
+      window.termWS = ws; window.wsRunInFlight = true;
+
+      let settled = false; // prevent double resolve/reject
+      // inside index-c.html, in the `finish` function:
+const finish = async (ok) => {
+  if (settled) return; settled = true;
+  try{ hideRunnerOverlay(); }catch{}
+  try{ stopHeartbeat(); }catch{}
+  stopStatusDots(); stopInputCountdown();
+  window.PolyShell?.stopInputTicker?.();
+  showInputRow(false);
+  window.wsRunInFlight = false;
+  setComplexityEnabled(!!ok);
+
+  /*if (!ok) {
+    const j = document.getElementById('jconsole')?.textContent || '';
+
+    
+    // NEW: show the runtime banner heading
+    showCompileFailNotice('runtime');  // uses "Execution Failed — See Details Below."
+
+    // Optional: lightly de-duplicate the common double "[process exited ...]" line
+    const cleaned = j.replace(
+      /\n*\[process exited with code\s+(-?\d+)\][^\n]*\n(?:\s*\[process exited with code\s+\1\][^\n]*\n)+/i,
+      '\n[process exited with code $1]\n'
+    );
+
+    // Put the (cleaned) raw error only in #stderrText (single source of truth)
+    const st = document.getElementById('stderrText');
+    if (st) { st.textContent = cleaned; st.style.display = 'block'; }
+
+    // NEW: keep the explainer’s input in sync and render it now
+    window.PolyShell?.setRawOutputs('', cleaned);          // feed stderr
+    try { await window.refreshStderrExplanation?.({ alsoAlert:false }); } catch {}  // render "Polycode Analysis"
+
+    // Optional: reflect status like the compile path does
+    window.PolyShell?.setRunnerPhase?.('error');
+    window.PolyShell?.setStatus('Execution Failed','error');
+  }*/
+
+
+  if (!ok && !__userReset) {
+  const j  = document.getElementById('jconsole')?.textContent || '';
+   window.PolyShell?.setRawOutputs('', j);                 // NEW: give stderr to explainer
+try { await window.refreshStderrExplanation?.({ alsoAlert:false }); } catch {}  // NEW
+  const st = document.getElementById('stderrText');
+  if (st) { st.textContent = j; st.style.display = 'block'; }
+  showCompileFailNotice('runtime');                // add this
+  const jc = document.getElementById('jconsole');  // and clear console
+  if (jc) jc.textContent = '';
+}
+
+
+  ok ? resolve() : reject(new Error('run_failed'));
+};
+
+      ws.addEventListener('open', ()=>{
+        hideRunnerOverlay();
+        __statusBase = needsStdin ? 'Running (interactive)' : 'Running';
+        startStatusDots(__statusBase);
+        startHeartbeat(ws);
+        window.PolyShell?.setRunnerPhase?.('running');
+        if (needsStdin){
+          // If stdout didn’t flush prompt, still allow typing shortly
+          setTimeout(()=>{ if (!settled && window.wsRunInFlight) showInputRow(true); }, 400);
+        }
+      });
+
+     ws.addEventListener('message', (ev)=>{
+  const raw = ev.data;
+  const text = typeof raw === 'string' ? raw : String(raw || '');
+
+  // 1) JSON image payload from runner
+  if (text.trim().startsWith('{')) {
+    try {
+      const msg = JSON.parse(text);
+      if (msg && msg.type === 'images' && Array.isArray(msg.urls)) {
+        showImages(msg.urls);      // NEW
+        return;                    // don't print JSON to console
+      }
+    } catch {}
+  }
+
+  // 2) Plain-text fallback marker from runner (still supported)
+  if (text.startsWith('[image] ')) {
+    const url = text.substring(8).trim();
+    if (url) { showImages([url]); return; }   // NEW
+  }
+
+  // 3) Original behavior (unchanged)
+  termWrite(text);
+
+  // 4) Your existing structured messages
+  try{
+    const msg = JSON.parse(text);
+    if (msg.type === 'stdin_req'){
+      showInputRow(true);
+      window.PolyShell?.setRunnerPhase?.('waiting_input');
+      window.PolyShell?.setStatus('Waiting for User Input…','busy');
+      __statusBase = 'Waiting for User Input'; startStatusDots(__statusBase);
+      startInputCountdown(5*60*1000);
+      window.PolyShell?.startInputTicker?.(getCountdownText, 500);
+    } else if (msg.type === 'exit'){
+      runState.exitCode = Number(msg.code);
+    }
+  }catch{}
+
+  const m = text.match(/\[process exited with code\s+(-?\d+)\]/i);
+  if (m) runState.exitCode = parseInt(m[1],10);
+});
+
+
+      ws.addEventListener('error', ()=>{ termWrite('\n[connection error]\n'); finish(false); });
+
+      /*ws.addEventListener('close', ()=>{
+        // stop timers/overlays, then resolve/reject so shell.js can set final status + time
+        const ok = (runState.exitCode === 0);
+        finish(ok);
+      }, { once:true });*/
+
+
+   ws.addEventListener('close', ()=>{
+        // stop timers/overlays, then resolve/reject so shell.js can set final status + time
+        const ok = (runState.exitCode === 0); 
+        finish(ok);
+      }, { once:true });
+
+    }catch(err){
+      // network / unexpected failure
+      stopStatusDots(); stopInputCountdown();
+      window.PolyShell?.stopInputTicker?.();
+      showInputRow(false);
+      window.wsRunInFlight = false;
+      window.PolyShell?.setRunnerPhase?.('error');
+      window.PolyShell?.setStatus('Execution Failed','error');
+      document.getElementById('output')?.classList.add('error');
+      termWrite((err && err.message) ? (err.message+'\n') : 'Execution failed\n');
+      showFailNotice('runtime');
+      reject(err);
+    }
+  });
+};
+
+
+
+    let __userReset = false;
+
+    window.clearLang = function(){
+      setConsole('');
+      //try{ window.termWS?.close(); }catch{}
+      __userReset = true;
+try{ window.termWS?.close(1000, 'user_reset'); }catch{}
+      window.termWS = null; window.wsRunInFlight = false;
+      showInputRow(false);
+      setComplexityEnabled(false);
+      stopStatusDots(); stopInputCountdown();
+      window.PolyShell?.stopInputTicker?.();
+      //window.PolyShell.setStatus('Ready','ok');
+      window.PolyShell.setStatus('Waiting for Execution','ok');
+    };
+
+    // Start after shell.js
+    (function startWhenReady(){
+      function start(){
+        if (!window.PolyShell){
+          const id = setInterval(()=>{ if (window.PolyShell){ clearInterval(id); window.bootstrap(); } }, 25);
+          setTimeout(()=>clearInterval(id), 3000);
+          return;
+        }
+        window.bootstrap();
+      }
+      if (document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', start, { once:true }); }
+      else { start(); }
+    })();
+  </script>
+
+  <!-- Runner overlay -->
+  <div id="runnerOverlay" aria-hidden="true">
+    <div id="runnerCard">
+      <div id="runnerMsg" style="font-weight:600; margin-bottom:8px;">Connecting to C runner…</div>
+      <div id="runnerBarWrap"><div id="runnerBar"></div></div>
+      <div id="runnerHint" style="margin-top:8px; opacity:.8;">Warming up backend…</div>
+    </div>
+  </div>
+
+  <!-- Complexity modal (optional UI) -->
+  <div class="pc-modal" id="cxModal" aria-hidden="true">
+    <div class="pc-modal__backdrop" data-close></div>
+    <div class="pc-modal__dialog">
+      <div class="pc-modal__header">
+        <div class="pc-modal__title">Time Complexity (C)</div>
+        <button class="pc-modal__x" data-close aria-label="Close">×</button>
+      </div>
+      <div class="pc-modal__body">
+        <div class="cx-summary" id="cxSummary"></div>
+        <hr/>
+        <table class="cx-table" id="cxTable"><thead><tr><th>Line</th><th>Type</th><th>Complexity</th><th>Reason</th></tr></thead><tbody></tbody></table>
+        <div class="cx-notes" id="cxNotes"></div>
+      </div>
+      <div class="pc-modal__footer"><button class="btn" data-close>Close</button></div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('click', (e)=>{ if (e.target && e.target.matches('[data-close]')){ document.getElementById('cxModal')?.setAttribute('aria-hidden','true'); }});
+    document.getElementById('btnComplexity')?.addEventListener('click', ()=>{
+      document.getElementById('cxModal')?.setAttribute('aria-hidden','false');
+      window.PolyShell?.setStatus('Analyzing…'); setTimeout(()=> window.PolyShell?.setStatus('Ready','ok'), 400);
+    });
+  </script>
+  <script src="./js/complexityc.js" defer></script>
+
+ <script src="./js/lang-select.js" defer></script>
+
+<script type="module">
+  import { parseCompilerOutput, renderHintHTML } from './js/error-helper.js';
+  // Expose for shell.js if needed:
+  window.PolyErrorHelper = { parseCompilerOutput, renderHintHTML };
+</script>
+
+  
+</body>
+</html>
