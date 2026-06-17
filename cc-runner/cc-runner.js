@@ -8,7 +8,12 @@ const GCC_COMPAT = `
 #include <stdio.h>
 
 #define strcmpi strcasecmp
-#define gets(s) fgets((s),1000,stdin)
+
+
+char *gets(char *s)
+{
+    return fgets(s,1000,stdin);
+}
 
 
 
