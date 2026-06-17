@@ -121,23 +121,9 @@ export async function run(){
     ws.binaryType = 'arraybuffer';
     ws.onopen = () => attachInput(ws);
     ws.onmessage = (ev) => {
-
-  const text =
-    (typeof ev.data === 'string')
-      ? ev.data
-      : new TextDecoder().decode(ev.data);
-
-  const term = getTerminal();
-
-  term.write(text);
-
-  if (term.refresh) {
-    term.refresh(
-      0,
-      term.rows - 1
-    );
-  }
-};
+      const text = (typeof ev.data === 'string') ? ev.data : new TextDecoder().decode(ev.data);
+      getTerminal().write(text);
+    };
     ws.onclose = () => { detachInput(); setStatus('Program finished.', 'ok'); showSpinner(false); };
     ws.onerror = () => { detachInput(); setStatus('Run error.', 'err'); showSpinner(false); };
   }catch(err){
