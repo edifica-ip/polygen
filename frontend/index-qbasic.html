@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
 
-  <title>Polygen | C</title>
+  <title>Polygen | QBasic</title>
   
  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
  <link rel="icon" href="./assets/logo.png" />
@@ -148,7 +148,8 @@
       <section class="panel left" id="leftPanel">
         <div class="pane-head">
           <select id="langSelect" class="select" aria-label="Choose language" onchange="location.href=this.value" disabled> 
-            <option value="./index-c.html" selected>C</option>
+            <option value="./index-qbasic.html" selected>QBasic</option>
+            <option value="./index-c.html">C</option>
             <option value="./index-cpp.html">C++</option>
             <option value="./index-web.html">HTML/CSS/JS</option>
             <option value="./index-java.html">Java</option>
@@ -163,7 +164,7 @@
         </div>
         <div class="pane-scroll">
         <div class="pane-body"><div id="leftContent" style="margin-top:12px;"></div></div>
-        <div class="pane-foot"><span class="msg" id="leftFoot">About C</span></div>
+        <div class="pane-foot"><span class="msg" id="leftFoot">About QBasic</span></div>
         </div>
       </section>
 
@@ -318,22 +319,20 @@
   <!-- Page script -->
   <script>
     /* --- Sample C used in the editor --- */
-    const SAMPLE_C =
-`#include <stdio.h>
+    const SAMPLE_QBASIC =
+`PRINT "Welcome to Polygen"
 
-int main(){
-    int n;
-    printf("Enter a number: ");
-    if (scanf("%d", &n) != 1) return 0;
-    printf("Square = %d\\n", n*n);
-    return 0;
-}`;
+PRINT "QBASIC Ready"
+`;
 
     /* --- Bootstrap (same call pattern as Java) --- */
     window.bootstrap = async function(){
-      await window.PolyShell.initMonaco({ value: SAMPLE_C, language: 'c' });
+      await window.PolyShell.initMonaco({
+  value: SAMPLE_QBASIC,
+  language: 'plaintext'
+});
       window.PolyShell.setStatus('Ready','ok');
-      window.PolyShell.loadLeftContent?.('c');
+      window.PolyShell.loadLeftContent?.('qbasic');
       setComplexityEnabled(false);
     };
 
@@ -741,250 +740,26 @@ async function prepare(){
     
 
 window.runLang = async function(){
-  // --- pre-run cleanup (same as you already do) ---
-  clearEditorMarkers();
-  setComplexityEnabled(false);
-  const prefix = document.getElementById('consolePrefix'); if (prefix) prefix.textContent = '';
-  showInputRow(false);
+
   setConsole('');
-  document.getElementById('output')?.classList.remove('error');
 
-  const src = window.editor ? window.editor.getValue() : '';
-  const needsStdin = /\bscanf\s*\(|\bgetchar\s*\(|\bfgets\s*\(/.test(src);
+  const code =
+    window.editor.getValue();
 
-  // state used to decide success at close
-  const runState = { exitCode:null, compiled:false };
+  const qb =
+    new window.QBasicInterpreter();
 
-  return new Promise(async (resolve, reject)=>{
-    try{
-      // ---- compile (prepare) ----
-      window.PolyShell?.setStatus('Compiling…','busy');
-      __statusBase = 'Compiling'; startStatusDots(__statusBase);
+  const result =
+    qb.run(code);
 
-      const code = window.editor ? window.editor.getValue() : '';
-      const files = [{ path:'main.c', content:code }];
-      const res = await fetch('https://polycode-cc.onrender.com/api/cc/prepare', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ lang:'c', files, entry:'main.c', output:'a.out' })
-      });
-      if (!res.ok) throw new Error('Prepare failed: ' + res.status);
-      const prep = await res.json();
+  setConsole(result);
 
-     /* if (!prep || !prep.ok || !prep.token){
-        // print compiler output, set Monaco markers, then REJECT
-        stopStatusDots();
-        const log = (prep && (prep.compileLog || prep.stderr || prep.stdout)) || '';
-        termWrite((log||'').trim() + '\n');
-        const m = /main\.c:(\d+):\d+:\s*(?:error|fatal error):\s*(.+)/.exec(log||'');
-        if (m){ setEditorMarker(Math.max(1,parseInt(m[1],10)), m[2]); }
-        else { setEditorMarker(1, (log.split('\n')[0] || 'Compilation failed').trim()); }
-        window.PolyShell?.setRunnerPhase?.('error');
-        window.PolyShell?.setStatus('Execution Failed','error');
-        setComplexityEnabled(false);
-       showCompileFailNotice();
-        return reject(new Error('compile_failed'));
-      }*/
+  window.PolyShell?.setStatus(
+    'Execution Completed',
+    'ok'
+  );
 
-
-
-
-if (!prep || !prep.ok || !prep.token) {
-  stopStatusDots();
-
-  // 1) Get compiler log (stderr preferred, then stdout/aggregate)
-  const log = (prep && (prep.compileLog || prep.stderr || prep.stdout)) || '';
-  const trimmed = (log || '').trim();
-
-  // 2) Show a short note in the console (not the whole log — avoids duplication)
-  showCompileFailNotice();
-
-  // 3) Put the full log ONLY into #stderrText (single source of truth for the explainer/UI)
-  const st = document.getElementById('stderrText');
-  if (st) {
-    st.textContent = trimmed;
-    st.style.display = 'block';
-  }
-
-  // 4) Set Monaco marker from the first precise error, if present
-  const m = /main\.c:(\d+):\d+:\s*(?:error|fatal error):\s*(.+)/.exec(trimmed);
-  if (m) { setEditorMarker(Math.max(1, parseInt(m[1], 10)), m[2]); }
-  else   { setEditorMarker(1, (trimmed.split('\n')[0] || 'Compilation failed').trim()); }
-
-  // 5) Keep PolyShell cache in sync for the explainer
-  window.PolyShell?.setRawOutputs('', trimmed);
-
-  // 6) Render the friendly explanation INLINE now (no alert here to avoid double popups)
-  try { await window.refreshStderrExplanation?.({ alsoAlert: false }); } catch {}
-
-  // 7) Status/UI
-  window.PolyShell?.setRunnerPhase?.('error');
-  window.PolyShell?.setStatus('Execution Failed', 'error');
-  setComplexityEnabled(false);
-
-  // 8) Reject with a meaningful first line (so your catch has a good .message)
-  const firstLine = trimmed.split('\n').find(Boolean) || 'Compilation failed';
-   showCompileFailNotice();
-  return reject(new Error(firstLine));
-}
-
-
-
-
-
-
-
-
-      
-      runState.compiled = true;
-
-      // ---- connect ----
-      showRunnerOverlay('Connecting to C runner…', 12, 'Creating interactive session…');
-      __statusBase = 'Connecting'; startStatusDots(__statusBase);
-
-      const ws = new WebSocket('wss://polycode-cc.onrender.com/cc?token=' + encodeURIComponent(prep.token));
-      window.termWS = ws; window.wsRunInFlight = true;
-
-      let settled = false; // prevent double resolve/reject
-      // inside index-c.html, in the `finish` function:
-const finish = async (ok) => {
-  if (settled) return; settled = true;
-  try{ hideRunnerOverlay(); }catch{}
-  try{ stopHeartbeat(); }catch{}
-  stopStatusDots(); stopInputCountdown();
-  window.PolyShell?.stopInputTicker?.();
-  showInputRow(false);
-  window.wsRunInFlight = false;
-  setComplexityEnabled(!!ok);
-
-  /*if (!ok) {
-    const j = document.getElementById('jconsole')?.textContent || '';
-
-    
-    // NEW: show the runtime banner heading
-    showCompileFailNotice('runtime');  // uses "Execution Failed — See Details Below."
-
-    // Optional: lightly de-duplicate the common double "[process exited ...]" line
-    const cleaned = j.replace(
-      /\n*\[process exited with code\s+(-?\d+)\][^\n]*\n(?:\s*\[process exited with code\s+\1\][^\n]*\n)+/i,
-      '\n[process exited with code $1]\n'
-    );
-
-    // Put the (cleaned) raw error only in #stderrText (single source of truth)
-    const st = document.getElementById('stderrText');
-    if (st) { st.textContent = cleaned; st.style.display = 'block'; }
-
-    // NEW: keep the explainer’s input in sync and render it now
-    window.PolyShell?.setRawOutputs('', cleaned);          // feed stderr
-    try { await window.refreshStderrExplanation?.({ alsoAlert:false }); } catch {}  // render "Polycode Analysis"
-
-    // Optional: reflect status like the compile path does
-    window.PolyShell?.setRunnerPhase?.('error');
-    window.PolyShell?.setStatus('Execution Failed','error');
-  }*/
-
-
-  if (!ok && !__userReset) {
-  const j  = document.getElementById('jconsole')?.textContent || '';
-   window.PolyShell?.setRawOutputs('', j);                 // NEW: give stderr to explainer
-try { await window.refreshStderrExplanation?.({ alsoAlert:false }); } catch {}  // NEW
-  const st = document.getElementById('stderrText');
-  if (st) { st.textContent = j; st.style.display = 'block'; }
-  showCompileFailNotice('runtime');                // add this
-  const jc = document.getElementById('jconsole');  // and clear console
-  if (jc) jc.textContent = '';
-}
-
-
-  ok ? resolve() : reject(new Error('run_failed'));
 };
-
-      ws.addEventListener('open', ()=>{
-        hideRunnerOverlay();
-        __statusBase = needsStdin ? 'Running (interactive)' : 'Running';
-        startStatusDots(__statusBase);
-        startHeartbeat(ws);
-        window.PolyShell?.setRunnerPhase?.('running');
-        if (needsStdin){
-          // If stdout didn’t flush prompt, still allow typing shortly
-          setTimeout(()=>{ if (!settled && window.wsRunInFlight) showInputRow(true); }, 400);
-        }
-      });
-
-     ws.addEventListener('message', (ev)=>{
-  const raw = ev.data;
-  const text = typeof raw === 'string' ? raw : String(raw || '');
-
-  // 1) JSON image payload from runner
-  if (text.trim().startsWith('{')) {
-    try {
-      const msg = JSON.parse(text);
-      if (msg && msg.type === 'images' && Array.isArray(msg.urls)) {
-        showImages(msg.urls);      // NEW
-        return;                    // don't print JSON to console
-      }
-    } catch {}
-  }
-
-  // 2) Plain-text fallback marker from runner (still supported)
-  if (text.startsWith('[image] ')) {
-    const url = text.substring(8).trim();
-    if (url) { showImages([url]); return; }   // NEW
-  }
-
-  // 3) Original behavior (unchanged)
-  termWrite(text);
-
-  // 4) Your existing structured messages
-  try{
-    const msg = JSON.parse(text);
-    if (msg.type === 'stdin_req'){
-      showInputRow(true);
-      window.PolyShell?.setRunnerPhase?.('waiting_input');
-      window.PolyShell?.setStatus('Waiting for User Input…','busy');
-      __statusBase = 'Waiting for User Input'; startStatusDots(__statusBase);
-      startInputCountdown(5*60*1000);
-      window.PolyShell?.startInputTicker?.(getCountdownText, 500);
-    } else if (msg.type === 'exit'){
-      runState.exitCode = Number(msg.code);
-    }
-  }catch{}
-
-  const m = text.match(/\[process exited with code\s+(-?\d+)\]/i);
-  if (m) runState.exitCode = parseInt(m[1],10);
-});
-
-
-      ws.addEventListener('error', ()=>{ termWrite('\n[connection error]\n'); finish(false); });
-
-      /*ws.addEventListener('close', ()=>{
-        // stop timers/overlays, then resolve/reject so shell.js can set final status + time
-        const ok = (runState.exitCode === 0);
-        finish(ok);
-      }, { once:true });*/
-
-
-   ws.addEventListener('close', ()=>{
-        // stop timers/overlays, then resolve/reject so shell.js can set final status + time
-        const ok = (runState.exitCode === 0); 
-        finish(ok);
-      }, { once:true });
-
-    }catch(err){
-      // network / unexpected failure
-      stopStatusDots(); stopInputCountdown();
-      window.PolyShell?.stopInputTicker?.();
-      showInputRow(false);
-      window.wsRunInFlight = false;
-      window.PolyShell?.setRunnerPhase?.('error');
-      window.PolyShell?.setStatus('Execution Failed','error');
-      document.getElementById('output')?.classList.add('error');
-      termWrite((err && err.message) ? (err.message+'\n') : 'Execution failed\n');
-      showFailNotice('runtime');
-      reject(err);
-    }
-  });
-};
-
 
 
     let __userReset = false;
@@ -1032,7 +807,7 @@ try{ window.termWS?.close(1000, 'user_reset'); }catch{}
     <div class="pc-modal__backdrop" data-close></div>
     <div class="pc-modal__dialog">
       <div class="pc-modal__header">
-        <div class="pc-modal__title">Time Complexity (C)</div>
+        <div class="pc-modal__title">Time Complexity (QBasic)</div>
         <button class="pc-modal__x" data-close aria-label="Close">×</button>
       </div>
       <div class="pc-modal__body">
@@ -1062,5 +837,18 @@ try{ window.termWS?.close(1000, 'user_reset'); }catch{}
 </script>
 
   
+
+<script type="module">
+
+import { QBasicInterpreter }
+from './js/lang/qbasic.js';
+
+window.QBasicInterpreter =
+  QBasicInterpreter;
+
+</script>
+
+
+
 </body>
 </html>
