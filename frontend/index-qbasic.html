@@ -318,6 +318,8 @@
 
   <!-- Page script -->
   <script>
+
+
     /* --- Sample C used in the editor --- */
     const SAMPLE_QBASIC =
 `PRINT "Welcome to Polygen"
@@ -325,11 +327,12 @@
 PRINT "QBASIC Ready"
 `;
 
+
     /* --- Bootstrap (same call pattern as Java) --- */
     window.bootstrap = async function(){
       await window.PolyShell.initMonaco({
   value: SAMPLE_QBASIC,
-  language: 'plaintext'
+  language: 'vb'
 });
       window.PolyShell.setStatus('Ready','ok');
       window.PolyShell.loadLeftContent?.('qbasic');
