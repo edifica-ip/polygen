@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QBASIC Reference — Statements • Functions • Syntax • Examples</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { font-family: system-ui, sans-serif; line-height:1.5; margin:20px; max-width:900px; }
+  h1 { font-size: 1.8em; margin-top:0; }
+  h2 { font-size: 1.3em; margin-top:1.5em; }
+  pre { padding:8px; border-radius:4px; overflow-x:auto; }
+  code { padding:2px 4px; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<h1>QBASIC Reference — Statements • Functions • Syntax • Examples</h1>
+
+<p>
+This reference covers commonly used <b>QBASIC commands, statements,
+functions, loops, arrays, graphics, and file handling concepts</b>.
+Each section contains a description, syntax, and a short example.
+</p>
+
+<!-- ========================================================= -->
+<h2>PRINT — Display Output</h2>
+
+<p><b>Description:</b> Displays text, numbers, and expressions on the screen.</p>
+
+<p><b>Syntax:</b> <code>PRINT expression</code></p>
+
+<p><b>Example:</b></p>
+
+<pre><code>CLS
+
+PRINT "Welcome to Polygen"
+PRINT 10 + 20
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>INPUT — Accept User Input</h2>
+
+<p><b>Description:</b> Reads data entered by the user.</p>
+
+<p><b>Syntax:</b> <code>INPUT variable</code></p>
+
+<p><b>Example:</b></p>
+
+<pre><code>CLS
+
+INPUT "Enter your name: ", N$
+
+PRINT "Hello "; N$
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>LET — Assign Values</h2>
+
+<p><b>Description:</b> Assigns a value to a variable. LET is optional.</p>
+
+<p><b>Syntax:</b> <code>LET variable = value</code></p>
+
+<p><b>Example:</b></p>
+
+<pre><code>LET A = 10
+B = 20
+
+PRINT A + B
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>IF...THEN...ELSE — Decision Making</h2>
+
+<p><b>Description:</b> Executes statements based on a condition.</p>
+
+<p><b>Syntax:</b></p>
+
+<pre><code>IF condition THEN
+   statements
+ELSE
+   statements
+END IF
+</code></pre>
+
+<p><b>Example:</b></p>
+
+<pre><code>INPUT "Enter Marks: ", M
+
+IF M >= 40 THEN
+   PRINT "Pass"
+ELSE
+   PRINT "Fail"
+END IF
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>FOR...NEXT — Looping</h2>
+
+<p><b>Description:</b> Repeats statements a fixed number of times.</p>
+
+<p><b>Syntax:</b></p>
+
+<pre><code>FOR variable = start TO end
+   statements
+NEXT variable
+</code></pre>
+
+<p><b>Example:</b></p>
+
+<pre><code>FOR I = 1 TO 5
+   PRINT I
+NEXT I
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>WHILE...WEND — Conditional Loop</h2>
+
+<p><b>Description:</b> Repeats statements while a condition remains true.</p>
+
+<p><b>Syntax:</b></p>
+
+<pre><code>WHILE condition
+   statements
+WEND
+</code></pre>
+
+<p><b>Example:</b></p>
+
+<pre><code>I = 1
+
+WHILE I <= 5
+   PRINT I
+   I = I + 1
+WEND
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>SELECT CASE — Multiple Conditions</h2>
+
+<p><b>Description:</b> Tests a variable against multiple values.</p>
+
+<p><b>Syntax:</b></p>
+
+<pre><code>SELECT CASE variable
+CASE value1
+   statements
+CASE value2
+   statements
+CASE ELSE
+   statements
+END SELECT
+</code></pre>
+
+<p><b>Example:</b></p>
+
+<pre><code>INPUT "Enter Grade: ", G$
+
+SELECT CASE G$
+CASE "A"
+   PRINT "Excellent"
+CASE "B"
+   PRINT "Good"
+CASE ELSE
+   PRINT "Try Again"
+END SELECT
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>Arrays</h2>
+
+<p><b>Description:</b> Stores multiple values using a single variable name.</p>
+
+<p><b>Syntax:</b> <code>DIM array(size)</code></p>
+
+<p><b>Example:</b></p>
+
+<pre><code>DIM A(5)
+
+FOR I = 1 TO 5
+   INPUT A(I)
+NEXT I
+
+FOR I = 1 TO 5
+   PRINT A(I)
+NEXT I
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>String Functions</h2>
+
+<p><b>Description:</b> Manipulate text and characters.</p>
+
+<p><b>Common Functions:</b></p>
+
+<ul>
+<li><code>LEN()</code> – Length of string</li>
+<li><code>LEFT$()</code> – Left characters</li>
+<li><code>RIGHT$()</code> – Right characters</li>
+<li><code>MID$()</code> – Extract substring</li>
+<li><code>UCASE$()</code> – Convert to uppercase</li>
+<li><code>LCASE$()</code> – Convert to lowercase</li>
+</ul>
+
+<p><b>Example:</b></p>
+
+<pre><code>S$ = "Polygen"
+
+PRINT LEN(S$)
+PRINT LEFT$(S$, 4)
+PRINT RIGHT$(S$, 3)
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>Numeric Functions</h2>
+
+<p><b>Description:</b> Perform mathematical operations.</p>
+
+<p><b>Common Functions:</b></p>
+
+<ul>
+<li><code>ABS()</code></li>
+<li><code>SQR()</code></li>
+<li><code>INT()</code></li>
+<li><code>RND</code></li>
+<li><code>SIN()</code></li>
+<li><code>COS()</code></li>
+<li><code>TAN()</code></li>
+</ul>
+
+<p><b>Example:</b></p>
+
+<pre><code>PRINT ABS(-10)
+PRINT SQR(25)
+PRINT INT(5.8)
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>Subprograms (SUB)</h2>
+
+<p><b>Description:</b> Reusable blocks of code.</p>
+
+<p><b>Syntax:</b></p>
+
+<pre><code>DECLARE SUB Display()
+
+CALL Display
+
+SUB Display
+   PRINT "Hello"
+END SUB
+</code></pre>
+
+<p><b>Example:</b></p>
+
+<pre><code>DECLARE SUB Welcome()
+
+CALL Welcome
+
+SUB Welcome
+   PRINT "Welcome to QBASIC"
+END SUB
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>Functions (FUNCTION)</h2>
+
+<p><b>Description:</b> Returns a value to the calling program.</p>
+
+<p><b>Syntax:</b></p>
+
+<pre><code>FUNCTION Add(A, B)
+   Add = A + B
+END FUNCTION
+</code></pre>
+
+<p><b>Example:</b></p>
+
+<pre><code>DECLARE FUNCTION Add(A, B)
+
+PRINT Add(10, 20)
+
+FUNCTION Add(A, B)
+   Add = A + B
+END FUNCTION
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>DATA, READ and RESTORE</h2>
+
+<p><b>Description:</b> Store and retrieve constant values.</p>
+
+<p><b>Syntax:</b></p>
+
+<pre><code>DATA values
+READ variable
+RESTORE
+</code></pre>
+
+<p><b>Example:</b></p>
+
+<pre><code>DATA 10,20,30
+
+READ A, B, C
+
+PRINT A, B, C
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>Graphics Commands</h2>
+
+<p><b>Description:</b> Create graphics and drawings.</p>
+
+<p><b>Common Commands:</b></p>
+
+<ul>
+<li><code>SCREEN</code></li>
+<li><code>PSET</code></li>
+<li><code>LINE</code></li>
+<li><code>CIRCLE</code></li>
+<li><code>PAINT</code></li>
+<li><code>DRAW</code></li>
+</ul>
+
+<p><b>Example:</b></p>
+
+<pre><code>SCREEN 12
+
+LINE (100,100)-(300,100), 4
+CIRCLE (200,200), 50, 2
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>File Handling</h2>
+
+<p><b>Description:</b> Read and write data to files.</p>
+
+<p><b>Common Commands:</b></p>
+
+<ul>
+<li><code>OPEN</code></li>
+<li><code>INPUT #</code></li>
+<li><code>PRINT #</code></li>
+<li><code>CLOSE</code></li>
+</ul>
+
+<p><b>Example:</b></p>
+
+<pre><code>OPEN "data.txt" FOR OUTPUT AS #1
+
+PRINT #1, "Hello"
+
+CLOSE #1
+
+END
+</code></pre>
+
+<!-- ========================================================= -->
+<h2>Common Built-in Functions</h2>
+
+<p><b>String Functions:</b>
+LEN(), LEFT$(), RIGHT$(), MID$(), INSTR(), UCASE$(), LCASE$()
+</p>
+
+<p><b>Math Functions:</b>
+ABS(), SQR(), INT(), FIX(), SIN(), COS(), TAN(), LOG(), EXP()
+</p>
+
+<p><b>Date & Time:</b>
+DATE$, TIME$
+</p>
+
+<p><b>Random Numbers:</b>
+RND, RANDOMIZE TIMER
+</p>
+
+<!-- ========================================================= -->
+<h2>Program Control Statements</h2>
+
+<p><b>Common Statements:</b></p>
+
+<ul>
+<li><code>CLS</code> — Clear screen</li>
+<li><code>END</code> — End program</li>
+<li><code>GOTO</code> — Jump to label</li>
+<li><code>GOSUB</code> — Call subroutine</li>
+<li><code>RETURN</code> — Return from subroutine</li>
+<li><code>STOP</code> — Pause execution</li>
+</ul>
+
+<p><b>Example:</b></p>
+
+<pre><code>CLS
+
+PRINT "Start"
+
+END
+</code></pre>
+
+</body>
+</html>

@@ -1239,7 +1239,7 @@ const lang = (() => {
   // 1) Ask Monaco first (most reliable when the editor is loaded)
   const monacoId = window.editor?.getModel?.()?.getLanguageId?.();
   if (monacoId) return ({
-    'c':'c', 'cpp':'cpp', 'c++':'cpp',
+    'c':'c', 'cpp':'cpp', 'c++':'cpp', 'q-basic': 'qb',
     'java':'java', 'python':'python', 'py':'python',
     'sql':'sql', 'mysql':'sql', 'sqlite':'sql',
     'html':'web','javascript':'web','typescript':'web','css':'web'
