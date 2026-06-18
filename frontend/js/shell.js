@@ -1252,8 +1252,7 @@ const lang = (() => {
   // 3) Fall back to the language dropdown’s label
   const label = (document.querySelector('#langSelect option:checked')?.textContent || '').toLowerCase();
 
-  alert(label);
-  alert(monacoId);
+
   if (label.includes('c++'))       return 'cpp';
   if (label === 'c')               return 'c';
   if (label.includes('python'))    return 'python';
