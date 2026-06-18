@@ -1251,12 +1251,15 @@ const lang = (() => {
 
   // 3) Fall back to the language dropdown’s label
   const label = (document.querySelector('#langSelect option:checked')?.textContent || '').toLowerCase();
+
+  alert(label);
+  alert(monacoId);
   if (label.includes('c++'))       return 'cpp';
   if (label === 'c')               return 'c';
   if (label.includes('python'))    return 'python';
   if (label.includes('java'))      return 'java';
   if (label.includes('sql'))       return 'sql';
-  if (label === 'q-basic')          return 'vb';
+  if (label === 'q-basic')          return 'qb';
   if (label.includes('html') || label.includes('css') || label.includes('js') || label.includes('web'))
                                    return 'web';
 
