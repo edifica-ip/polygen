@@ -19552,9 +19552,8 @@ Answer = ${resultHex}₁₆`;
 
   }
 
-  resultDiv.innerHTML =
-    `${result}`;
-
+   resultDiv.value =    `${result}`;
+  
   stepsDiv.textContent =
     steps;
 
