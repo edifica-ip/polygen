@@ -1,405 +1,2695 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>polygen | Boolean Algebra</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark light" />
-  <link rel="icon" href="./assets/logo.png" />
-  <style>
-    :root{ --bg:#0b0f13; --bg2:#141922; --panel:#1e2024; --text:#e9edf3; --muted:#aeb5bd; --link:#9ecbff; --brand:#2e5bea; --border:#2b2f34; }
-    *{ box-sizing:border-box }
-    body{ margin:0; background:linear-gradient(180deg,var(--bg),var(--bg2)); color:var(--text); font-family:system-ui,Roboto,Ubuntu,sans-serif; }
-    a{ color:var(--link); text-decoration:none } a:hover{ text-decoration:underline }
-    header{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#1a1c1f; border-bottom:1px solid var(--border) }
-    .brand{ display:flex; align-items:center; gap:10px; font-weight:700 }
-    .brand img{ width:26px; height:26px; border-radius:6px }
-    main{ max-width:1100px; margin:0 auto; padding:18px }
-    .grid{ display:grid; gap:16px; grid-template-columns:1fr; }
-    @media (min-width:980px){ .grid{ grid-template-columns:1.1fr .9fr; } }
-    .card{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow:0 16px 50px rgba(0,0,0,.28) }
-    .card h2{ margin:0 0 10px; font-size:20px }
-    textarea{ width:100%; min-height:90px; background:#141922; color:var(--text); border:1px solid var(--border); border-radius:10px; padding:10px; outline:none }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:10px 0 }
-    .btn{ padding:10px 14px; border-radius:10px; border:1px solid var(--border); background:var(--brand); color:#fff; font-weight:600; cursor:pointer }
-    .btn.secondary{ background:#24272d; color:#d5dbe4 }
-    .mono{ font-family:ui-monospace,Menlo,Consolas,monospace; }
-    table{ width:auto; border-collapse:collapse; font-size:14px }
-    th,td{ border:1px solid var(--border); padding:6px 8px; text-align:center }
-    th{ background:#1a1c1f }
-    .muted{ color:#aeb5bd }
-    .grid > .card.wide { grid-column: 1 / -1; }
-    #result svg { max-height: none !important; width: 100%; height: auto; }
-    aside.card.wide { padding-block: 24px; }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="brand"><img src="./assets/logo.png" alt="polygen"/><div>Polygen — Boolean Algebra</div></div>
-    <nav><a href="./index.html">Home</a></nav>
-  </header>
+  <!doctype html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8" />
 
-  <main>
-    <div class="grid">
-      <section class="card">
-        <h2>Expression</h2>
-        <p class="muted mono">
-          Ops: + (OR), ·/*/& (AND), ~(NOT), ^ (XOR), parentheses.
-          Implicit AND allowed, e.g., <b>AB + A~C</b>.
-          K-map commands: <b>kmap A,B,C : Σm(1,3,5)</b>, <b>kmap A,B : ΠM(0,2)</b>, or <b>kmap A,B,C : AB + A'C</b>.
-        </p>
-        <textarea id="expr" placeholder="Example: A·B + ¬A·C"></textarea>
-        <div class="row">
-          <label class="muted"><input type="checkbox" id="includeTable"> Show truth table</label>
-          <span class="muted">Vars (optional, comma):</span>
-          <input id="vars" placeholder="A,B,C" style="padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:#141922;color:var(--text)">
-          <button class="btn" id="btnSimplify">Simplify</button>
-          <!-- NEW: teaching-safe buttons -->
-          <button class="btn secondary" id="btnSimplifyDraw">Simplify &amp; Draw</button>
-          <button class="btn secondary" id="btnSimplyDraw">Simply Draw</button>
-          <!-- legacy circuit modes kept for now -->
-          <button class="btn secondary" id="btnCircuitNAND">NAND-only</button>
-          <button class="btn secondary" id="btnCircuitNOR">NOR-only</button>
-          <button class="btn secondary" id="btnKmapGroups">K-map Pairings &amp; Solution</button>
-          <button class="btn secondary" id="btnClear">Clear</button>
-        </div>
-      </section>
+    <title>Polygen | Digital Electronics Lab</title>
 
-      <aside class="card">
-        <h2>Result</h2>
-        <div id="result" class="mono"></div>
-      </aside>
-    </div>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-    <section class="card" id="ttCard" style="display:none">
-      <h2>Truth Table</h2>
-      <div id="tt"></div>
-    </section>
-  </main>
+    <link rel="icon" href="./assets/logo.png" />
 
-<script type="module">
-  const API = "https://polycode-ba.onrender.com";
-  const $ = s => document.querySelector(s);
-  const exprEl = $("#expr"), varsEl = $("#vars"), resEl = $("#result");
-  const includeTableEl = $("#includeTable"), ttCard = $("#ttCard"), ttEl = $("#tt");
-  const gray = n => n ^ (n >> 1);
+    <!-- SAME SHELL CSS -->
+    <link rel="stylesheet" href="./css/shell.css" />
 
-  $("#btnClear").addEventListener("click", () => {
-    exprEl.value = ""; varsEl.value = "";
-    resEl.innerHTML = ""; ttCard.style.display = "none"; ttEl.innerHTML = "";
-  });
+    <style>
 
-  /* ---------- KMAP parsing (unchanged) ---------- */
-  function parseKmapCommand(s){
-    const mHdr = /^kmap\s+([A-Za-z0-9_]+(?:\s*,\s*[A-Za-z0-9_]+){1,3})\s*[:=]\s*(.+)$/i.exec(s.trim());
-    if (!mHdr) return null;
-    const vars = mHdr[1].split(",").map(x=>x.trim());
-    let rhs = mHdr[2].trim();
+      .ns-tabs{
+  position:sticky;
+    top:0;
+    width:280px;
+  max-height:75vh;
 
-    let dontCares = [];
-    const mDC = /(?:[,;]\s*d\s*\(\s*([0-9,\s]+)\s*\)\s*)$/i.exec(rhs);
-    if (mDC) { dontCares = mDC[1].split(",").map(x=>+x.trim()).filter(Number.isFinite); rhs = rhs.slice(0, mDC.index).trim(); }
+    overflow:auto;
+    display:flex;
+    flex-direction:column;
 
-    const parseList = str => str.split(",").map(x=>+x.trim()).filter(Number.isFinite);
-    const reSigma = /^(?:Σ|sigma|s)\s*m?\s*\(\s*([0-9,\s]+)\s*\)$/i;
-    const rePi    = /^(?:Π|pi|prod|p)\s*m?\s*\(\s*([0-9,\s]+)\s*\)$/i;
+    gap:10px;
+    padding-top:10px;
+    flex-shrink:0;
 
-    if (reSigma.test(rhs)) {
-      const mm = reSigma.exec(rhs);
-      const minterms = parseList(mm[1]);
-      return { vars, mode:"ones", minterms, dontCares };
-    }
-    if (rePi.test(rhs)) {
-      const mm = rePi.exec(rhs);
-      const maxterms = parseList(mm[1]);
-      const n = vars.length, U = Array.from({length:1<<n},(_,i)=>i);
-      const bad = new Set([...maxterms, ...dontCares]);
-      const minterms = U.filter(i => !bad.has(i));
-      return { vars, mode:"zeros", maxterms, minterms, dontCares };
-    }
-    if (/^[0-9,\s]+$/.test(rhs)) {
-      const minterms = parseList(rhs);
-      return { vars, mode:"ones", minterms, dontCares };
-    }
-    return { vars, expr: rhs, dontCares };
   }
 
-  /* ---------- Teaching-safe simple circuit renderer ---------- */
-  // Layout: strict columns, fixed spacing, straight wires into gate faces.
-  function renderSimpleCircuitSVG(net, caption = "") {
-    const GW=64, GH=40, PIN=10, XSTEP=140, YSTEP=70, PAD=24;
-    const textSize = 14;
+      .ns-layout{
 
-    const nodes = new Map(), succ = new Map(), pred = new Map();
-    const addNode = n => { nodes.set(n.id, n); succ.has(n.id)||succ.set(n.id,[]); pred.has(n.id)||pred.set(n.id,[]); };
-    net.gates.forEach(g => addNode({...g}));
-    net.inputs.forEach(i => addNode({ id:i.id, type:"IN", ins:[], label:i.label }));
-    addNode({ id: net.output, type:"OUT", ins: nodes.get(net.output)?.ins || [] });
-    nodes.forEach(n => (n.ins||[]).forEach(p => { if(!nodes.has(p)) addNode({id:p,type:"WIRE",ins:[]}); succ.get(p).push(n.id); pred.get(n.id).push(p); }));
+    display:flex;
+    gap:20px;
 
-    // Longest-path levels
-    const level = new Map();
-    const lev = id => level.has(id) ? level.get(id)
-      : level.set(id, (["IN","VCC","GND"].includes(nodes.get(id)?.type)) ? 0
-        : Math.max(0,...(pred.get(id)||[]).map(lev))+1).get(id);
-    nodes.forEach((_,id)=>lev(id));
+    align-items:stretch;
 
-    // Pack per level top-to-bottom (no crossing minimization—intentionally simple)
-    const layers=[]; level.forEach((v,id)=> (layers[v]||(layers[v]=[])).push(id));
+  }
+      
+    .ns-tab{
 
-    const abs = new Map();
-    layers.forEach((ids, lx) => ids.forEach((id, ly) => {
-      abs.set(id, { x: PAD + lx*XSTEP, y: PAD + ly*YSTEP });
-    }));
+    padding:14px 18px;
 
-    const width  = (layers.length+1)*XSTEP + 2*PAD;
-    const height = Math.max(1,...layers.map(a=>a.length))*YSTEP + 2*PAD + (caption?28:0);
+    border-radius:1px;
+    border:none;
 
-    const pinY = (y,n,k)=> y + GH*((k+1)/(Math.max(1,n)+1));
+    cursor:pointer;
 
-    // Gate glyphs — classic shapes
-    const bubble = (x,y,r=6)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="currentColor"/>`;
-    const gAND = (x,y)=>`<path d="M${x},${y} H${x+GW/2} A${GH/2},${GH/2} 0 0 1 ${x+GW/2},${y+GH} H${x} Z" fill="none" stroke="currentColor"/>`;
-    const gOR  = (x,y)=>`
-      <path d="M${x+10},${y}
-               C ${x+GW*0.55},${y} ${x+GW*0.78},${y+GH/2} ${x+GW-10},${y+GH/2}
-               C ${x+GW*0.78},${y+GH/2} ${x+GW*0.55},${y+GH} ${x+10},${y+GH}
-               C ${x+4},${y+GH-10} ${x+4},${y+10} ${x+10},${y}"
-            fill="none" stroke="currentColor"/>`;
-    const gXOR = (x,y)=> gOR(x,y) +
-      `<path d="M${x+4},${y} C ${x+GW*0.32},${y} ${x+GW*0.38},${y+GH/2} ${x+4},${y+GH}"
-            fill="none" stroke="currentColor"/>`;
-    const gNOT = (x,y)=>`<path d="M${x},${y} L${x},${y+GH} L${x+GW-14},${y+GH/2} Z" fill="none" stroke="currentColor"/>` + bubble(x+GW-6, y+GH/2, 6);
-    const gNAND= (x,y)=> gAND(x,y) + bubble(x+GW, y+GH/2, 6);
-    const gNOR = (x,y)=> gOR(x,y)  + bubble(x+GW, y+GH/2, 6);
-    const gXNOR= (x,y)=> gXOR(x,y) + bubble(x+GW, y+GH/2, 6);
+    background:var(--panel2);
+    color:var(--text);
 
-    function drawGate(n){
-      if (n.type==="WIRE" || n.type==="OUT") return "";
-      const p = abs.get(n.id);
-      const nIns=(n.ins||[]).length||1;
-      const pins = Array.from({length:nIns},(_,k)=>{
-        const py = pinY(p.y, nIns, k);
-        return `<line x1="${p.x-10}" y1="${py}" x2="${p.x}" y2="${py}" stroke="currentColor"/>`;
-      }).join("");
+    font-weight:600;
 
-      const body = {
-        "IN":  "",
-        "AND": gAND(p.x,p.y),
-        "OR":  gOR(p.x,p.y),
-        "XOR": gXOR(p.x,p.y),
-        "NOT": gNOT(p.x,p.y),
-        "NAND":gNAND(p.x,p.y),
-        "NOR": gNOR(p.x,p.y),
-        "XNOR":gXNOR(p.x,p.y)
-      }[n.type] || `<rect x="${p.x}" y="${p.y}" width="${GW}" height="${GH}" rx="10" fill="none" stroke="currentColor"/>`;
+    width:100%;
 
-      if (n.type === "IN") {
-        const r=9, cx=p.x+r, cy=p.y+r;
-        return `<g class="gate IN">
-          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="currentColor"/>
-          <line x1="${cx+r}" y1="${cy}" x2="${cx+r+PIN}" y2="${cy}" stroke="currentColor"/>
-          <text x="${p.x-8}" y="${cy+5}" text-anchor="end" class="mono" font-size="${textSize}" fill="currentColor">${n.label||n.id}</text>
-        </g>`;
+    display:flex;
+    align-items:center;
+    justify-content:left;
+
+    text-align:left;
+
+  }
+    
+      
+      .ns-content{
+
+    flex:1;
+  min-height:600px;
+
+    display:flex;
+    flex-direction:column;
+
+  }
+
+      .ns-tab.active{
+        background:#374151;
+
+    color:#ffffff;
+
+    border:1px solid #6b7280;
       }
 
-      return `<g class="gate ${n.type}">
-        ${pins}
-        ${body}
-      </g>`;
-    }
+    
+      
+      .ns-card{
+        background:var(--panel);
+        border-radius:1px;
+        padding:18px;
+        border:1px solid var(--border);
+      }
 
-    function outX(id){
-      const t = nodes.get(id)?.type || "WIRE";
-      const p = abs.get(id);
-      if (t === "IN"){ const r = 9; return p.x + r + r + PIN; }
-      return p.x + GW;
-    }
+      .ns-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:18px;
+      }
 
-    // Straight wires: horizontal into gate, one vertical bend from source level
-    function wiresTo(tid){
-      const t   = nodes.get(tid);
-      const dst = abs.get(tid);
-      const x2  = dst.x;
-      const ins = (t.ins || []);
-      return ins.map((sid, k) => {
-        const sp = abs.get(sid);
-        const y1 = (nodes.get(sid)?.type === "IN") ? sp.y + 9 : sp.y + GH/2;
-        const y2 = dst.y + GH*((k+1)/(Math.max(1,ins.length)+1));
-        const x1 = outX(sid);
-        // H — V — H, no detours
-        const midX = x2 - GW/2 - 20;
-        return `M${x1},${y1} H${midX} V${y2} H${x2}`;
-      }).join(" ");
-    }
+      .ns-input-group{
+        margin-bottom:16px;
+      }
 
-    const gatesSVG = Array.from(nodes.values()).map(drawGate).join("");
-    const wiresSVG = Array.from(nodes.values())
-      .filter(n=>(n.ins||[]).length)
-      .map(n=>`<path d="${wiresTo(n.id)}" stroke="currentColor" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`)
-      .join("");
+      .ns-input-group label{
+        display:block;
+        margin-bottom:6px;
+        opacity:.85;
+      }
 
-    const outPos = abs.get(net.output) || { x: width-80, y: height/2 };
-    const lamp = `
-      <g transform="translate(${outPos.x + GW + 30}, ${outPos.y + GH/2 - 18})" stroke="currentColor" fill="none">
-        <path d="M0,18 C0,8 8,0 18,0 C28,0 36,8 36,18 C36,26 31,31 27,34 L24,42 H12 L9,34 C5,31 0,26 0,18 Z" />
-        <circle cx="18" cy="18" r="12" />
-      </g>`;
+      .ns-input-group input,
+      .ns-input-group select{
+        width:100%;
+        padding:12px;
+        border-radius:1px;
+        border:1px solid var(--border);
+        background:var(--panel2);
+        color:var(--text);
+      }
 
-    const style = `
-      <style>
-        .mono { font-family: ui-monospace, Menlo, Consolas, monospace; }
-        text { font-size: ${textSize}px; }
-      </style>`;
+      .ns-btn{
+        width:100%;
+        padding:14px;
+        border:none;
+        border-radius:1px;
+        background:#38bdf8;
+        color:#000;
+        font-weight:700;
+        cursor:pointer;
+      }
 
-    const captionSVG = caption ? `<text x="${PAD}" y="${height-8}" class="mono" fill="currentColor">F = ${caption}</text>` : "";
+      .ns-output{
+        min-height:320px;
+        background:#020617;
+        border-radius:1px;
+        padding:18px;
+        overflow:auto;
+      }
 
-    return `<svg viewBox="0 0 ${width+120} ${height}" width="100%" preserveAspectRatio="xMinYMin meet">
-      ${style}
-      <g>${gatesSVG}</g>
-      <g>${wiresSVG}</g>
-      ${lamp}
-      ${captionSVG}
-    </svg>`;
-  }
+      .ns-result{
+        font-size:22px;
+        color:#4ade80;
+        margin-bottom:18px;
+        word-break:break-word;
+      }
 
-  /* ---------- Existing: Simplify / K-map / TT ---------- */
-  $("#btnSimplify").addEventListener("click", async () => {
-    const text = exprEl.value.trim();
-    if (!text) { alert("Enter an expression or a kmap command"); return; }
+      .ns-steps{
+        white-space:pre-wrap;
+        line-height:1.7;
+      }
 
-    // K-map command?
-    const km = parseKmapCommand(text);
-    if (km) {
-      ttCard.style.display = "none"; ttEl.innerHTML = "";
-      resEl.textContent = "Building K-map…";
-      try {
-        let displayMins = km.minterms;
-        if (km.expr) {
-          const r1 = await fetch(API + "/api/ba/simplify", {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ expr: km.expr, vars: km.vars, includeTable: false })
-          });
-          const j1 = await r1.json();
-          if (!j1.ok) throw new Error(j1.error || "simplify error");
-          displayMins = j1.minterms;
+      .hidden{
+        display:none;
+      }
+
+      .topic-list{
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+        margin-top:14px;
+      }
+
+      .topic-item{
+        padding:12px;
+        border-radius:1px;
+        background:var(--panel2);
+        border:1px solid var(--border);
+      }
+
+      @media(max-width:900px){
+
+        .ns-grid{
+          grid-template-columns:1fr;
         }
-        const body = km.mode === "zeros"
-          ? { vars: km.vars, mode: "zeros", maxterms: km.maxterms, full: true }
-          : { vars: km.vars, mode: "ones",  minterms: displayMins, full: true };
 
-        const r = await fetch(API + "/api/ba/kmap", {
-          method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body)
-        });
-        const j = await r.json(); if (!j.ok) throw new Error(j.error || "kmap error");
+      }
 
-        resEl.innerHTML = `
-          <div class="mono" style="margin-bottom:6px">${j.mode==="zeros" ? `Solution (POS): ${j.simplified}` : `Solution (SOP): ${j.simplified}`}</div>
-          <!-- K-map SVG could be injected here (omitted to keep focus on circuit clarity) -->
-        `;
-      } catch (e) { resEl.innerHTML = `<span class="muted">Error: ${String(e.message||e)}</span>`; }
-      return;
-    }
 
-    // Otherwise, normal simplify flow
-    const vars = varsEl.value.trim() ? varsEl.value.split(",").map(s=>s.trim()).filter(Boolean) : undefined;
-    resEl.textContent = "Working…";
-    try{
-      const r = await fetch(API + "/api/ba/simplify", {
-        method:"POST", headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ expr: text, vars, includeTable: includeTableEl.checked })
-      });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error||"error");
-      const { vars:V, minterms, maxterms, sop, pos, simplifiedSOP } = j;
-      resEl.innerHTML = `
-        <div>Vars: ${V.join(", ")}</div>
-        <div>Σ m: ${sop}</div>
-        <div>Π M: ${pos}</div>
-        <div>Simplified (SOP): <b>${simplifiedSOP}</b></div>
-        <div class="muted">Minterms: [${minterms.join(", ")}] — Maxterms: [${maxterms.join(", ")}]</div>
-      `;
-      if (includeTableEl.checked && j.table){
-        const rows = j.table;
-        const cols = V.map(v=>`<th>${v}</th>`).join("") + "<th>f</th>";
-        const trs = rows.map(r=>{
-          const tds = V.map(v=>`<td>${r.env[v]?1:0}</td>`).join("") + `<td>${r.out}</td>`;
-          return `<tr>${tds}</tr>`;
-        }).join("");
-        ttEl.innerHTML = `<table><thead><tr>${cols}</tr></thead><tbody>${trs}</tbody></table>`;
-        ttCard.style.display="";
-      } else { ttCard.style.display="none"; ttEl.innerHTML=""; }
-    }catch(e){
-      resEl.innerHTML = `<span class="muted">Error: ${String(e.message||e)}</span>`;
-      ttCard.style.display="none"; ttEl.innerHTML="";
-    }
-  });
 
-  /* ---------- NEW buttons: Simplify & Draw / Simply Draw ---------- */
-  async function fetchNetlist(expr, vars, style="mixed") {
-    const r = await fetch(API + "/api/ba/netlist", {
-      method:"POST", headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ expr, vars, style })
-    });
-    const j = await r.json();
-    if (!j.ok) throw new Error(j.error || "netlist error");
-    return j;
+
+      /* =========================================
+  MOBILE SCROLL FIX
+  ========================================= */
+
+  html,
+  body{
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
   }
 
-  $("#btnSimplifyDraw").addEventListener("click", async () => {
-    const text = exprEl.value.trim();
-    const vars = varsEl.value.trim() ? varsEl.value.split(",").map(s=>s.trim()) : undefined;
-    if (!text) { alert("Enter an expression"); return; }
-    resEl.textContent = "Simplifying…";
-    try {
-      const r1 = await fetch(API + "/api/ba/simplify", {
-        method:"POST", headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ expr: text, vars, includeTable: false })
-      });
-      const j1 = await r1.json(); if (!j1.ok) throw new Error(j1.error || "simplify error");
-      const net = await fetchNetlist(j1.simplifiedSOP || j1.simplified || text, vars, "mixed");
-      resEl.innerHTML = renderSimpleCircuitSVG(net, j1.simplifiedSOP || j1.simplified || text);
-    } catch (e) { resEl.innerHTML = `<span class="muted">Error: ${String(e.message||e)}</span>`; }
-  });
+  .stage{
+    overflow:auto;
+  }
 
-  $("#btnSimplyDraw").addEventListener("click", async () => {
-    const text = exprEl.value.trim();
-    const vars = varsEl.value.trim() ? varsEl.value.split(",").map(s=>s.trim()) : undefined;
-    if (!text) { alert("Enter an expression"); return; }
-    resEl.textContent = "Drawing…";
-    try {
-      const net = await fetchNetlist(text, vars, "mixed");
-      resEl.innerHTML = renderSimpleCircuitSVG(net, text);
-    } catch (e) { resEl.innerHTML = `<span class="muted">Error: ${String(e.message||e)}</span>`; }
-  });
+  .app{
+    overflow:auto;
+  }
 
-  // Keep NAND/NOR buttons for parity (they’ll also use the simple renderer)
-  $("#btnCircuitNAND").addEventListener("click", async () => {
-    const text = exprEl.value.trim();
-    const vars = varsEl.value.trim() ? varsEl.value.split(",").map(s=>s.trim()) : undefined;
-    if (!text) return alert("Enter an expression");
-    resEl.textContent = "Drawing (NAND)…";
-    try {
-      const net = await fetchNetlist(text, vars, "nand");
-      resEl.innerHTML = renderSimpleCircuitSVG(net, text + "  (NAND)");
-    } catch(e){ resEl.innerHTML = `<span class="muted">Error: ${String(e.message||e)}</span>`; }
-  });
-  $("#btnCircuitNOR").addEventListener("click", async () => {
-    const text = exprEl.value.trim();
-    const vars = varsEl.value.trim() ? varsEl.value.split(",").map(s=>s.trim()) : undefined;
-    if (!text) return alert("Enter an expression");
-    resEl.textContent = "Drawing (NOR)…";
-    try {
-      const net = await fetchNetlist(text, vars, "nor");
-      resEl.innerHTML = renderSimpleCircuitSVG(net, text + "  (NOR)");
-    } catch(e){ resEl.innerHTML = `<span class="muted">Error: ${String(e.message||e)}</span>`; }
-  });
+  .pane-scroll{
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+  }
 
-  /* ---------- (Optional) K-map groups button stays wired to your API ---------- */
-  $("#btnKmapGroups").addEventListener("click", () => {
-    ttCard.style.display="none"; ttEl.innerHTML="";
-    resEl.textContent = "Analyzing K-map… (renderer simplified for teaching)";
-  });
-</script>
-</body>
-</html>
+
+
+
+      /* =========================================
+  SELECT DROPDOWN FIX
+  ========================================= */
+
+  .ns-input-group select{
+    appearance:none;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+
+    background-color:#111827;
+    color:#ffffff;
+  }
+
+  /* Dropdown option colors */
+
+  .ns-input-group select option{
+    background:#111827;
+    color:#ffffff;
+  }
+
+
+
+      .ns-input-group select{
+    background-image:
+      linear-gradient(45deg, transparent 50%, #38bdf8 50%),
+      linear-gradient(135deg, #38bdf8 50%, transparent 50%);
+
+    background-position:
+      calc(100% - 20px) calc(50% - 3px),
+      calc(100% - 14px) calc(50% - 3px);
+
+    background-size:6px 6px;
+    background-repeat:no-repeat;
+  }
+
+
+
+        @media (max-width: 900px){
+
+      body{
+        height:auto !important;
+        overflow:auto !important;
+      }
+
+      .stage{
+        height:auto !important;
+        min-height:100vh;
+        overflow:auto !important;
+        padding-bottom:80px;
+      }
+
+      .app{
+        height:auto !important;
+        min-height:auto !important;
+
+        display:flex;
+        flex-direction:column;
+
+        overflow:visible !important;
+        gap:16px;
+      }
+
+      .panel{
+        min-height:auto !important;
+        height:auto !important;
+
+        overflow:visible !important;
+      }
+
+      .pane-scroll{
+        overflow:visible !important;
+        max-height:none !important;
+      }
+
+    }
+
+
+    .mode-selector{
+
+  display:flex;
+
+  justify-content:center;
+  align-items:center;
+
+  gap:30px;
+
+  flex-wrap:wrap;
+
+  margin-bottom:20px;
+
+}
+
+
+
+.mode-selector{
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  gap:12px;
+
+  margin-bottom:20px;
+
+  flex-wrap:wrap;
+
+}
+
+.mode-selector .mode-btn{
+
+  min-width:160px;
+
+  padding:12px 24px;
+
+  border:none;
+
+  border-radius:1px;
+
+  background:#1e293b;
+
+  color:#cbd5e1;
+
+  cursor:pointer;
+
+  font-size:15px;
+
+  font-weight:600;
+
+
+}
+
+.mode-selector .mode-btn:hover{
+
+  background:#334155;
+}
+
+
+
+    
+  #globalResult{
+
+    position:sticky;
+    top:0;
+
+    background:#020617;
+
+    z-index:10;
+
+    padding-bottom:12px;
+
+  }
+
+
+      .global-output{
+
+    height:100%;
+    min-height:0;
+
+    display:flex;
+    flex-direction:column;
+
+  }
+  #globalSteps{
+
+    flex:1;
+    overflow:auto;
+  font-family:monospace;
+    white-space:pre-wrap;
+    line-height: 1.8;
+    font-size: 18px;
+  }
+
+  .mobile-menu-btn{
+
+    display:none;
+
+  }
+
+  .base-banner{
+
+  width:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+
+  padding:14px;
+
+  margin-bottom:18px;
+
+  border-radius:1px;
+
+  background:#1e293b;
+
+  border:1px solid #334155;
+
+  color:#38bdf8;
+
+  font-size:18px;
+  font-weight:600;
+
+}
+      
+    @media(max-width:900px){
+
+      .mobile-menu-btn{
+
+      display:flex;
+
+      align-items:center;
+      justify-content:center;
+
+      width:100%;
+
+      padding:14px;
+
+      margin-bottom:14px;
+
+      border:none;
+      border-radius:1px;
+      background:#374151;
+
+      color:#fff;
+
+      font-weight:700;
+
+      cursor:pointer;
+
+    }
+
+
+      .ns-tabs{
+
+    display:none;
+
+  }
+
+      .ns-tabs.show{
+
+    display:flex;
+
+  }
+
+      .ns-tabs{
+
+    width:100%;
+
+    flex-direction:column;
+
+    gap:8px;
+
+  }
+
+      .ns-tab{
+
+    width:100%;
+
+    justify-content:center;
+
+    text-align:center;
+
+  }
+    .ns-layout{
+
+      flex-direction:column;
+
+    }
+
+    .ns-tabs{
+
+      width:100%;
+
+      max-height:none;
+
+      flex-direction:column;
+
+      overflow:visible;
+
+    }
+
+    .ns-tab{
+
+      width:100%;
+  min-height:48px;
+      justify-content:center;
+
+      text-align:center;
+
+    }
+
+  }
+
+
+  #globalResult{
+
+  width:100%;
+
+  min-height:90px;
+
+  max-height:180px;
+
+  resize:none;
+
+  overflow:auto;
+
+  border:none;
+  outline:none;
+
+  border-radius:1px;
+
+  background:#000;
+
+  color:#00ff66;
+
+  font-size:32px;
+  font-weight:700;
+
+  font-family:monospace;
+
+  text-align:center;
+
+  padding:18px;
+
+}
+
+
+.mode-btn{
+
+  min-width:180px;
+
+  padding:14px 28px;
+
+  border:none;
+
+  border-radius:1px;
+
+  background:#172554;
+
+  color:#ffffff;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+  transition:.25s;
+
+}
+
+.mode-btn:hover{
+
+  transform:translateY(-2px);
+
+}
+
+
+
+
+
+
+.quick-result{
+
+  margin-top:20px;
+
+}
+
+.quick-result label{
+
+  display:block;
+
+  margin-bottom:8px;
+
+  font-weight:700;
+
+  color:#38bdf8;
+
+}
+
+.quick-result textarea{
+
+  width:100%;
+
+  min-height:80px;
+
+  max-height:120px;
+
+  resize:none;
+
+  overflow:auto;
+
+  border:none;
+
+  border-radius:1px;
+
+  background:#000;
+
+  color:#00ff66;
+
+  font-size:24px;
+
+  font-weight:700;
+
+  font-family:monospace;
+
+  text-align:center;
+
+  padding:15px;
+
+}
+
+.mode-selector{
+
+  width:100%;
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  gap:16px;
+
+  margin:10px auto;
+
+}
+
+
+
+
+#globalResult{
+
+  width:100%;
+
+  height:70px;
+
+  background:#000;
+
+  color:#fff;
+
+  border:none;
+
+  border-radius:1px;
+
+  font-size:28px;
+
+  text-align:center;
+
+  font-weight:700;
+
+}
+
+
+@media (max-width:900px){
+
+  .ns-content{
+    min-height:auto !important;
+    height:auto !important;
+  }
+
+  .tab-content{
+    min-height:auto !important;
+  }
+
+  .pane-body{
+    min-height:auto !important;
+  }
+
+}
+
+
+
+
+#globalSteps{
+
+  padding:24px;
+
+  margin:12px;
+
+  border-radius:1px;
+
+  background:#020617;
+
+  border:1px solid #1e293b;
+
+  box-sizing:border-box;
+
+  overflow:auto;
+
+  white-space:pre-wrap;
+
+  line-height:1.8;
+
+  font-size:18px;
+
+  font-family:Consolas, Monaco, monospace;
+
+}
+
+
+@media(max-width:900px){
+
+  #globalSteps{
+
+    padding:16px;
+
+    margin:8px;
+
+    font-size:16px;
+
+  }
+
+}
+
+
+#globalResult{
+
+  width:calc(100% - 24px);
+
+  margin:12px;
+
+  height:100px;
+
+  padding:20px;
+
+  box-sizing:border-box;
+
+  border-radius:1px;
+
+  border:1px solid #1e293b;
+
+  background:#020617;
+
+  color:#ffffff;
+
+  font-size:30px;
+
+  font-weight:700;
+
+  text-align:center;
+
+  outline:none;
+
+}
+
+#globalSteps{
+
+  white-space:normal;
+
+  overflow:auto;
+
+  word-wrap:normal;
+
+  overflow-wrap:normal;
+
+}
+
+.base-banner{
+
+  background:
+    linear-gradient(
+      to bottom,
+      #242830,
+      #111418,
+      #050607
+    );
+
+  border:1px solid #444c56;
+
+  color:#ffffff;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 6px 15px rgba(0,0,0,.5);
+
+}
+
+
+
+.mode-selector .mode-btn.active{
+
+  background:#ffffff;
+
+  color:#000000 !important;
+
+  box-shadow:none;
+
+  border:1px solid #d1d5db;
+
+
+}
+
+.mode-selector .mode-btn{
+
+  transition:
+    background .25s ease,
+    color .25s ease;
+
+}
+
+.mode-selector .mode-btn:hover{
+
+
+
+  transform:none;
+
+}
+
+.mode-selector .mode-btn:active{
+
+  transform:none;
+
+}
+
+
+
+.error-modal{
+
+  display:none;
+
+  position:fixed;
+
+  inset:0;
+
+  background:rgba(0,0,0,.75);
+
+  z-index:9999;
+
+  align-items:center;
+
+  justify-content:center;
+
+}
+
+.error-box{
+
+  width:90%;
+
+  max-width:420px;
+
+  background:#111827;
+
+  border:1px solid #374151;
+
+  padding:24px;
+
+  text-align:center;
+
+  color:#fff;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.6);
+
+}
+
+.error-title{
+
+  font-size:22px;
+
+  font-weight:700;
+
+  margin-bottom:16px;
+
+  color:#ef4444;
+
+}
+
+#errorMessage{
+
+  margin-bottom:20px;
+
+  line-height:1.6;
+
+}
+
+.error-box button{
+
+  padding:10px 24px;
+
+  border:none;
+
+  background:#ef4444;
+
+  color:#fff;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+}
+
+
+.panel.right{
+  display:flex;
+  flex-direction:column;
+}
+
+.panel.right .pane-scroll{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+.panel.right .pane-body{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+#globalSteps{
+  flex:1;
+  height:100%;
+  min-height:0;
+
+  padding:24px;
+  margin:12px;
+
+  background:#020617;
+  border:1px solid #1e293b;
+
+  overflow:auto;
+}
+
+
+
+.topic-list details{
+
+  background:var(--panel2);
+
+  border:1px solid var(--border);
+
+  margin-bottom:10px;
+
+}
+
+.topic-list summary{
+
+  padding:12px;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+  list-style:none;
+
+}
+
+.topic-list summary::-webkit-details-marker{
+
+  display:none;
+
+}
+
+.topic-list summary::after{
+
+  content:' ▼';
+
+  float:right;
+
+}
+
+.topic-list details[open] summary::after{
+
+  content:' ▲';
+
+}
+
+.topic-list .topic-item{
+
+  border:none;
+
+  margin:0;
+
+}
+
+
+.step-item{
+
+  padding:18px 12px;
+
+}
+
+.step-item:not(:last-child){
+
+  border-bottom:1px solid #334155;
+
+}
+
+.rule-name{
+
+  font-size:14px;
+
+  color:#94a3b8;
+
+  text-transform:uppercase;
+
+  margin-bottom:10px;
+
+}
+
+.expression{
+
+  font-size:18px;
+
+  font-weight:700;
+
+  font-family:Consolas, Monaco, monospace;
+
+  color:#ffffff;
+
+}
+
+.rule-name.final{
+
+  color:#22c55e;
+
+  font-weight:700;
+
+}
+
+
+
+
+
+.kmap-toolbar{
+
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+
+}
+
+.result-box{
+
+    margin-top:20px;
+    padding:15px;
+
+    background:
+      rgba(
+        255,
+        255,
+        255,
+        .05
+      );
+
+    border:
+      1px solid
+      rgba(
+        255,
+        255,
+        255,
+        .1
+      );
+
+    border-radius:12px;
+
+    font-size:1.3rem;
+
+    color:#00ff88;
+
+    text-align:center;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Control Panel */
+        .control-panel { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #000; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; align-items: center; }
+        .control-group { display: flex; align-items: center; gap: 8px; }
+        .control-group label { font-weight: bold; cursor: pointer; color: #000 }
+        .control-group input[type="text"], .control-group select { padding: 6px; border-radius: 4px; border: 1px solid #000; text-align: center; font-family: monospace; font-size: 1rem; }
+
+        /* K-Map Grid Styling */
+        table { border-collapse: collapse; margin: 10px auto 20px auto; font-size: 1.2rem; }
+        th, td { border: 2px solid #ccc; width: 75px; height: 60px; text-align: center; vertical-align: middle; position: relative; }
+        th { background: #eee; font-weight: bold; font-size: 1rem; line-height: 1.2; padding: 5px; }
+        .top-left { background: none; border: none; font-size: 1rem; font-weight: bold; text-align: right; vertical-align: bottom; padding-right: 5px; }
+        
+        /* Clickable Cells */
+        td.cell { cursor: pointer; font-weight: bold; font-size: 1.5rem; transition: transform 0.1s; user-select: none; }
+        td.cell:active { transform: scale(0.9); }
+        
+        /* Tiny minterm numbers in the corner */
+        .minterm-label { position: absolute; top: 2px; left: 4px; font-size: 0.65rem; color: #888; font-weight: normal; z-index: 10; }
+        .cell-value { position: relative; z-index: 10; }
+
+        .output-box { margin-top: 20px; padding: 15px; background: #e8f4f8; border-radius: 8px; font-family: monospace; font-size: 1.5rem; font-weight: bold; color: #0056b3; min-height: 35px; }
+        .btn { margin-top: 20px; padding: 10px 20px; font-size: 1rem; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .btn:hover { background: #c82333; }
+        
+        /* Visual Grouping Legend */
+        .legend { margin-top: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; font-size: 0.9rem; font-family: monospace; }
+        .legend-item { display: flex; align-items: center; gap: 5px; background: #f9f9f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #ddd; color: #000 }
+        .color-box { width: 15px; height: 15px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.2); }
+
+
+
+
+
+
+
+
+        /* =========================================
+   KMAP STYLING - POLYGEN THEME
+   ========================================= */
+
+.control-panel{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:15px;
+
+  align-items:center;
+
+  padding:16px;
+
+  margin-bottom:20px;
+
+  background:#111827;
+
+  border:1px solid #334155;
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  gap:25px;
+
+  flex-wrap:wrap;
+
+  width:100%;
+
+}
+
+.control-group{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+}
+
+.control-group label{
+
+  color:#ffffff;
+
+  font-weight:600;
+
+}
+
+.control-group input[type="text"],
+.control-group select{
+
+  background:#1e293b;
+
+  color:#ffffff;
+
+  border:1px solid #475569;
+
+  padding:10px;
+
+  border-radius:1px;
+
+  font-family:Consolas, monospace;
+
+}
+
+.control-group select option{
+
+  background:#1e293b;
+
+  color:#ffffff;
+
+}
+
+/* =========================================
+   KMAP GRID
+   ========================================= */
+
+#kmapContainer{
+
+  display:flex;
+
+  justify-content:center;
+
+  margin-top:20px;
+
+  overflow:auto;
+
+}
+
+#kmapContainer table{
+
+  border-collapse:collapse;
+
+  margin:auto;
+
+}
+
+#kmapContainer th{
+
+  background:#e5e7eb;
+
+  color:#111827;
+
+  border:1px solid #94a3b8;
+
+  padding:8px;
+
+  font-weight:700;
+
+}
+
+#kmapContainer td{
+
+  border:1px solid #94a3b8;
+
+}
+
+td.cell{
+
+  width:72px;
+
+  height:72px;
+
+  background:#111827;
+
+  color:#ffffff;
+
+  cursor:pointer;
+
+  position:relative;
+
+  text-align:center;
+
+  font-size:34px;
+
+  font-weight:700;
+
+  transition:.2s;
+
+}
+
+td.cell:hover{
+
+  background:#1e293b;
+
+}
+
+.cell-value{
+
+  position:relative;
+
+  z-index:2;
+
+}
+
+.minterm-label{
+
+  position:absolute;
+
+  top:3px;
+
+  left:5px;
+
+  font-size:11px;
+
+  color:#94a3b8;
+
+  font-weight:400;
+
+}
+
+/* =========================================
+   RESULT BOX
+   ========================================= */
+
+.output-box{
+
+  margin-top:20px;
+
+  padding:20px;
+
+  background:#020617;
+
+  border:1px solid #1e293b;
+
+  color:#22c55e;
+
+  font-size:18px;
+
+  font-weight:500;
+
+  text-align:center;
+
+  font-family:Consolas, monospace;
+
+  overflow:auto;
+
+}
+
+/* =========================================
+   LEGEND
+   ========================================= */
+
+.legend{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:10px;
+
+  margin-top:20px;
+
+  padding:15px;
+
+  background:#111827;
+
+  border:1px solid #334155;
+
+}
+
+.legend-item{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
+  background:#1e293b;
+
+  border:1px solid #334155;
+
+  padding:8px 12px;
+
+  color:#ffffff;
+
+  font-size:14px;
+
+}
+
+.color-box{
+
+  width:16px;
+
+  height:16px;
+
+  border-radius:2px;
+
+}
+
+/* =========================================
+   RESET BUTTON
+   ========================================= */
+
+.btn{
+
+  width:100%;
+
+  margin-top:20px;
+
+  padding:14px;
+
+  border:none;
+
+  background:#38bdf8;
+
+  color:#000;
+
+  font-weight:700;
+
+  cursor:pointer;
+
+}
+
+.btn:hover{
+
+  opacity:.9;
+
+}
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media(max-width:900px){
+
+  td.cell{
+
+    width:56px;
+
+    height:56px;
+
+    font-size:26px;
+
+  }
+
+  .output-box{
+
+    font-size:22px;
+
+  }
+
+}
+
+
+
+/* =========================================
+   KMAP CONTROL PANEL
+   ========================================= */
+
+.control-panel{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:14px;
+
+  padding:18px;
+
+  margin-bottom:20px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      #1f2937,
+      #111827
+    );
+
+  border:1px solid #334155;
+
+}
+
+.control-group{
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  gap:14px;
+
+  flex-wrap:wrap;
+
+}
+
+/* =========================================
+   LABELS
+   ========================================= */
+
+.control-group label{
+
+  color:#ffffff;
+
+  font-size:15px;
+
+  font-weight:700;
+
+}
+
+/* =========================================
+   INPUTS & DROPDOWNS
+   ========================================= */
+
+.control-group input[type="text"],
+.control-group select{
+
+  height:44px;
+
+  padding:0 14px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      #273449,
+      #1e293b
+    );
+
+  color:#ffffff;
+
+  border:1px solid #475569;
+
+  outline:none;
+
+  font-size:15px;
+
+  font-weight:600;
+
+  font-family:Consolas, monospace;
+
+  transition:.25s;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 2px 6px rgba(0,0,0,.35);
+
+}
+
+/* =========================================
+   DROPDOWN ARROW
+   ========================================= */
+
+.control-group select{
+
+  appearance:none;
+
+  -webkit-appearance:none;
+
+  -moz-appearance:none;
+
+  padding-right:40px;
+
+  cursor:pointer;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      #38bdf8 50%
+    ),
+    linear-gradient(
+      135deg,
+      #38bdf8 50%,
+      transparent 50%
+    );
+
+  background-position:
+    calc(100% - 18px) 18px,
+    calc(100% - 12px) 18px;
+
+  background-size:
+    6px 6px,
+    6px 6px;
+
+  background-repeat:no-repeat;
+
+}
+
+.control-group select option{
+
+  background:#1e293b;
+
+  color:#ffffff;
+
+}
+
+/* =========================================
+   HOVER
+   ========================================= */
+
+.control-group input:hover,
+.control-group select:hover{
+
+  border-color:#64748b;
+
+}
+
+/* =========================================
+   FOCUS
+   ========================================= */
+
+.control-group input:focus,
+.control-group select:focus{
+
+  border-color:#38bdf8;
+
+  box-shadow:
+    0 0 0 2px rgba(56,189,248,.25);
+
+}
+
+/* =========================================
+   RADIO BUTTONS
+   ========================================= */
+
+.control-group input[type="radio"]{
+
+  accent-color:#38bdf8;
+
+  transform:scale(1.1);
+
+}
+
+
+#globalResult{
+
+  overflow-x:auto;
+
+  white-space:nowrap;
+
+  text-overflow:clip;
+
+}
+
+
+#globalResult.kmap-result{
+    font-size: 26px;
+    font-weight: 500;
+}
+
+
+.result-scroll{
+    overflow-x:auto;
+    overflow-y:hidden;
+}
+
+.result-scroll input{
+    min-width:max-content;
+    width:max-content;
+}
+
+
+
+
+
+/* =========================================
+   FORCE HORIZONTAL SCROLL IN ANSWER BOX
+   ========================================= */
+
+#globalResult{
+
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+
+  white-space:pre !important;
+
+  word-break:normal !important;
+  overflow-wrap:normal !important;
+
+  text-align:center !important;
+
+  padding:20px !important;
+
+}
+
+/* If Answer box is inside a wrapper */
+
+.answer-box{
+
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+
+}
+
+
+.step-item{
+    margin:10px 0;
+    padding:10px 12px;
+
+    background:none;
+
+    
+
+    color:#ffffff;
+
+    line-height:1.7;
+}
+
+.kmap-step-divider{
+    border:none;
+    height:1px;
+    background:linear-gradient(
+        to right,
+        transparent,
+        #4db8ff,
+        transparent
+    );
+    margin:18px 0;
+}
+
+
+.color-box{
+    width:15px;
+    height:15px;
+    display:inline-block;
+    border-radius:1px;
+    vertical-align:middle;
+    margin-right:20px;
+    
+}
+
+
+
+.step-item{
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    margin:10px 0;
+    padding:10px 12px;
+    color:#fff;
+    line-height:1.7;
+}
+
+.kmap-step-divider{
+    border:none;
+    height:1px;
+    background:linear-gradient(
+        to right,
+        transparent,
+        rgba(255,255,255,.25),
+        transparent
+    );
+    margin:12px 0;
+}
+
+
+
+
+.step-item{
+    position:relative;
+
+    margin:12px 0;
+    padding:12px 16px 12px 22px;
+
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:8px;
+
+    color:#e5e7eb;
+    line-height:1.8;
+
+    transition:all .2s ease;
+}
+
+.step-item:hover{
+    background:rgba(255,255,255,0.04);
+    border-color:rgba(255,255,255,0.15);
+}
+
+.step-item{
+    padding-bottom:20px;
+    margin-bottom:20px;
+    border-bottom:11px solid #4db8ff;
+}
+
+
+/* Group title */
+.step-item strong{
+    color:#ffffff;
+    font-size:1rem;
+    font-weight:700;
+}
+
+/* Cells list */
+.step-item .cells{
+    color:#94a3b8;
+    font-size:.92rem;
+}
+
+/* Original expression */
+.step-item .original{
+    margin-top:8px;
+    color:#cbd5e1;
+    font-family:Consolas, monospace;
+}
+
+/* Simplified result */
+.step-item .reduced{
+    margin-top:4px;
+    color:#22c55e;
+    font-weight:700;
+    font-family:Consolas, monospace;
+}
+
+.zoom-toolbar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 12px;
+  border-bottom:1px solid #333;
+}
+
+#explanationZoom{
+  flex:1;
+}
+
+
+.answer-center{
+
+  height:100px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+}
+
+#globalResult{
+
+  height:auto;
+
+  min-height:0;
+
+  resize:none;
+
+  text-align:center;
+
+}
+
+
+.kmap-vars-panel{
+
+    display:flex;
+    gap:20px;
+
+    align-items:stretch;
+
+    margin:15px 0;
+
+}
+
+.input-panel,
+.output-panel{
+
+    flex:1;
+
+}
+
+.vertical-divider{
+
+    width:2px;
+
+    background:#d0d0d0;
+
+}
+
+.section-title{
+
+    font-size:1.1rem;
+
+    font-weight:700;
+
+    text-align:center;
+
+    margin-bottom:8px;
+
+}
+
+.input-panel label,
+.output-panel label{
+
+    display:block;
+
+    margin-top:10px;
+    margin-bottom:5px;
+
+    font-weight:600;
+
+}
+
+.input-panel input,
+.output-panel input,
+.input-panel select{
+
+    width:100%;
+
+}
+
+
+
+  </style>
+  </head>
+
+  <body class="page-fade">
+
+  <!-- ========================================= -->
+  <!-- HEADER -->
+  <!-- ========================================= -->
+
+  <header class="site-header">
+
+    <div class="brand-wrap">
+      <div class="brand-grid">
+        <img src="./assets/PC-Logo.png"
+            alt="polygen"
+            class="brand-logo" />
+
+        <div class="brand-title2">
+          polygen
+        </div>
+
+        <div class="brand-tagline2">
+          next-gen<span class="dot">.</span>learning<span class="dot">.</span>system
+        </div>
+      </div>
+    </div>
+
+    <nav class="site-nav">
+      <a href="./index.html">Home</a>
+      <a href="./about.html">About</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+
+  </header>
+
+  <!-- ========================================= -->
+  <!-- MAIN -->
+  <!-- ========================================= -->
+
+  <main class="stage">
+
+  <div class="app">
+
+    <!-- ===================================== -->
+    <!-- LEFT PANEL -->
+    <!-- ===================================== -->
+
+    <section class="panel left">
+
+      <div class="pane-head">
+        <strong>📘 Concepts</strong>
+      </div>
+
+      <div class="pane-scroll">
+
+        <div class="pane-body">
+
+        <div class="topic-list">
+
+  <details>
+
+    <summary>📘 Digital Electronics Theory</summary>
+
+    <div class="topic-item">
+
+      • Binary (Base 2): 0,1<br>
+• Octal (Base 8): 0-7<br>
+• Decimal (Base 10): 0-9<br>
+• Hexadecimal (Base 16): 0-9,A-F<br><br>
+
+Position Value = Digit × Baseⁿ<br><br>
+
+Used in computer arithmetic,
+coding, memory and digital systems.
+
+<br><br>
+
+<strong>What is a Number System?</strong><br><br>
+
+A Number System is a method of representing and expressing numbers using a set of symbols called digits. Every number system is defined by its Base (Radix), which specifies the total number of unique digits available.
+
+<br><br>
+
+Examples:<br>
+Decimal → Base 10 → Digits 0-9<br>
+Binary → Base 2 → Digits 0,1<br>
+Octal → Base 8 → Digits 0-7<br>
+Hexadecimal → Base 16 → Digits 0-9,A-F
+
+<br><br>
+
+<strong>Base or Radix</strong><br><br>
+
+The base of a number system indicates the number of distinct symbols used to represent numbers.
+
+<br><br>
+
+Base 2 → Binary<br>
+Base 8 → Octal<br>
+Base 10 → Decimal<br>
+Base 16 → Hexadecimal
+
+<br><br>
+
+<strong>Positional Number System</strong><br><br>
+
+Most modern number systems are positional. The value of a digit depends on:
+
+1. The digit itself<br>
+2. Its position in the number
+
+<br><br>
+
+Value = Digit × Baseⁿ
+
+<br><br>
+
+Example:
+
+(345)₁₀
+
+= 3×10² + 4×10¹ + 5×10⁰
+
+= 300 + 40 + 5
+
+= 345
+
+<br><br>
+
+<strong>Binary Number System</strong><br><br>
+
+Binary is the fundamental language of computers.
+
+Digits Used: 0 and 1
+
+Example:
+
+(1011)₂
+
+= 1×2³ + 0×2² + 1×2¹ + 1×2⁰
+
+= 8 + 0 + 2 + 1
+
+= 11₁₀
+
+<br><br>
+
+Advantages:
+
+• Simple electronic implementation<br>
+• Reliable storage and transmission<br>
+• Directly compatible with digital circuits
+
+<br><br>
+
+<strong>Octal Number System</strong><br><br>
+
+Base = 8
+
+Digits = 0 to 7
+
+Each Octal Digit represents exactly 3 Binary Bits.
+
+Example:
+
+563₈ = 101110011₂
+
+<br><br>
+
+Used to shorten long binary numbers.
+
+<br><br>
+
+<strong>Decimal Number System</strong><br><br>
+
+Base = 10
+
+Digits = 0 to 9
+
+Most commonly used number system in daily life.
+
+Example:
+
+528₁₀
+
+= 5×10² + 2×10¹ + 8×10⁰
+
+<br><br>
+
+<strong>Hexadecimal Number System</strong><br><br>
+
+Base = 16
+
+Digits:
+
+0 1 2 3 4 5 6 7 8 9 A B C D E F
+
+Where:
+
+A = 10<br>
+B = 11<br>
+C = 12<br>
+D = 13<br>
+E = 14<br>
+F = 15
+
+<br><br>
+
+Each Hex Digit represents exactly 4 Binary Bits.
+
+Example:
+
+FA₁₆
+
+= 11111010₂
+
+<br><br>
+
+Widely used in:
+
+• Memory Addressing<br>
+• Programming<br>
+• Machine Language<br>
+• Color Codes (#FFFFFF)
+
+<br><br>
+
+<strong>Why Computers Use Binary?</strong><br><br>
+
+Electronic circuits naturally have two stable states:
+
+ON / OFF<br>
+HIGH / LOW<br>
+TRUE / FALSE
+
+These are represented as:
+
+1 / 0
+
+Hence computers process all information using binary digits.
+
+<br><br>
+
+<strong>Number System Conversions</strong><br><br>
+
+Common conversions include:
+
+• Binary ↔ Decimal<br>
+• Binary ↔ Octal<br>
+• Binary ↔ Hexadecimal<br>
+• Decimal ↔ Octal<br>
+• Decimal ↔ Hexadecimal
+
+<br><br>
+
+<strong>Complements</strong><br><br>
+
+Complements simplify subtraction operations.
+
+Examples:
+
+1's Complement<br>
+2's Complement<br>
+7's Complement<br>
+8's Complement<br>
+9's Complement<br>
+10's Complement
+
+<br><br>
+
+<strong>Digital Codes</strong><br><br>
+
+Special coding schemes used in digital electronics:
+
+• BCD (Binary Coded Decimal)<br>
+• Excess-3 Code<br>
+• Gray Code
+
+<br><br>
+
+<strong>Signed Number Representation</strong><br><br>
+
+Negative numbers can be represented using:
+
+• Sign Magnitude<br>
+• 1's Complement<br>
+• 2's Complement
+
+<br><br>
+
+<strong>Floating Point Representation</strong><br><br>
+
+Real numbers are represented using:
+
+• Fixed Point Format<br>
+• Floating Point Format<br>
+• IEEE-754 Standard
+
+<br><br>
+
+<strong>Important Exam Facts</strong><br><br>
+
+• Binary uses 2 symbols.<br>
+• Octal uses 8 symbols.<br>
+• Decimal uses 10 symbols.<br>
+• Hexadecimal uses 16 symbols.<br>
+• 1 Octal Digit = 3 Bits.<br>
+• 1 Hex Digit = 4 Bits.<br>
+• Base is also called Radix.<br>
+• 2's Complement is most commonly used for signed integers.<br>
+• IEEE-754 is the standard floating-point representation.<br>
+• Gray Code changes only one bit between consecutive values.
+
+<br><br>
+
+<strong>Applications of Number Systems</strong><br><br>
+
+• Computer Architecture<br>
+• Digital Electronics<br>
+• Programming Languages<br>
+• Networking<br>
+• Data Communication<br>
+• Embedded Systems<br>
+• Microprocessors<br>
+• Memory Management<br>
+• Operating Systems<br>
+• Scientific Computing
+
+    </div>
+
+  </details>
+
+</div>
+
+
+
+
+
+        </div>
+
+        <div class="pane-foot">
+          <span class="msg">Number System Theory</span>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ===================================== -->
+    <!-- CENTER PANEL -->
+    <!-- ===================================== -->
+
+    <section class="panel center">
+
+      <div class="pane-head">
+
+        <strong>🔢 Digital Electronics Lab</strong>
+
+      </div>
+
+      <div class="pane-scroll">
+
+        <div class="pane-body"> 
+
+<button class="mobile-menu-btn"
+        id="mobileMenuBtn">
+
+  ☰ Modules
+
+</button>
+
+<div class="ns-layout">
+
+  <!-- LEFT MODULE MENU -->
+
+  <div class="ns-tabs">
+
+    <button class="ns-tab active"
+            data-tab="expression">
+
+      Expression Solver
+
+    </button>
+
+    <button class="ns-tab"
+            data-tab="truth">
+
+      Truth Tables
+
+    </button>
+
+    <button class="ns-tab"
+            data-tab="gates">
+
+      Logic Gates
+
+    </button>
+
+
+    <button class="ns-tab"
+            data-tab="circuit">
+
+      Circuit Generator
+
+    </button>
+
+    <button class="ns-tab"
+            data-tab="kmap">
+
+      Karnaugh Maps
+
+    </button>
+
+  </div>
+
+  <!-- CONTENT AREA -->
+
+ <div class="ns-content">
+
+  <div class="ns-card tab-content"
+       id="expression">
+
+    <div class="base-banner">
+
+      Boolean Expression Solver
+
+    </div>
+
+    <div class="ns-input-group">
+
+      <label>
+
+        Boolean Expression
+
+      </label>
+
+      <input type="text"
+             id="boolExpression"
+             placeholder="A.B + A'.C">
+
+    </div>
+
+    <button class="ns-btn"  id="solveBtn" data-mode="simplify">
+
+      Simplify
+
+    </button>
+
+  </div>
+
+  <div class="ns-card tab-content hidden"
+     id="truth">
+
+  <div class="base-banner" >
+
+    Truth Table Generator
+
+  </div>
+
+  <div class="ns-input-group">
+
+    <label>
+
+      Expression
+
+    </label>
+
+    <input type="text"
+           id="truthExpression"
+           placeholder="A+B">
+
+  </div>
+
+  <button class="ns-btn" id="truthBtn" data-mode="simplify">
+
+    Generate Truth Table
+
+  </button>
+
+</div>
+
+
+<div class="ns-card tab-content hidden"
+     id="gates">
+
+  <div class="base-banner">
+
+    Logic Gates
+
+  </div>
+
+  <div class="ns-input-group">
+
+    <label>
+
+      Select Gate
+
+    </label>
+
+    <select id="gateType">
+
+      <option>AND</option>
+      <option>OR</option>
+      <option>NOT</option>
+      <option>NAND</option>
+      <option>NOR</option>
+      <option>XOR</option>
+      <option>XNOR</option>
+
+    </select>
+
+  </div>
+
+  <button class="ns-btn">
+
+    Show Gate
+
+  </button>
+
+</div>
+
+
+
+ <div class="ns-card tab-content"
+       id="circuit">
+
+    <div class="base-banner">
+
+      Circuit Generator
+
+    </div>
+
+    <div class="ns-input-group">
+
+      <label>
+
+        Boolean Expression
+
+      </label>
+
+      <input type="text"
+             id="exprInput"
+             placeholder="A.B + A'.C">
+
+    </div>
+
+    <button class="ns-btn"  id="drawBtn" onclick="drawCircuit()">
+
+      Draw/Generate
+
+    </button>
+
+  </div>
+
+
+
+
+
+<div class="ns-card tab-content hidden"
+     id="kmap">
+
+  <div class="base-banner">
+    Karnaugh Map Visualizer
+  </div>
+
+
+  <div class="control-panel">
+        <div class="control-group">
+            <label style="font-size: 1.25rem;"><input type="radio" name="kmapMode" value="SOP" checked onchange="buildGrid()"> Sum of Product - SOP (Σ)</label>
+            <label style="font-size: 1.25rem;"><input type="radio" name="kmapMode" value="POS" onchange="buildGrid()"> Product of Sum - POS (Π)</label>
+        </div>
+        <br/>
+        <div class="control-group" >
+            <label for="varCount">Inputs:</label>
+            <select id="varCount" onchange="handleVarCountChange()">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4" selected>4</option>
+            </select>
+        
+            <input type="text" id="varNames" placeholder="A,B,C,D" value="A, B, C, D" onchange="buildGrid()" onkeyup="if(event.key==='Enter') buildGrid()" style="width: 120px; text-align: center;">
+
+            <label for="varNames"  style = "margin-left:40px;">Function:</label>
+            <input type="text" id="varOutNames" placeholder="F" value="F" onchange="buildGrid()" onkeyup="if(event.key==='Enter') buildGrid()" style="width: 40px; text-align: center; ">
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+    <p style="text-align:center; margin-top:0; font-size: 0.95rem; color: #666;">Click the cells to toggle 1s and 0s.</p>
+
+    <!-- The grid will be dynamically generated here -->
+    <div id="kmapContainer"></div>
+
+    <div class="output-box" id="expressionOutput">0</div>
+    <div class="legend" id="groupLegend"></div>
+    <br/><br/>
+    <button class="ns-btn" onclick="clearMap()">Reset Map</button>
+
+
+
+    
+  
+
+</div>
+
+
+</div>
+
+</div>
+
+
+        </div>
+       
+
+        <div class="pane-foot">
+          <span class="msg">
+            Ready for Digital Electronics Operations
+          </span>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ===================================== -->
+    <!-- RIGHT PANEL -->
+    <!-- ===================================== -->
+
+
+    
+
+
+
+
+
+    <section class="panel right">
+
+      <div class="pane-head">
+        <strong id="answerTitle">💡 Answer</strong>
+      </div>
+  <div class="answer-box">
+   <div class="answer-center">
+    <textarea
+      id="globalResult"
+      readonly
+      value="" rows = "1">  </textarea>
+   </div>
+
+  </div>
+
+  
+ 
+
+
+      <div class="pane-head">
+
+       
+
+
+
+        <strong id="explanationTitle">📖 Explanation</strong>
+      </div>
+
+
+
+      <!-- ZOOM BAR HERE -->
+
+<div class="zoom-toolbar">
+
+  🔍
+
+  <input
+    type="range"
+    id="explanationZoom"
+    min="100"
+    max="250"
+    value="100"
+  >
+
+  <span id="zoomValue">
+    100%
+  </span>
+
+</div>
+
+      <div class="pane-scroll">
+
+        <div class="pane-body">
+
+
+
+
+        
+<div id="explanationContent">
+    <div class="ns-steps"
+        id="globalSteps">
+
+    </div></div>
+
+  </div>
+
+        </div>
+
+        <div class="pane-foot">
+          <span class="msg">
+            Learning Mode Enabled
+          </span>
+        </div>
+
+     
+
+    </section>
+
+  
+
+  </div>
+
+  </main>
+
+  <!-- ========================================= -->
+  <!-- FOOTER -->
+  <!-- ========================================= -->
+
+  <footer class="site-footer">
+
+    <div class="footer-grid">
+
+      <div class="footer-left">
+
+        <img src="./assets/logo.png"
+            alt="Edifica"
+            class="footer-logo" />
+
+        <div class="txt">
+
+          <span class="powered">
+            powered by edifica
+          </span>
+
+          <span class="subline">
+            education<span class="dot">.</span>
+            consultation<span class="dot">.</span>
+            assistance
+          </span>
+
+        </div>
+
+      </div>
+
+      <div class="footer-right">
+
+        <a href="./privacy.html">
+          Privacy Policy
+        </a>
+
+        <a href="./terms.html">
+          Terms & Conditions
+        </a>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+    <div id="errorModal" class="error-modal">
+
+  <div class="error-box">
+
+    <div class="error-title">
+      ⚠ Invalid Input
+    </div>
+
+    <div id="errorMessage">
+    </div>
+
+    <button id = "modalOkBtn" onclick="closeErrorModal()">
+      OK
+    </button>
+
+  </div>
+
+</div>
+
+
+
+<script src="./js/booleanexprsolver.js" defer></script>
+<script src="./js/kmap.js" defer></script>
+<script src="./js/logicdiagram.js" defer></script>
+<script src="./js/boolean.js" defer></script>
+
+  </body>
+  </html>
