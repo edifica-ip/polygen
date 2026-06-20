@@ -815,7 +815,9 @@ function processExpression() {
     }
 }
 
+
 function addStepToList(rule, expr, isFinal = false) {
+    
     const list = document.getElementById('stepList');
     const li = document.createElement('li');
     li.className = 'step-item';
@@ -826,18 +828,15 @@ function addStepToList(rule, expr, isFinal = false) {
     </div>
 
     <div class="expression">
-        ${expr}
+        ${expr}222
 
-        
-    </div>
-
-    <div>ddd</div>
+            </div>
 
     
 `;
+
     list.appendChild(li);
 }
-
 
 
 //HELPER

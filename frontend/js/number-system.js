@@ -19552,7 +19552,7 @@ Answer = ${resultHex}₁₆`;
 
   }
 
-   resultDiv.value =    `${result}`;
+  resultDiv.value =    `${result}`;
   
   stepsDiv.textContent =
     steps;
