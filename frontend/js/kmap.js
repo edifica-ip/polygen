@@ -359,16 +359,17 @@ const signature =
 
     kmapresult.notation =
     mode === 'SOP'
-    ? `${signature} = Σ()`
-    : `${signature} = Π()`;
+    ? `${signature} = Σ ( )`
+    : `${signature} = Π ( )`;
 
     explanation += `
 <div class="step-item">
 No cells selected.
 </div>
-
+<hr class='kmap-step-divider'>
 Therefore:<br>
 ${kmapresult.notation} = ${kmapresult.answer}
+<hr class='kmap-step-divider'>
 `;
 
     kmapresult.explanation =
@@ -417,6 +418,7 @@ else if(maxMinterms === 16)
 <hr class='kmap-step-divider'>
 Therefore:<br>
 ${notation} = ${kmapresult.answer}
+<hr class='kmap-step-divider'>
 `;
 
 kmapresult.explanation =
@@ -641,7 +643,7 @@ const resultSignature =
 
 document.getElementById(
     'globalResult'
-).value =
+).textContent =
     `${resultSignature} = ${kmapresult.answer}`;
 
     document.getElementById(

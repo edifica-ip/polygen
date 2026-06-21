@@ -674,7 +674,7 @@ document
         );
 
 
-        globalResult.value='';
+        globalResult.textContent='';
 
         globalSteps.textContent =
           'Boolean Algebra Lab Ready';
@@ -703,6 +703,9 @@ document
         if(panel.id === "kmap"
 ){
     resetOutputPanel("💡 Answer","📦 Groupings Found")
+    document.getElementById(
+  "explanationZoom"
+).disabled = false;
     buildGrid();
 }
 
@@ -710,6 +713,29 @@ if(panel.id === "expression"
 ){
   resetBooleanTool();
     resetOutputPanel("💡 Answer","🧮 Detailed Algebraic Steps & Laws")
+    
+}
+
+if(panel.id === "truth"
+){
+  resetTruthTable();
+    resetOutputPanel("💡 Expression","📊 Selected Options")
+    
+}
+
+if(panel.id === "circuit"
+){
+
+  resetCircuitDiagram();
+    resetOutputPanel("💡 Logic Equation","🔌 Circuit (Logic) Diagram")
+    
+}
+
+if(panel.id === "gates"
+){
+
+  resetGateTool();
+    resetOutputPanel("💡 Logic Equation","🔲 Circuit (Logic), Symbolic Diagram & Truth Table")
     
 }
 
@@ -732,7 +758,19 @@ if(panel.id === "expression"
 
   });
 
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
 
+    document
+      .querySelector(
+        '.ns-tab[data-tab="truth"]'
+      )
+      ?.click();
+      resetTruthTable();
+
+  }
+);
 
 // INITIAL STATE
 
@@ -770,7 +808,7 @@ function resetOutputPanel(
         'explanationTitle'
     ).innerHTML = explanationTitle;
 
-    globalResult.value = '';
+    globalResult.textContent = '';
     globalSteps.innerHTML = '';
 }
 
@@ -880,6 +918,458 @@ function extractVariables(expr){
 
 
 
+document
+  .getElementById("gateType")
+  .addEventListener(
+    "change",
+    loadGateExpression
+  );
+
+function loadGateExpression(){
+
+  const gate =
+    document.getElementById(
+      "gateType"
+    ).value;
+
+  const exprInput =
+    document.getElementById(
+      "exprInput2"
+    );
+
+  switch(gate){
+
+    case "AND":
+      exprInput.value = "A.B";
+      break;
+
+    case "OR":
+      exprInput.value = "A+B";
+      break;
+
+    case "NOT":
+      exprInput.value = "A'";
+      break;
+
+    case "NAND":
+      exprInput.value = "(A.B)'";
+      break;
+
+    case "NOR":
+      exprInput.value = "(A+B)'";
+      break;
+
+    case "XOR":
+      exprInput.value = "A'B+AB'";
+      break;
+
+    case "XNOR":
+      exprInput.value = "AB+A'B'";
+      break;
+
+  }
+
+}
+
+
+document
+  .getElementById("gateBtn")
+  .addEventListener(
+    "click",
+    handleGatesButton
+  );
+
+function handleGatesButton(){
+
+    const btn =
+        document.getElementById(
+            "gateBtn"
+        );
+
+    if(
+        btn.dataset.mode === "reset"
+    ){
+        resetGateTool();
+    }
+    else{
+        generateGateDiagram();
+    }
+}
+
+function resetGateTool(){
+
+    document.getElementById(
+    "exprInput2"
+).value = "A.B";
+
+document.getElementById(
+    "exprInput2"
+).disabled = true;
+
+  const stepList =
+    document.getElementById("stepList");
+
+if(stepList){
+    stepList.innerHTML = "";
+}
+
+
+document.getElementById(
+  "explanationZoom"
+).disabled = true;
+
+
+const errorBox =
+    document.getElementById("errorBox");
+
+if(errorBox){
+    errorBox.style.display = "none";
+}
+
+    const btn =
+        document.getElementById(
+            "gateBtn"
+        );
+
+        globalResult.textContent = "";
+globalSteps.innerHTML = "";
+
+    btn.textContent =
+        "Show Gate";
+
+    btn.dataset.mode =
+        "simplify";
+
+    document.getElementById(
+  "gateType"
+).disabled = false;
+
+        const gateSelect =
+  document.getElementById(
+    "gateType"
+  );
+
+gateSelect.selectedIndex = 0;
+gateSelect.focus();
+}
+
+function generateGateDiagram(){
+
+  const expr =
+    document
+      .getElementById(
+        'exprInput2'
+      )
+      .value
+      .trim();
+
+  if(!expr){
+
+    globalResult.textContent='';
+    
+    showErrorModal(
+    'Please enter a Boolean expression.');
+
+      return;
+  }
+
+
+const error = validateBooleanExpression(expr);
+
+if(error){
+
+    showErrorModal(
+        error);
+
+        return;
+    }
+ try{
+
+  document
+      .getElementById(
+        'exprInput2'
+      )
+      .value = expr.toUpperCase();
+document.getElementById(
+  "explanationZoom"
+).disabled = false;
+
+      const btn =
+    document.getElementById(
+        "gateBtn"
+    );
+
+btn.textContent =
+    "Reset";
+
+btn.dataset.mode =
+    "reset";
+
+globalResult.textContent =   formatExpression(expr);
+
+document.getElementById(
+  "gateType"
+).disabled = true;
+
+
+
+drawCircuit(expr);
+globalSteps.innerHTML += '<h3>Circuit (Logic) Diagram</h3>';
+
+
+const gate1 =
+    document.getElementById(
+      "gateType"
+    ).value;
+  switch(gate1){
+
+    case "AND":
+ globalSteps.innerHTML += generateBasicAND();
+      globalSteps.innerHTML += '<h3>Symbolic Diagram</h3>';
+    break;
+ case "OR":
+ globalSteps.innerHTML += generateBasicOR();
+      globalSteps.innerHTML += '<h3>Symbolic Diagram</h3>';
+    break;
+
+ case "NOT":
+ globalSteps.innerHTML += generateBasicNOT();
+      globalSteps.innerHTML += '<h3>Symbolic Diagram</h3>';
+    break;
+
+    case "NAND":
+      globalSteps.innerHTML += generateBasicNAND();
+      globalSteps.innerHTML += '<h3>Symbolic Diagram</h3>';
+      
+      break;
+
+    case "NOR":
+      globalSteps.innerHTML += generateBasicNOR();
+      globalSteps.innerHTML += '<h3>Symbolic Diagram</h3>';
+      
+      break;
+
+    case "XOR":
+      globalSteps.innerHTML += generateBasicXOR();
+      globalSteps.innerHTML += '<h3>Symbolic Diagram</h3>';
+      
+      break;
+
+    case "XNOR":
+      globalSteps.innerHTML += generateBasicXNOR();
+      globalSteps.innerHTML += '<h3>Symbolic Diagram</h3>';
+      
+      break;
+
+  }
+
+
+
+generateTruthTableForGateOnly(expr);
+globalSteps.innerHTML += '<h3>Truth Table</h3>';
+
+  }
+  catch(error){
+
+    
+     showErrorModal(
+     "Syntax Error\n\n" +
+        error.message);
+  }
+}
+
+function generateTruthTableForGateOnly(expr){
+
+    if(!expr){
+
+        showErrorModal(
+    'Please enter a Boolean expression.',);
+        return;
+    }
+
+    try{
+
+        const tokens =
+            tokenize(expr);
+
+        const parser =
+            new Parser(tokens);
+
+        const ast =
+            parser.parse();
+
+        const tableData =
+            generateTruthTableFromAST(
+                ast
+            );
+
+        if(
+            !tableData ||
+            tableData.length === 0
+        ){
+
+             showErrorModal(
+    'Error in generating truth table.');
+
+            return;
+        }
+
+            globalSteps.innerHTML += '<hr class=kmap-step-divider>' +
+            renderTruthTableHTML(
+                tableData
+            ) + '<hr class=kmap-step-divider>';
+
+       
+
+    }
+    catch(error){
+
+       showErrorModal(
+     "Syntax Error\n\n" + error.message);
+          }
+}
+
+function generateBasicNAND() {
+    return `
+    <svg width="200" height="80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Inputs A & B -->
+        <text x="10" y="30" font-family="monospace" font-size="16" font-weight="bold" fill="white">A</text>
+        <text x="10" y="60" font-family="monospace" font-size="16" font-weight="bold" fill="white">B</text>
+        <line x1="25" y1="25" x2="40" y2="25" stroke="#555" stroke-width="2"/>
+        <line x1="25" y1="55" x2="40" y2="55" stroke="#555" stroke-width="2"/>
+        
+        <!-- NAND Body (D-Shape + Bubble) -->
+        <path d="M 40,10 L 65,10 A 30,30 0 0,1 65,70 L 40,70 Z" fill="#e8f4f8" stroke="#0056b3" stroke-width="2"/>
+        <circle cx="100" cy="40" r="5" fill="#fff" stroke="#0056b3" stroke-width="2"/>
+        <text x="65" y="44" font-family="sans-serif" font-size="10" font-weight="bold" fill="#0056b3" text-anchor="middle">NAND</text>
+        
+        <!-- Output -->
+        <line x1="105" y1="40" x2="135" y2="40" stroke="#555" stroke-width="2"/>
+        <text x="140" y="45" font-family="monospace" font-size="16" font-weight="bold" fill="white">(A.B)'</text>
+    </svg>`;
+}
+
+// --- 2. NOR GATE ---
+function generateBasicNOR() {
+    return `
+    <svg width="200" height="80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Inputs A & B -->
+        <text x="10" y="30" font-family="monospace" font-size="16" font-weight="bold" fill="white">A</text>
+        <text x="10" y="60" font-family="monospace" font-size="16" font-weight="bold" fill="white">B</text>
+        <line x1="25" y1="25" x2="48" y2="25" stroke="#555" stroke-width="2"/>
+        <line x1="25" y1="55" x2="48" y2="55" stroke="#555" stroke-width="2"/>
+        
+        <!-- NOR Body (Shield Shape + Bubble) -->
+        <path d="M 40,10 Q 75,10 95,40 Q 75,70 40,70 Q 60,40 40,10 Z" fill="#fdf3ec" stroke="#d35400" stroke-width="2"/>
+        <circle cx="100" cy="40" r="5" fill="#fff" stroke="#d35400" stroke-width="2"/>
+        <text x="65" y="44" font-family="sans-serif" font-size="10" font-weight="bold" fill="#d35400" text-anchor="middle">NOR</text>
+        
+        <!-- Output -->
+        <line x1="105" y1="40" x2="135" y2="40" stroke="#555" stroke-width="2"/>
+        <text x="140" y="45" font-family="monospace" font-size="16" font-weight="bold" fill="white">(A+B)'</text>
+    </svg>`;
+}
+
+// --- 3. XOR GATE ---
+function generateBasicXOR() {
+    return `
+    <svg width="200" height="80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Inputs A & B -->
+        <text x="10" y="30" font-family="monospace" font-size="16" font-weight="bold" fill="white">A</text>
+        <text x="10" y="60" font-family="monospace" font-size="16" font-weight="bold" fill="white">B</text>
+        <line x1="25" y1="25" x2="42" y2="25" stroke="#555" stroke-width="2"/>
+        <line x1="25" y1="55" x2="42" y2="55" stroke="#555" stroke-width="2"/>
+        
+        <!-- XOR Body (Double Shield Shape) -->
+        <path d="M 32,10 Q 52,40 32,70" fill="none" stroke="#6f42c1" stroke-width="2"/>
+        <path d="M 40,10 Q 75,10 95,40 Q 75,70 40,70 Q 60,40 40,10 Z" fill="#f4e8f8" stroke="#6f42c1" stroke-width="2"/>
+        <text x="65" y="44" font-family="sans-serif" font-size="10" font-weight="bold" fill="#6f42c1" text-anchor="middle">XOR</text>
+        
+        <!-- Output -->
+        <line x1="95" y1="40" x2="135" y2="40" stroke="#555" stroke-width="2"/>
+        <text x="140" y="45" font-family="monospace" font-size="16" font-weight="bold" fill="white">A ⊕ B</text>
+    </svg>`;
+}
+
+// --- 4. XNOR GATE ---
+function generateBasicXNOR() {
+    return `
+    <svg width="200" height="80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Inputs A & B -->
+        <text x="10" y="30" font-family="monospace" font-size="16" font-weight="bold" fill="white">A</text>
+        <text x="10" y="60" font-family="monospace" font-size="16" font-weight="bold" fill="white">B</text>
+        <line x1="25" y1="25" x2="42" y2="25" stroke="#555" stroke-width="2"/>
+        <line x1="25" y1="55" x2="42" y2="55" stroke="#555" stroke-width="2"/>
+        
+        <!-- XNOR Body (Double Shield + Bubble) -->
+        <path d="M 32,10 Q 52,40 32,70" fill="none" stroke="#28a745" stroke-width="2"/>
+        <path d="M 40,10 Q 75,10 95,40 Q 75,70 40,70 Q 60,40 40,10 Z" fill="#e8f8ec" stroke="#28a745" stroke-width="2"/>
+        <circle cx="100" cy="40" r="5" fill="#fff" stroke="#28a745" stroke-width="2"/>
+        <text x="65" y="44" font-family="sans-serif" font-size="10" font-weight="bold" fill="#28a745" text-anchor="middle">XNOR</text>
+        
+        <!-- Output -->
+        <line x1="105" y1="40" x2="135" y2="40" stroke="#555" stroke-width="2"/>
+        <text x="140" y="45" font-family="monospace" font-size="16" font-weight="bold" fill="white">(A ⊕ B)'</text>
+    </svg>`;
+}
+
+function generateBasicAND() {
+    return `
+    <svg width="200" height="80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Inputs A & B -->
+        <text x="10" y="30" font-family="monospace" font-size="16" font-weight="bold" fill="white">A</text>
+        <text x="10" y="60" font-family="monospace" font-size="16" font-weight="bold" fill="white">B</text>
+        <line x1="25" y1="25" x2="40" y2="25" stroke="#555" stroke-width="2"/>
+        <line x1="25" y1="55" x2="40" y2="55" stroke="#555" stroke-width="2"/>
+        
+        <!-- AND Body (D-Shape, no bubble) -->
+        <path d="M 40,10 L 65,10 A 30,30 0 0,1 65,70 L 40,70 Z" fill="#e8f4f8" stroke="#0056b3" stroke-width="2"/>
+        <text x="60" y="44" font-family="sans-serif" font-size="10" font-weight="bold" fill="#0056b3" text-anchor="middle">AND</text>
+        
+        <!-- Output -->
+        <line x1="95" y1="40" x2="135" y2="40" stroke="#555" stroke-width="2"/>
+        <text x="140" y="45" font-family="monospace" font-size="16" font-weight="bold" fill="white">A.B</text>
+    </svg>`;
+}
+
+// --- 2. OR GATE ---
+function generateBasicOR() {
+    return `
+    <svg width="200" height="80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Inputs A & B -->
+        <text x="10" y="30" font-family="monospace" font-size="16" font-weight="bold" fill="white">A</text>
+        <text x="10" y="60" font-family="monospace" font-size="16" font-weight="bold" fill="white">B</text>
+        <line x1="25" y1="25" x2="48" y2="25" stroke="#555" stroke-width="2"/>
+        <line x1="25" y1="55" x2="48" y2="55" stroke="#555" stroke-width="2"/>
+        
+        <!-- OR Body (Shield Shape, no bubble) -->
+        <path d="M 40,10 Q 75,10 95,40 Q 75,70 40,70 Q 60,40 40,10 Z" fill="#fdf3ec" stroke="#d35400" stroke-width="2"/>
+        <text x="62" y="44" font-family="sans-serif" font-size="10" font-weight="bold" fill="#d35400" text-anchor="middle">OR</text>
+        
+        <!-- Output -->
+        <line x1="95" y1="40" x2="135" y2="40" stroke="#555" stroke-width="2"/>
+        <text x="140" y="45" font-family="monospace" font-size="16" font-weight="bold" fill="white">A+B</text>
+    </svg>`;
+}
+
+// --- 3. NOT GATE ---
+function generateBasicNOT() {
+    return `
+    <svg width="200" height="80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Input A (Centered) -->
+        <text x="10" y="45" font-family="monospace" font-size="16" font-weight="bold" fill="white">A</text>
+        <line x1="25" y1="40" x2="45" y2="40" stroke="#555" stroke-width="2"/>
+        
+        <!-- NOT Body (Triangle + Bubble) -->
+        <polygon points="45,15 85,40 45,65" fill="#e8f8ec" stroke="#28a745" stroke-width="2"/>
+        <circle cx="90" cy="40" r="5" fill="#fff" stroke="#28a745" stroke-width="2"/>
+        <text x="58" y="44" font-family="sans-serif" font-size="10" font-weight="bold" fill="#28a745" text-anchor="middle">NOT</text>
+        
+        <!-- Output -->
+        <line x1="95" y1="40" x2="135" y2="40" stroke="#555" stroke-width="2"/>
+        <text x="140" y="45" font-family="monospace" font-size="16" font-weight="bold" fill="white">A'</text>
+    </svg>`;
+}
 
 
 
@@ -894,8 +1384,297 @@ function extractVariables(expr){
 
 
 
+function validateBooleanExpression(expr){
+
+    expr = expr.trim().toUpperCase();
+
+    if(!expr){
+        return "Expression cannot be empty.";
+    }
+
+    // Allowed chars
+    if(!/^[A-Z0-1()+.'\s]+$/.test(expr)){
+        return "Expression contains invalid characters.";
+    }
+
+    // Start/end operator
+    if(/^[+.]/.test(expr)){
+        return "Expression cannot start with an operator.";
+    }
+
+    if(/[+.]$/.test(expr)){
+        return "Expression cannot end with an operator.";
+    }
+
+    // Consecutive operators
+    if(/[+.]{2,}/.test(expr)){
+        return "Consecutive operators are not allowed.";
+    }
+
+    if(/\+\./.test(expr) || /\.\+/.test(expr)){
+        return "Invalid operator sequence.";
+    }
+
+    // Empty parentheses
+    if(/\(\s*\)/.test(expr)){
+        return "Empty parentheses are not allowed.";
+    }
+
+    // Parenthesis balance
+    let count = 0;
+
+    for(const ch of expr){
+
+        if(ch === '(') count++;
+        if(ch === ')') count--;
+
+        if(count < 0){
+            return "Closing parenthesis without matching opening parenthesis.";
+        }
+    }
+
+    if(count !== 0){
+        return "Unbalanced parentheses.";
+    }
+
+    // Missing operator before (
+    if(/[A-Z0-1']\(/.test(expr)){
+        return "Missing operator before '('.";
+    }
+
+    // Missing operator after )
+    if(/\)[A-Z0-1(]/.test(expr)){
+        return "Missing operator after ')'.";
+    }
+
+    return null;
+}
 
 
+document
+    .getElementById("drawBtn")
+    .addEventListener(
+        "click",
+        handleDrawButton
+    );
+
+function handleDrawButton(){
+
+    const btn =
+        document.getElementById(
+            "drawBtn"
+        );
+
+    if(
+        btn.dataset.mode === "reset"
+    ){
+        resetCircuitDiagram();
+    }
+    else{
+        generateLogicDiagram();
+    }
+}
+
+
+
+function resetCircuitDiagram(){
+
+    
+document.getElementById(
+    "exprInput"
+).disabled = false;
+
+document
+  .querySelectorAll(
+    'input[name="circuitMode"]'
+  )
+  .forEach(r => {
+
+    r.disabled = false;
+
+  });
+
+  document.querySelector(
+  'input[name="circuitMode"][value="basic"]'
+).checked = true;
+
+
+    const stepList =
+    document.getElementById("stepList");
+
+if(stepList){
+    stepList.innerHTML = "";
+}
+
+
+document.getElementById(
+  "explanationZoom"
+).disabled = true;
+
+
+const errorBox =
+    document.getElementById("errorBox");
+
+if(errorBox){
+    errorBox.style.display = "none";
+}
+
+    const btn =
+        document.getElementById(
+            "drawBtn"
+        );
+
+        globalResult.textContent = "";
+globalSteps.innerHTML = "";
+
+    btn.textContent =
+        "Draw/Generate";
+
+    btn.dataset.mode =
+        "simplify";
+
+    document.getElementById(
+        "exprInput"
+    ).focus();
+}
+
+function generateLogicDiagram(){
+
+  const expr =
+    document
+      .getElementById(
+        'exprInput'
+      )
+      .value
+      .trim();
+
+  if(!expr){
+    globalResult.textContent='';
+    
+    showErrorModal(
+    'Please enter a Boolean expression.',
+    () => {
+        document
+            .getElementById('exprInput')
+            .focus();
+    }
+);
+
+      return;
+  }
+
+
+const error = validateBooleanExpression(expr);
+
+if(error){
+
+    showErrorModal(
+        error,
+        () =>
+            document
+                .getElementById("exprInput")
+                .focus()
+    );
+
+    return;
+}
+
+
+ try{
+
+  document
+      .getElementById(
+        'exprInput'
+      )
+      .value = expr.toUpperCase();
+document.getElementById(
+  "explanationZoom"
+).disabled = false;
+
+      const btn =
+    document.getElementById(
+        "drawBtn"
+    );
+
+btn.textContent =
+    "Reset";
+
+btn.dataset.mode =
+    "reset";
+
+document.getElementById(
+    "exprInput"
+).disabled = true;
+
+document
+  .querySelectorAll(
+    'input[name="circuitMode"]'
+  )
+  .forEach(r => {
+
+    r.disabled = true;
+
+  });
+
+
+globalResult.textContent =   formatExpression(expr);
+
+const mode =
+  document.querySelector(
+    'input[name="circuitMode"]:checked'
+  )?.value || "basic";
+
+switch(mode){
+
+  case "basic":
+
+    drawCircuit();
+    break;
+
+  case "nand":
+
+    generateNandCircuit();
+    break;
+
+  case "nor":
+
+    generateNorCircuit();
+    break;
+
+  case "nandnor":
+
+    generateMixCircuit();
+    break;
+
+}
+
+ if (
+        document.getElementById(
+            "chkTruthTableWD"
+        )?.checked
+    ) {
+
+      generateTruthTableForGateOnly(expr);
+    }
+
+
+
+
+  }
+  catch(error){
+
+    
+     showErrorModal(
+     "Syntax Error\n\n" +
+        error.message,
+    () => {
+        document
+            .getElementById('exprInput')
+            .focus();
+    }
+);
+  }
+}
 
 
 
@@ -926,28 +1705,51 @@ function handleTruthButton(){
         generateTruthTable();
     }
 }
-function resetTruthTable(){
+function formatExpression(expr){
 
-    document.getElementById(
-        "truthExpression"
-    ).value = "";
+  return expr
+
+    .toUpperCase()
+
+    .replace(/\s+/g,'')
+
+    .replace(/\+/g,' + ')
+    .replace(/\./g,' · ')
+
+    .replace(/\s+/g,' ')
+    .trim();
+
+}
+function resetTruthTable(){
 
     document.getElementById(
         "truthExpression"
     ).disabled = false;
 
-    globalResult.value = "";
+    document.getElementById(
+  "explanationZoom"
+).disabled = true;
+
+    globalResult.textContent = "";
 
     globalSteps.innerHTML =
-        "Boolean Algebra Lab Ready";
+        "";
 
     const btn =
         document.getElementById(
             "truthBtn"
         );
 
+         document
+    .querySelectorAll(
+      '.truth-options input[type="checkbox"]'
+    )
+    .forEach(
+      cb => cb.disabled = false
+    );
+
     btn.textContent =
-        "Generate Truth Table";
+        "Generate";
 
     btn.dataset.mode =
         "simplify";
@@ -955,7 +1757,130 @@ function resetTruthTable(){
     document.getElementById(
         "truthExpression"
     ).focus();
+
+    
 }
+
+
+function generateSelectedForms(expr) {
+
+    let html = "";
+
+    const sections = [
+
+        {
+            checkbox: "chkCSOP",
+            title: "Canonical SOP (CSOP)",
+            fn: toolsGetCSOP
+        },
+
+        {
+            checkbox: "chkCPOS",
+            title: "Canonical POS (CPOS)",
+            fn: toolsGetCPOS
+        },
+
+        {
+            checkbox: "chkMinterm",
+            title: "Minterm Expression",
+            fn: toolsGetMintermExpr
+        },
+
+        {
+            checkbox: "chkMaxterm",
+            title: "Maxterm Expression",
+            fn: toolsGetMaxtermExpr
+        },
+
+        {
+            checkbox: "chkSigma",
+            title: "Cardinal Sigma Form",
+            fn: toolsGetCardinalSigma
+        },
+
+        {
+            checkbox: "chkPi",
+            title: "Cardinal Pi Form",
+            fn: toolsGetCardinalPi
+        },
+
+        {
+            checkbox: "chkDual",
+            title: "Dual Form",
+            fn: toolsGetDual
+        },
+
+        {
+            checkbox: "chkInverse",
+            title: "Inverse Form",
+            fn: toolsGetInverse
+        }
+    ];
+
+    let stepNo = 1;
+
+    // Truth Table
+    if (
+        document.getElementById(
+            "chkTruthTable"
+        )?.checked
+    ) {
+
+        const env =
+            toolsAnalyzeExpression(expr);
+
+        const tableData =
+            generateTruthTableFromAST(
+                env.ast
+            );
+
+        html += `
+            <div class="result-card">
+                <h3>${stepNo++}. Truth Table</h3>
+                ${renderTruthTableHTML(tableData)}
+            </div>
+        `;
+    }
+
+    // Other selected forms
+    sections.forEach(section => {
+
+        const chk =
+            document.getElementById(
+                section.checkbox
+            );
+
+        if (!chk?.checked) return;
+
+        const result =
+            section.fn(expr);
+
+        html += `
+            <div class="result-card">
+                <h3>${stepNo++}. ${section.title}</h3>
+
+                <div class="final-result">
+                    ${result.result}
+                </div>
+
+                <details>
+                    <summary>
+                        View Derivation Steps
+                    </summary>
+
+                    <div class="steps-content">
+                        ${result.html}
+                    </div>
+
+                </details>
+
+            </div>
+        `;
+    });
+
+    globalSteps.innerHTML = html;
+}
+
 
 function generateTruthTable(){
 
@@ -971,9 +1896,13 @@ function generateTruthTable(){
     if(!expr){
 
         showErrorModal(
-            "Please enter a Boolean expression."
-        );
-
+    'Please enter a Boolean expression.',
+    () => {
+        document
+            .getElementById('truthExpression')
+            .focus();
+    }
+);
         return;
     }
 
@@ -998,24 +1927,30 @@ function generateTruthTable(){
             tableData.length === 0
         ){
 
-            showErrorModal(
-                "Unable to generate truth table."
-            );
+             showErrorModal(
+    'Error in generating truth table.',
+    () => {
+        document
+            .getElementById('truthExpression')
+            .focus();
+    }
+);
 
             return;
         }
 
-        globalResult.value =            expr;
+        globalResult.textContent =   formatExpression(expr);
 
-        globalSteps.innerHTML =
-            renderTruthTableHTML(
-                tableData
-            );
+         generateSelectedForms(expr);
 
         const btn =
             document.getElementById(
                 "truthBtn"
             );
+
+document.getElementById(
+  "explanationZoom"
+).disabled = false;
 
         btn.textContent =
             "Reset";
@@ -1027,14 +1962,27 @@ function generateTruthTable(){
             "truthExpression"
         ).disabled = true;
 
+        document
+    .querySelectorAll(
+      '.truth-options input[type="checkbox"]'
+    )
+    .forEach(
+      cb => cb.disabled = true
+    );
+
     }
     catch(error){
 
-        showErrorModal(
-            "Syntax Error\n\n" +
-            error.message
-        );
+       showErrorModal(
+     "Syntax Error\n\n" +            error.message,
+    () => {
+        document
+            .getElementById('truthExpression')
+            .focus();
     }
+);
+      
+          }
 }
 
 // Generates a 2D array representing a step-by-step truth table
@@ -1126,13 +2074,15 @@ function renderTruthTableHTML(tableData){
 
     <div style="
         margin-top:20px;
-        overflow-x:auto;
+        
         border-radius:14px;
     ">
 
     <table style="
-        width:100%;
-        border-collapse:collapse;
+        min-width:max-content;
+    border-collapse:separate;
+    border-spacing:0;
+        border-collapse:separate;
         font-family:'Segoe UI',Arial,sans-serif;
         background:#081326;
         color:white;
@@ -1145,7 +2095,7 @@ function renderTruthTableHTML(tableData){
 
     // HEADER
 
-    html += `<tr>`;
+    html += `<thead><tr>`;
 
     for(
         let i = 0;
@@ -1163,21 +2113,29 @@ function renderTruthTableHTML(tableData){
 
         html += `
         <th style="
-            background:${bg};
-            color:white;
-            padding:16px 14px;
-            border:1px solid rgba(255,255,255,.08);
-            font-size:15px;
-            font-weight:700;
-            white-space:nowrap;
-            letter-spacing:.5px;
-        ">
+    position:sticky;
+    top:0;
+    z-index:100;
+
+    background:${bg};
+
+    color:white;
+    padding:16px 14px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    font-size:15px;
+    font-weight:700;
+
+    white-space:nowrap;
+    letter-spacing:.5px;
+">
             ${head}
         </th>
         `;
     }
 
-    html += `</tr>`;
+    html += `</tr></thead><tbody>`;
 
     // DATA ROWS
 
@@ -1244,7 +2202,7 @@ function renderTruthTableHTML(tableData){
     }
 
     html += `
-    </table>
+    </tbody></table>
     </div>
     `;
 
@@ -1287,10 +2245,6 @@ function resetBooleanTool(){
 
     document.getElementById(
     "boolExpression"
-).value = "";
-
-document.getElementById(
-    "boolExpression"
 ).disabled = false;
 
     const stepList =
@@ -1299,6 +2253,12 @@ document.getElementById(
 if(stepList){
     stepList.innerHTML = "";
 }
+
+
+document.getElementById(
+  "explanationZoom"
+).disabled = true;
+
 
 const errorBox =
     document.getElementById("errorBox");
@@ -1312,7 +2272,7 @@ if(errorBox){
             "solveBtn"
         );
 
-        globalResult.value = "";
+        globalResult.textContent = "";
 globalSteps.innerHTML = "";
 
     btn.textContent =
@@ -1338,7 +2298,7 @@ function solveExpression(){
 
   if(!expr){
 
-    globalResult.value='';
+    globalResult.textContent='';
     
     showErrorModal(
     'Please enter a Boolean expression.',
@@ -1369,6 +2329,7 @@ function solveExpression(){
     let html='';
 
     html += `
+    <hr class='kmap-step-divider'>
       <div class="step-item">
 
         <div class="rule-name">
@@ -1406,6 +2367,7 @@ function solveExpression(){
         break;
 
       html += `
+      <hr class='kmap-step-divider'>
         <div class="step-item">
 
           <div class="rule-name">
@@ -1416,6 +2378,7 @@ function solveExpression(){
             ${stringify(ast)}
           </div>
 
+          
         </div>
       `;
 
@@ -1423,6 +2386,7 @@ function solveExpression(){
     }
 
     html += `
+    <hr class='kmap-step-divider'>
       <div class="step-item">
 
         <div class="rule-name final">
@@ -1434,14 +2398,17 @@ function solveExpression(){
         </div>
 
       </div>
+      <hr class='kmap-step-divider'>
     `;
 
-    globalResult.value =
+    globalResult.textContent =
       stringify(ast);
 
     globalSteps.innerHTML =
       html;
-
+document.getElementById(
+  "explanationZoom"
+).disabled = false;
 
       const btn =
     document.getElementById(
@@ -1461,11 +2428,16 @@ document.getElementById(
   }
   catch(error){
 
-    
     showErrorModal(
-        "Syntax Error\n\n" +
-        error.message
-    );
+     "Syntax Error\n\n" +
+        error.message,
+    () => {
+        document
+            .getElementById('boolExpression')
+            .focus();
+    }
+);
+    
   }
 }
 

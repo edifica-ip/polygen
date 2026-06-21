@@ -171,7 +171,7 @@ function logicGenerateSVG(ast, layoutProps) {
             let bxNot = layoutProps.busX[v + "'"];
             
             // Variable Label
-            svgContent += `<text x="${bx}" y="30" font-family="monospace" font-size="18" font-weight="bold" fill="#111" text-anchor="middle">${v}</text>`;
+            svgContent += `<text x="${bx}" y="30" font-family="monospace" font-size="18" font-weight="bold" fill="white" text-anchor="middle">${v}</text>`;
             // Main vertical line
             svgContent += `<line x1="${bx}" y1="40" x2="${bx}" y2="${layoutProps.height}" stroke="#aaa" stroke-width="2"/>`;
             
@@ -214,7 +214,7 @@ function logicGenerateSVG(ast, layoutProps) {
         
         if (n.isNegatedBus || n.type === 'VAR') {
             // Simply draw a solid black connection dot on the corresponding bus
-            svgContent += `<circle cx="${n.x}" cy="${n.y}" r="4" fill="#111"/>`;
+            svgContent += `<circle cx="${n.x}" cy="${n.y}" r="4" fill="white"/>`;
             return;
         } 
         
@@ -261,7 +261,7 @@ function logicGenerateSVG(ast, layoutProps) {
             
             // Draw Sub-expression Label
             let expr = logicStringify(n);
-            svgContent += `<text x="${n.x + 25}" y="${n.y - 6}" font-family="monospace" font-size="13" fill="#666">${expr}</text>`;
+            svgContent += `<text x="${n.x + 25}" y="${n.y - 6}" font-family="monospace" font-size="13" fill="white">${expr}</text>`;
             
             drawNode(n.left);
             drawNode(n.right);
@@ -285,8 +285,9 @@ function logicGenerateSVG(ast, layoutProps) {
 }
 
 // --- 4. UI CONTROLLER ---
-function drawCircuit() {
-    const input = document.getElementById('exprInput').value.replace(/\s+/g, '');
+function drawCircuit(input = null) {
+    if(!input)
+     input = document.getElementById('exprInput').value.replace(/\s+/g, '');
     //const errorBox = document.getElementById('errorBox');
     //const svgContainer = document.getElementById('svgContainer');
     
@@ -315,15 +316,17 @@ function drawCircuit() {
 
 globalSteps.innerHTML =
 `
-<h3>Logic Diagram</h3>
 <hr class='kmap-step-divider'>
 
 <div style="
 overflow:auto;
 margin-top:15px;
+margin-bottom: 15px;
 ">
     ${svg}
 </div>
+
+<hr class='kmap-step-divider'>
 `;
     } catch (e) {
         showErrorModal("Syntax Error: " + e.message);

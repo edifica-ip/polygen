@@ -345,19 +345,6 @@
 
 
     
-  #globalResult{
-
-    position:sticky;
-    top:0;
-
-    background:#020617;
-
-    z-index:10;
-
-    padding-bottom:12px;
-
-  }
-
 
       .global-output{
 
@@ -368,15 +355,7 @@
     flex-direction:column;
 
   }
-  #globalSteps{
 
-    flex:1;
-    overflow:auto;
-  font-family:monospace;
-    white-space:pre-wrap;
-    line-height: 1.8;
-    font-size: 18px;
-  }
 
   .mobile-menu-btn{
 
@@ -501,37 +480,6 @@
   }
 
 
-  #globalResult{
-
-  width:100%;
-
-  min-height:90px;
-
-  max-height:180px;
-
-  resize:none;
-
-  overflow:auto;
-
-  border:none;
-  outline:none;
-
-  border-radius:1px;
-
-  background:#000;
-
-  color:#00ff66;
-
-  font-size:32px;
-  font-weight:700;
-
-  font-family:monospace;
-
-  text-align:center;
-
-  padding:18px;
-
-}
 
 
 .mode-btn{
@@ -636,27 +584,7 @@
 
 
 
-#globalResult{
 
-  width:100%;
-
-  height:70px;
-
-  background:#000;
-
-  color:#fff;
-
-  border:none;
-
-  border-radius:1px;
-
-  font-size:28px;
-
-  text-align:center;
-
-  font-weight:700;
-
-}
 
 
 @media (max-width:900px){
@@ -679,31 +607,7 @@
 
 
 
-#globalSteps{
 
-  padding:24px;
-
-  margin:12px;
-
-  border-radius:1px;
-
-  background:#020617;
-
-  border:1px solid #1e293b;
-
-  box-sizing:border-box;
-
-  overflow:auto;
-
-  white-space:pre-wrap;
-
-  line-height:1.8;
-
-  font-size:18px;
-
-  font-family:Consolas, Monaco, monospace;
-
-}
 
 
 @media(max-width:900px){
@@ -721,47 +625,9 @@
 }
 
 
-#globalResult{
 
-  width:calc(100% - 24px);
 
-  margin:12px;
 
-  height:100px;
-
-  padding:20px;
-
-  box-sizing:border-box;
-
-  border-radius:1px;
-
-  border:1px solid #1e293b;
-
-  background:#020617;
-
-  color:#ffffff;
-
-  font-size:30px;
-
-  font-weight:700;
-
-  text-align:center;
-
-  outline:none;
-
-}
-
-#globalSteps{
-
-  white-space:normal;
-
-  overflow:auto;
-
-  word-wrap:normal;
-
-  overflow-wrap:normal;
-
-}
 
 .base-banner{
 
@@ -898,36 +764,7 @@
 }
 
 
-.panel.right{
-  display:flex;
-  flex-direction:column;
-}
 
-.panel.right .pane-scroll{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-}
-
-.panel.right .pane-body{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-}
-
-#globalSteps{
-  flex:1;
-  height:100%;
-  min-height:0;
-
-  padding:24px;
-  margin:12px;
-
-  background:#020617;
-  border:1px solid #1e293b;
-
-  overflow:auto;
-}
 
 
 
@@ -982,11 +819,6 @@
 }
 
 
-.step-item{
-
-  padding:18px 12px;
-
-}
 
 .step-item:not(:last-child){
 
@@ -1612,19 +1444,11 @@ td.cell:hover{
 }
 
 
-#globalResult{
 
-  overflow-x:auto;
-
-  white-space:nowrap;
-
-  text-overflow:clip;
-
-}
 
 
 #globalResult.kmap-result{
-    font-size: 26px;
+    font-size: 18px;
     font-weight: 500;
 }
 
@@ -1647,56 +1471,11 @@ td.cell:hover{
    FORCE HORIZONTAL SCROLL IN ANSWER BOX
    ========================================= */
 
-#globalResult{
 
-  overflow-x:auto !important;
-  overflow-y:hidden !important;
-
-  white-space:pre !important;
-
-  word-break:normal !important;
-  overflow-wrap:normal !important;
-
-  text-align:center !important;
-
-  padding:20px !important;
-
-}
 
 /* If Answer box is inside a wrapper */
 
-.answer-box{
 
-  overflow-x:auto !important;
-  overflow-y:hidden !important;
-
-}
-
-
-.step-item{
-    margin:10px 0;
-    padding:10px 12px;
-
-    background:none;
-
-    
-
-    color:#ffffff;
-
-    line-height:1.7;
-}
-
-.kmap-step-divider{
-    border:none;
-    height:1px;
-    background:linear-gradient(
-        to right,
-        transparent,
-        #4db8ff,
-        transparent
-    );
-    margin:18px 0;
-}
 
 
 .color-box{
@@ -1711,59 +1490,9 @@ td.cell:hover{
 
 
 
-.step-item{
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-
-    margin:10px 0;
-    padding:10px 12px;
-    color:#fff;
-    line-height:1.7;
-}
-
-.kmap-step-divider{
-    border:none;
-    height:1px;
-    background:linear-gradient(
-        to right,
-        transparent,
-        rgba(255,255,255,.25),
-        transparent
-    );
-    margin:12px 0;
-}
 
 
 
-
-.step-item{
-    position:relative;
-
-    margin:12px 0;
-    padding:12px 16px 12px 22px;
-
-    background:rgba(255,255,255,0.02);
-    border:1px solid rgba(255,255,255,0.08);
-    border-radius:8px;
-
-    color:#e5e7eb;
-    line-height:1.8;
-
-    transition:all .2s ease;
-}
-
-.step-item:hover{
-    background:rgba(255,255,255,0.04);
-    border-color:rgba(255,255,255,0.15);
-}
-
-.step-item{
-    padding-bottom:20px;
-    margin-bottom:20px;
-    border-bottom:11px solid #4db8ff;
-}
 
 
 /* Group title */
@@ -1807,27 +1536,8 @@ td.cell:hover{
 }
 
 
-.answer-center{
 
-  height:100px;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-}
-
-#globalResult{
-
-  height:auto;
-
-  min-height:0;
-
-  resize:none;
-
-  text-align:center;
-
-}
 
 
 .kmap-vars-panel{
@@ -1890,6 +1600,385 @@ td.cell:hover{
 
 
 
+/* ==========================
+   ANSWER PANEL
+   ========================== */
+
+
+
+
+.answer-box{
+
+  padding:12px;
+
+  flex-shrink:0;
+
+  overflow:auto;
+
+  
+}
+
+.answer-center{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  min-height:120px;
+  padding:0 12px;
+}
+
+
+
+
+.answer-box{
+
+  padding:12px;
+
+  overflow-x:auto;
+  overflow-y:hidden;
+
+}
+
+
+
+.panel.right{
+
+  display:flex;
+  flex-direction:column;
+
+  min-height:0;
+}
+
+.panel.right .pane-scroll{
+
+  flex:1;
+
+  min-height:0;
+
+  overflow:auto;
+}
+
+.panel.right .pane-body{
+
+  flex:1;
+
+  min-height:0;
+
+  display:flex;
+
+  flex-direction:column;
+}
+
+
+#globalSteps{
+
+  flex:1;
+
+  min-height:0;
+
+  overflow-x: auto;
+  overflow-y:auto;
+
+  padding:20px;
+
+  margin:12px;
+
+  border:1px solid #1e293b;
+
+  background:#020617;
+
+  border-radius:8px;
+
+  line-height:1.6;
+
+  white-space: normal;
+}
+
+
+
+
+
+
+/* Consolidated Step Item */
+.step-item {
+    position: relative;
+    margin: 20px 0;
+    padding: 12px 16px 20px 22px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    color: #e5e7eb;
+    line-height: 1.8;
+    transition: all .2s ease;
+}
+
+.step-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* JavaScript Matching Classes */
+.rule-name {
+    color: gray;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.expression {
+    color: #cbd5e1;
+    font-family: Consolas, monospace;
+    font-size: 1.2rem;
+}
+
+/* Fixed Divider */
+.kmap-step-divider {
+    display: block;
+    width: 100%;
+    border: none;
+    height: 5px;
+    background: linear-gradient(
+        to right,
+        transparent,
+        rgba(77, 184, 255, 0.4), /* Uses your #4db8ff color with transparency */
+        transparent
+    );
+    margin: 14px 0 0 0; /* Pushes the line down away from text */
+}
+
+
+/* =========================================
+   POLYGEN ANSWER CARD
+   ========================================= */
+
+#globalResult:hover{
+
+  transform:translateY(-2px);
+
+  border-color:#4db8ff;
+
+  box-shadow:
+    0 0 10px rgba(77,184,255,.25),
+    0 0 25px rgba(77,184,255,.18),
+    0 10px 30px rgba(0,0,0,.35);
+
+}
+
+
+#explanationZoom:disabled{
+
+  opacity:.4;
+
+  cursor:not-allowed;
+
+  filter:grayscale(100%);
+
+}
+
+.zoom-toolbar.disabled{
+
+  opacity:.5;
+
+}
+
+
+#globalResult{
+
+  width:100%;
+
+  min-height:100px;
+
+  padding:24px 30px;
+
+  box-sizing:border-box;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+
+  white-space:normal;
+
+  overflow-wrap:anywhere;
+  word-break:break-word;
+
+  line-height:1.6;
+
+  background:
+    linear-gradient(
+      180deg,
+      #020617 0%,
+      #030b20 100%
+    );
+
+  border:1px solid rgba(77,184,255,.18);
+
+  border-radius:8px;
+
+  color:#ffffff;
+
+  font-size:24px;
+
+  font-weight:700;
+
+  font-family:
+    Consolas,
+    Monaco,
+    "Courier New",
+    monospace;
+
+  letter-spacing:.3px;
+
+  text-shadow:
+    0 0 8px rgba(255,255,255,.08);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 4px 16px rgba(0,0,0,.25);
+
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+/* Top Accent Line */
+
+#globalResult::before{
+
+  content:'';
+
+  position:absolute;
+
+  top:0;
+  left:0;
+
+  width:100%;
+  height:2px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #4db8ff,
+      transparent
+    );
+}
+
+/* Container */
+
+.answer-box{
+
+  padding:12px;
+
+  flex-shrink:0;
+
+  overflow:visible;
+}
+
+.answer-center{
+
+  width:100%;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+}
+
+
+.circuit-mode-group{
+
+  display:flex;
+  flex-direction:column;
+
+  gap:10px;
+
+  margin:18px 0;
+
+  padding:14px;
+
+  background:#111827;
+
+  border:1px solid #334155;
+
+}
+
+.circuit-mode{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  color:#ffffff;
+
+  cursor:pointer;
+
+  font-weight:600;
+
+}
+
+.circuit-mode input[type="radio"]{
+
+  accent-color:#38bdf8;
+
+  transform:scale(1.1);
+
+}
+
+ h3 { margin-top: 30px; color: white; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+
+
+ .truth-options{
+
+  margin:18px 0;
+
+  padding:14px;
+
+  background:#111827;
+
+  border:1px solid #334155;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(auto-fit,minmax(280px,1fr));
+
+  gap:10px;
+
+}
+
+.truth-options label{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  color:#ffffff;
+
+  cursor:pointer;
+
+  font-weight:600;
+
+}
+
+.truth-options input[type="checkbox"]{
+
+  width:18px;
+
+  height:18px;
+
+  accent-color:#38bdf8;
+
+  cursor:pointer;
+
+}
   </style>
   </head>
 
@@ -1953,272 +2042,433 @@ td.cell:hover{
 
     <summary>📘 Digital Electronics Theory</summary>
 
-    <div class="topic-item">
+    <strong>What is Boolean Algebra?</strong><br><br>
 
-      • Binary (Base 2): 0,1<br>
-• Octal (Base 8): 0-7<br>
-• Decimal (Base 10): 0-9<br>
-• Hexadecimal (Base 16): 0-9,A-F<br><br>
+Boolean Algebra is a mathematical system used to represent and simplify logical expressions.
 
-Position Value = Digit × Baseⁿ<br><br>
+It was developed by George Boole and forms the foundation of Digital Electronics and Computer Science.
 
-Used in computer arithmetic,
-coding, memory and digital systems.
+Unlike ordinary algebra, Boolean Algebra uses only two values:
 
-<br><br>
-
-<strong>What is a Number System?</strong><br><br>
-
-A Number System is a method of representing and expressing numbers using a set of symbols called digits. Every number system is defined by its Base (Radix), which specifies the total number of unique digits available.
+0 = FALSE<br>
+1 = TRUE
 
 <br><br>
 
-Examples:<br>
-Decimal → Base 10 → Digits 0-9<br>
-Binary → Base 2 → Digits 0,1<br>
-Octal → Base 8 → Digits 0-7<br>
-Hexadecimal → Base 16 → Digits 0-9,A-F
+Used in:
+
+• Digital Circuits<br>
+• Computer Logic<br>
+• Microprocessors<br>
+• Control Systems<br>
+• Programming Logic<br>
 
 <br><br>
 
-<strong>Base or Radix</strong><br><br>
+<strong>Boolean Variables</strong><br><br>
 
-The base of a number system indicates the number of distinct symbols used to represent numbers.
+A Boolean Variable can have only two possible values:
 
-<br><br>
-
-Base 2 → Binary<br>
-Base 8 → Octal<br>
-Base 10 → Decimal<br>
-Base 16 → Hexadecimal
-
-<br><br>
-
-<strong>Positional Number System</strong><br><br>
-
-Most modern number systems are positional. The value of a digit depends on:
-
-1. The digit itself<br>
-2. Its position in the number
-
-<br><br>
-
-Value = Digit × Baseⁿ
+A = 0 or 1<br>
+B = 0 or 1<br>
+C = 0 or 1
 
 <br><br>
 
 Example:
 
-(345)₁₀
-
-= 3×10² + 4×10¹ + 5×10⁰
-
-= 300 + 40 + 5
-
-= 345
+A = TRUE<br>
+B = FALSE
 
 <br><br>
 
-<strong>Binary Number System</strong><br><br>
+<strong>Boolean Operators</strong><br><br>
 
-Binary is the fundamental language of computers.
-
-Digits Used: 0 and 1
-
-Example:
-
-(1011)₂
-
-= 1×2³ + 0×2² + 1×2¹ + 1×2⁰
-
-= 8 + 0 + 2 + 1
-
-= 11₁₀
+AND → .<br>
+OR → +<br>
+NOT → '
 
 <br><br>
-
-Advantages:
-
-• Simple electronic implementation<br>
-• Reliable storage and transmission<br>
-• Directly compatible with digital circuits
-
-<br><br>
-
-<strong>Octal Number System</strong><br><br>
-
-Base = 8
-
-Digits = 0 to 7
-
-Each Octal Digit represents exactly 3 Binary Bits.
-
-Example:
-
-563₈ = 101110011₂
-
-<br><br>
-
-Used to shorten long binary numbers.
-
-<br><br>
-
-<strong>Decimal Number System</strong><br><br>
-
-Base = 10
-
-Digits = 0 to 9
-
-Most commonly used number system in daily life.
-
-Example:
-
-528₁₀
-
-= 5×10² + 2×10¹ + 8×10⁰
-
-<br><br>
-
-<strong>Hexadecimal Number System</strong><br><br>
-
-Base = 16
-
-Digits:
-
-0 1 2 3 4 5 6 7 8 9 A B C D E F
-
-Where:
-
-A = 10<br>
-B = 11<br>
-C = 12<br>
-D = 13<br>
-E = 14<br>
-F = 15
-
-<br><br>
-
-Each Hex Digit represents exactly 4 Binary Bits.
-
-Example:
-
-FA₁₆
-
-= 11111010₂
-
-<br><br>
-
-Widely used in:
-
-• Memory Addressing<br>
-• Programming<br>
-• Machine Language<br>
-• Color Codes (#FFFFFF)
-
-<br><br>
-
-<strong>Why Computers Use Binary?</strong><br><br>
-
-Electronic circuits naturally have two stable states:
-
-ON / OFF<br>
-HIGH / LOW<br>
-TRUE / FALSE
-
-These are represented as:
-
-1 / 0
-
-Hence computers process all information using binary digits.
-
-<br><br>
-
-<strong>Number System Conversions</strong><br><br>
-
-Common conversions include:
-
-• Binary ↔ Decimal<br>
-• Binary ↔ Octal<br>
-• Binary ↔ Hexadecimal<br>
-• Decimal ↔ Octal<br>
-• Decimal ↔ Hexadecimal
-
-<br><br>
-
-<strong>Complements</strong><br><br>
-
-Complements simplify subtraction operations.
 
 Examples:
 
-1's Complement<br>
-2's Complement<br>
-7's Complement<br>
-8's Complement<br>
-9's Complement<br>
-10's Complement
+A.B<br>
+A+B<br>
+A'
 
 <br><br>
 
-<strong>Digital Codes</strong><br><br>
+<strong>Basic Logic Gates</strong><br><br>
 
-Special coding schemes used in digital electronics:
-
-• BCD (Binary Coded Decimal)<br>
-• Excess-3 Code<br>
-• Gray Code
+Logic Gates are electronic circuits that perform Boolean operations.
 
 <br><br>
 
-<strong>Signed Number Representation</strong><br><br>
+<strong>AND Gate</strong><br><br>
 
-Negative numbers can be represented using:
+Expression:
 
-• Sign Magnitude<br>
-• 1's Complement<br>
-• 2's Complement
+Y = A.B
+
+Output is 1 only when all inputs are 1.
+
+Truth Table:
+
+A B | Y<br>
+0 0 | 0<br>
+0 1 | 0<br>
+1 0 | 0<br>
+1 1 | 1
 
 <br><br>
 
-<strong>Floating Point Representation</strong><br><br>
+<strong>OR Gate</strong><br><br>
 
-Real numbers are represented using:
+Expression:
 
-• Fixed Point Format<br>
-• Floating Point Format<br>
-• IEEE-754 Standard
+Y = A + B
+
+Output is 1 when any input is 1.
+
+Truth Table:
+
+A B | Y<br>
+0 0 | 0<br>
+0 1 | 1<br>
+1 0 | 1<br>
+1 1 | 1
+
+<br><br>
+
+<strong>NOT Gate</strong><br><br>
+
+Expression:
+
+Y = A'
+
+Output is the complement of input.
+
+Truth Table:
+
+A | Y<br>
+0 | 1<br>
+1 | 0
+
+<br><br>
+
+<strong>Universal Gates</strong><br><br>
+
+Universal Gates can implement any Boolean function without using any other gate.
+
+There are two Universal Gates:
+
+• NAND Gate<br>
+• NOR Gate
+
+<br><br>
+
+<strong>NAND Gate</strong><br><br>
+
+Expression:
+
+Y = (A.B)'
+
+Truth Table:
+
+A B | Y<br>
+0 0 | 1<br>
+0 1 | 1<br>
+1 0 | 1<br>
+1 1 | 0
+
+<br><br>
+
+<strong>NOR Gate</strong><br><br>
+
+Expression:
+
+Y = (A+B)'
+
+Truth Table:
+
+A B | Y<br>
+0 0 | 1<br>
+0 1 | 0<br>
+1 0 | 0<br>
+1 1 | 0
+
+<br><br>
+
+<strong>XOR Gate (Exclusive OR)</strong><br><br>
+
+Expression:
+
+Y = A⊕B
+
+Output is 1 when inputs are different.
+
+Truth Table:
+
+A B | Y<br>
+0 0 | 0<br>
+0 1 | 1<br>
+1 0 | 1<br>
+1 1 | 0
+
+<br><br>
+
+Applications:
+
+• Binary Addition<br>
+• Error Detection<br>
+• Comparators
+
+<br><br>
+
+<strong>XNOR Gate (Exclusive NOR)</strong><br><br>
+
+Expression:
+
+Y = (A⊕B)'
+
+Output is 1 when inputs are equal.
+
+Truth Table:
+
+A B | Y<br>
+0 0 | 1<br>
+0 1 | 0<br>
+1 0 | 0<br>
+1 1 | 1
+
+<br><br>
+
+Applications:
+
+• Equality Checking<br>
+• Comparators
+
+<br><br>
+
+<strong>Boolean Laws</strong><br><br>
+
+These laws help simplify logical expressions.
+
+<br><br>
+
+<strong>Identity Law</strong><br><br>
+
+A + 0 = A<br>
+A . 1 = A
+
+<br><br>
+
+<strong>Null Law</strong><br><br>
+
+A + 1 = 1<br>
+A . 0 = 0
+
+<br><br>
+
+<strong>Idempotent Law</strong><br><br>
+
+A + A = A<br>
+A . A = A
+
+<br><br>
+
+<strong>Complement Law</strong><br><br>
+
+A + A' = 1<br>
+A . A' = 0
+
+<br><br>
+
+<strong>Involution Law</strong><br><br>
+
+(A')' = A
+
+<br><br>
+
+<strong>Commutative Law</strong><br><br>
+
+A + B = B + A<br>
+A.B = B.A
+
+<br><br>
+
+<strong>Associative Law</strong><br><br>
+
+(A+B)+C = A+(B+C)<br>
+(A.B).C = A.(B.C)
+
+<br><br>
+
+<strong>Distributive Law</strong><br><br>
+
+A(B+C) = AB + AC<br>
+A + BC = (A+B)(A+C)
+
+<br><br>
+
+<strong>Absorption Law</strong><br><br>
+
+A + AB = A<br>
+A(A+B) = A
+
+<br><br>
+
+<strong>De Morgan's Theorems</strong><br><br>
+
+Very important in Digital Electronics.
+
+<br><br>
+
+First Theorem:
+
+(A.B)' = A' + B'
+
+<br><br>
+
+Second Theorem:
+
+(A+B)' = A'.B'
+
+<br><br>
+
+Used extensively in NAND and NOR implementations.
+
+<br><br>
+
+<strong>Canonical Forms</strong><br><br>
+
+Boolean expressions can be represented in standard forms.
+
+<br><br>
+
+<strong>Minterm</strong><br><br>
+
+A Minterm contains all variables exactly once.
+
+Example:
+
+A'BC
+
+A minterm produces output 1 for exactly one combination.
+
+Notation:
+
+Σ (Sigma)
+
+Example:
+
+F(A,B,C)=Σ(1,3,5,7)
+
+<br><br>
+
+<strong>Maxterm</strong><br><br>
+
+A Maxterm contains all variables exactly once.
+
+Example:
+
+(A+B'+C)
+
+A maxterm produces output 0 for exactly one combination.
+
+Notation:
+
+Π (Pi)
+
+Example:
+
+F(A,B,C)=Π(0,2,4,6)
+
+<br><br>
+
+<strong>SOP (Sum of Products)</strong><br><br>
+
+Product terms are ORed together.
+
+Example:
+
+F = A'B + BC + AC'
+
+<br><br>
+
+Structure:
+
+AND terms → OR
+
+<br><br>
+
+Used widely in logic circuit design.
+
+<br><br>
+
+<strong>POS (Product of Sums)</strong><br><br>
+
+Sum terms are ANDed together.
+
+Example:
+
+F = (A+B)(A'+C)(B+C)
+
+<br><br>
+
+Structure:
+
+OR terms → AND
+
+<br><br>
+
+Used in NOR-based implementations.
+
+<br><br>
+
+<strong>Karnaugh Map (K-Map)</strong><br><br>
+
+A graphical method used to simplify Boolean expressions.
+
+Advantages:
+
+• Reduces logic gates<br>
+• Minimizes hardware cost<br>
+• Simplifies SOP and POS forms<br>
+
+Grouping Sizes:
+
+1, 2, 4, 8, 16 ...
 
 <br><br>
 
 <strong>Important Exam Facts</strong><br><br>
 
-• Binary uses 2 symbols.<br>
-• Octal uses 8 symbols.<br>
-• Decimal uses 10 symbols.<br>
-• Hexadecimal uses 16 symbols.<br>
-• 1 Octal Digit = 3 Bits.<br>
-• 1 Hex Digit = 4 Bits.<br>
-• Base is also called Radix.<br>
-• 2's Complement is most commonly used for signed integers.<br>
-• IEEE-754 is the standard floating-point representation.<br>
-• Gray Code changes only one bit between consecutive values.
+• Boolean Algebra was developed by George Boole.<br>
+• Boolean variables have only two states: 0 and 1.<br>
+• NAND and NOR are Universal Gates.<br>
+• XOR outputs 1 when inputs differ.<br>
+• XNOR outputs 1 when inputs are equal.<br>
+• De Morgan's Theorems are frequently asked in exams.<br>
+• SOP uses Minterms and Sigma notation.<br>
+• POS uses Maxterms and Pi notation.<br>
+• K-Maps are used to simplify Boolean expressions.<br>
+• NAND implementation is common in digital IC design.<br>
 
 <br><br>
 
-<strong>Applications of Number Systems</strong><br><br>
+<strong>Applications of Boolean Algebra</strong><br><br>
 
-• Computer Architecture<br>
 • Digital Electronics<br>
-• Programming Languages<br>
-• Networking<br>
-• Data Communication<br>
-• Embedded Systems<br>
+• Logic Circuit Design<br>
 • Microprocessors<br>
-• Memory Management<br>
-• Operating Systems<br>
-• Scientific Computing
-
-    </div>
+• Computer Architecture<br>
+• PLC Systems<br>
+• Embedded Systems<br>
+• Robotics<br>
+• Artificial Intelligence<br>
+• Communication Systems<br>
+• Computer Programming
 
   </details>
 
@@ -2231,7 +2481,7 @@ Real numbers are represented using:
         </div>
 
         <div class="pane-foot">
-          <span class="msg">Number System Theory</span>
+          <span class="msg">Digital Electronics Theory</span>
         </div>
 
       </div>
@@ -2268,40 +2518,48 @@ Real numbers are represented using:
   <div class="ns-tabs">
 
     <button class="ns-tab active"
+            data-tab="truth">
+
+      Boolean Representations
+
+    </button>
+
+    <button class="ns-tab"
             data-tab="expression">
 
       Expression Solver
 
     </button>
 
-    <button class="ns-tab"
-            data-tab="truth">
-
-      Truth Tables
-
-    </button>
-
-    <button class="ns-tab"
+<button class="ns-tab"
             data-tab="gates">
 
-      Logic Gates
+      Logic Gate Viewer
 
     </button>
 
 
-    <button class="ns-tab"
+     <button class="ns-tab"
             data-tab="circuit">
 
       Circuit Generator
 
     </button>
+   
 
-    <button class="ns-tab"
+   <button class="ns-tab"
             data-tab="kmap">
 
       Karnaugh Maps
 
     </button>
+
+    
+
+
+   
+
+    
 
   </div>
 
@@ -2340,44 +2598,14 @@ Real numbers are represented using:
 
   </div>
 
-  <div class="ns-card tab-content hidden"
-     id="truth">
-
-  <div class="base-banner" >
-
-    Truth Table Generator
-
-  </div>
-
-  <div class="ns-input-group">
-
-    <label>
-
-      Expression
-
-    </label>
-
-    <input type="text"
-           id="truthExpression"
-           placeholder="A+B">
-
-  </div>
-
-  <button class="ns-btn" id="truthBtn" data-mode="simplify">
-
-    Generate Truth Table
-
-  </button>
-
-</div>
-
+ 
 
 <div class="ns-card tab-content hidden"
      id="gates">
 
   <div class="base-banner">
 
-    Logic Gates
+    Logic Gate Viewer
 
   </div>
 
@@ -2401,9 +2629,26 @@ Real numbers are represented using:
 
     </select>
 
+
+    <div class="ns-input-group">
+
+<br/>
+      <label>
+
+        Boolean Expression
+
+      </label>
+      
+      <input type="text"
+             id="exprInput2"
+             value="A.B" disabled>
+
+    </div>
+
+
   </div>
 
-  <button class="ns-btn">
+  <button class="ns-btn" id="gateBtn">
 
     Show Gate
 
@@ -2413,7 +2658,7 @@ Real numbers are represented using:
 
 
 
- <div class="ns-card tab-content"
+ <div class="ns-card tab-content hidden"
        id="circuit">
 
     <div class="base-banner">
@@ -2436,7 +2681,54 @@ Real numbers are represented using:
 
     </div>
 
-    <button class="ns-btn"  id="drawBtn" onclick="drawCircuit()">
+
+    <div class="circuit-mode-group">
+
+  <label class="circuit-mode">
+    <input
+      type="radio"
+      name="circuitMode"
+      value="basic"
+      checked>
+    Using Basic Logic Gates
+  </label>
+
+  <label class="circuit-mode">
+    <input
+      type="radio"
+      name="circuitMode"
+      value="nand">
+    Using NAND Gates Only
+  </label>
+
+  <label class="circuit-mode">
+    <input
+      type="radio"
+      name="circuitMode"
+      value="nor">
+    Using NOR Gates Only
+  </label>
+
+  <label class="circuit-mode">
+    <input
+      type="radio"
+      name="circuitMode"
+      value="nandnor">
+    Using NAND-NOR Network
+  </label>
+
+  <label>
+    <input type="checkbox"
+           id="chkTruthTableWD"
+           >
+    Show Truth Table
+  </label>
+
+
+</div>
+
+
+    <button class="ns-btn"  id="drawBtn">
 
       Draw/Generate
 
@@ -2506,6 +2798,103 @@ Real numbers are represented using:
 </div>
 
 
+
+
+ <div class="ns-card tab-content hidden"
+     id="truth">
+
+  <div class="base-banner" >
+
+    Boolean Representations
+
+  </div>
+
+  <div class="ns-input-group">
+
+    <label>
+
+      Expression
+
+    </label>
+
+    <input type="text"
+           id="truthExpression"
+           placeholder="A+B">
+
+  </div>
+
+
+  <div class="truth-options">
+
+  <label>
+    <input type="checkbox"
+           id="chkTruthTable"
+           checked>
+    Truth Table
+  </label>
+
+  <label>
+    <input type="checkbox"
+           id="chkCSOP">
+    Canonical Sum of Products (CSOP)
+  </label>
+
+  <label>
+    <input type="checkbox"
+           id="chkCPOS">
+    Canonical Product of Sum (CPOS)
+  </label>
+
+  <label>
+    <input type="checkbox"
+           id="chkMinterm">
+    Minterm Expression (m)
+  </label>
+
+  <label>
+    <input type="checkbox"
+           id="chkMaxterm">
+    Maxterm Expression (M)
+  </label>
+
+  <label>
+    <input type="checkbox"
+           id="chkSigma">
+    Cardinal Expression (Σ Symbol)
+  </label>
+
+  <label>
+    <input type="checkbox"
+           id="chkPi">
+    Cardinal Expression (Π Symbol)
+  </label>
+
+  <label>
+    <input type="checkbox"
+           id="chkDual">
+    Dual Form
+  </label>
+
+  <label>
+    <input type="checkbox"
+           id="chkInverse">
+    Inverse Form
+  </label>
+
+</div>
+
+  <button class="ns-btn" id="truthBtn" data-mode="simplify">
+
+    Generate
+
+  </button>
+
+</div>
+
+
+
+
+
 </div>
 
 </div>
@@ -2542,10 +2931,8 @@ Real numbers are represented using:
       </div>
   <div class="answer-box">
    <div class="answer-center">
-    <textarea
-      id="globalResult"
-      readonly
-      value="" rows = "1">  </textarea>
+    <div
+      id="globalResult">  </div>
    </div>
 
   </div>
@@ -2577,6 +2964,7 @@ Real numbers are represented using:
     min="100"
     max="250"
     value="100"
+    disabled
   >
 
   <span id="zoomValue">
@@ -2686,9 +3074,14 @@ Real numbers are represented using:
 
 
 
-<script src="./js/booleanexprsolver.js" defer></script>
+
 <script src="./js/kmap.js" defer></script>
+<script src="./js/booleanexprsolver.js" defer></script>
 <script src="./js/logicdiagram.js" defer></script>
+<script src="./js/logicdiagramnand.js" defer></script>
+<script src="./js/logicdiagramnor.js" defer></script>
+<script src="./js/logicdiagramnandnor.js" defer></script>
+<script src="./js/booleantools.js" defer></script>
 <script src="./js/boolean.js" defer></script>
 
   </body>

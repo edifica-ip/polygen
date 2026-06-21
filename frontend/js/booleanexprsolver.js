@@ -773,6 +773,7 @@ function applyRules(node, state) {
 
 // --- UI CONTROLLER ---
 function processExpression() {
+
     const input = document.getElementById('exprInput').value.replace(/\s+/g, '');
     const list = document.getElementById('stepList');
     const errorBox = document.getElementById('errorBox');
@@ -828,11 +829,10 @@ function addStepToList(rule, expr, isFinal = false) {
     </div>
 
     <div class="expression">
-        ${expr}222
-
+        ${expr}
             </div>
 
-    
+          
 `;
 
     list.appendChild(li);
