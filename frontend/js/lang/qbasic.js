@@ -248,7 +248,7 @@ executeBlock(lines) {
 
       const m =
         lines[x].match(
-          /^([A-Z][A-Z0-9_\$]*)\s*:$/i
+          /^([A-Z][A-Z0-9_\$]*)\s*:/i
         );
 
       if (m) {
@@ -415,15 +415,20 @@ if(
 }
 
       // LABEL:
-      if (
-        /^([A-Z][A-Z0-9_\$]*)\s*:$/i
-          .test(line)
-      ) {
+      const labelMatch =
+  line.match(
+    /^([A-Z][A-Z0-9_\$]*)\s*:\s*(.*)$/i
+  );
 
-        i++;
-        continue;
+if(labelMatch){
 
-      }
+  line = labelMatch[2].trim();
+
+  if(!line){
+    i++;
+    continue;
+  }
+}
 
       if(/^CLS$/i.test(line)){
 
@@ -2537,7 +2542,7 @@ callSub(
 
         const m =
           block[i].match(
-            /^([A-Z][A-Z0-9_\$]*)\s*:$/i
+             /^([A-Z][A-Z0-9_\$]*)\s*:/i
           );
 
         if(m){
