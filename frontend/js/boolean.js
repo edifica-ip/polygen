@@ -1309,7 +1309,7 @@ function generateBasicXNOR() {
         
         <!-- Output -->
         <line x1="105" y1="40" x2="135" y2="40" stroke="#555" stroke-width="2"/>
-        <text x="140" y="45" font-family="monospace" font-size="16" font-weight="bold" fill="white">(A ⊕ B)'</text>
+        <text x="140" y="45" font-family="monospace" font-size="16" font-weight="bold" fill="white">(A⊕B)'</text>
     </svg>`;
 }
 

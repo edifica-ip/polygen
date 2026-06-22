@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Polygen - Combinational Circuits Explorer</title>
+
+<style>
+
+/* =========================
+   GLOBAL
+========================= */
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    margin:0;
+    padding:20px;
+
+    background:#1f2d3d;
+    color:#ecf0f1;
+
+    transition:.3s;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container{
+    max-width:1200px;
+    margin:auto;
+
+    background:#2c3e50;
+
+    padding:30px;
+    border-radius:12px;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.25);
+
+    transition:.3s;
+}
+
+/* =========================
+   HEADINGS
+========================= */
+
+h1{
+    text-align:center;
+    color:#5dade2;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#bdc3c7;
+    margin-bottom:30px;
+}
+
+.section-title{
+    color:#5dade2;
+    margin-bottom:15px;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+    background:#22313f;
+    border-left:5px solid #3498db;
+
+    padding:20px;
+    border-radius:8px;
+
+    margin-bottom:30px;
+}
+
+.hero p{
+    margin:0;
+    line-height:1.7;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.grid{
+    display:grid;
+    grid-template-columns:
+        repeat(auto-fit,minmax(260px,1fr));
+
+    gap:20px;
+    align-items:stretch;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card{
+    background:#34495e;
+
+    border:1px solid #4b6584;
+    border-radius:10px;
+
+    padding:22px;
+
+    display:flex;
+    flex-direction:column;
+
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+
+    box-shadow:
+    0 10px 20px rgba(0,0,0,.25);
+}
+
+.card h2{
+    color:#5dade2;
+
+    margin-top:0;
+
+    border-bottom:
+    2px solid rgba(255,255,255,.2);
+
+    padding-bottom:12px;
+
+    margin-bottom:15px;
+}
+
+.card p{
+    line-height:1.6;
+}
+
+.card ul{
+    padding-left:22px;
+    line-height:1.8;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.module-btn{
+    width:100%;
+
+    margin-top:auto;
+
+    padding:12px;
+
+    border:none;
+    border-radius:8px;
+
+    background:#3498db;
+    color:white;
+
+    font-size:15px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.module-btn:hover{
+    background:#2980b9;
+
+    transform:translateY(-2px);
+}
+
+/* =========================
+   THEME BUTTON
+========================= */
+
+.theme-btn{
+    float:right;
+
+    padding:10px 16px;
+
+    border:none;
+    border-radius:8px;
+
+    background:#3498db;
+    color:white;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.theme-btn:hover{
+    background:#2980b9;
+}
+
+/* =========================
+   TABLES
+========================= */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+
+    margin-top:15px;
+}
+
+th,
+td{
+    border:1px solid #4b6584;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#22313f;
+    color:#5dade2;
+}
+
+tr:nth-child(even){
+    background:#3b4a59;
+}
+
+/* =========================
+   FOOTER NOTES
+========================= */
+
+.footer-note{
+    margin-top:25px;
+
+    background:#22313f;
+
+    padding:15px;
+
+    border-radius:8px;
+}
+
+/* =========================
+   FORMS
+========================= */
+
+input,
+select,
+textarea{
+    width:100%;
+
+    padding:10px;
+
+    border:1px solid #4b6584;
+    border-radius:6px;
+
+    background:#34495e;
+    color:white;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    outline:none;
+    border-color:#3498db;
+}
+
+/* =========================
+   LIGHT MODE
+========================= */
+
+body.light{
+    background:#f4f7f6;
+    color:#333;
+}
+
+body.light .container{
+    background:white;
+    color:#333;
+}
+
+body.light h1{
+    color:#2980b9;
+}
+
+body.light .subtitle{
+    color:#7f8c8d;
+}
+
+body.light .hero{
+    background:#e8f4f8;
+    border-left:5px solid #3498db;
+}
+
+body.light .card{
+    background:#ffffff;
+    border:1px solid #e1e8ed;
+}
+
+body.light .card h2{
+    color:#2980b9;
+    border-bottom:2px solid #ecf0f1;
+}
+
+body.light table{
+    color:#333;
+}
+
+body.light th{
+    background:#ecf0f1;
+    color:#2c3e50;
+}
+
+body.light tr:nth-child(even){
+    background:#f9f9f9;
+}
+
+body.light .footer-note{
+    background:#f8f9fa;
+}
+
+body.light input,
+body.light select,
+body.light textarea{
+    background:white;
+    color:#333;
+    border:1px solid #ced4da;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:768px){
+
+    body{
+        padding:12px;
+    }
+
+    .container{
+        padding:20px;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    h1{
+        font-size:1.8rem;
+    }
+
+    .theme-btn{
+        width:100%;
+        margin-bottom:15px;
+        float:none;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Combinational Circuits Explorer</h1>
+<button id="themeBtn" class="theme-btn">
+    ☀ Light Mode
+</button>   
+
+<div class="subtitle">
+Digital Electronics • Polygen Learning Module
+</div>
+
+<div class="hero">
+<p>
+A combinational circuit is a digital circuit whose output depends only on the
+present combination of inputs. These circuits do not store previous states and
+form the foundation of arithmetic units, data selectors, code converters,
+encoders, decoders and comparators.
+</p>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<h2>Adders</h2>
+
+<p>Perform binary addition operations.</p>
+
+<ul>
+<li>Half Adder</li>
+<li>Full Adder</li>
+<li>Parallel Adder</li>
+<li>Ripple Carry Adder</li>
+<li>Carry Look-Ahead Adder</li>
+<li>BCD Adder</li>
+</ul>
+
+<button class="module-btn"
+onclick="openModule('adders.html')">
+Open Adders Module
+</button>
+
+</div>
+
+<div class="card">
+<h2>Subtractors</h2>
+
+<p>Perform binary subtraction operations.</p>
+
+<ul>
+<li>Half Subtractor</li>
+<li>Full Subtractor</li>
+</ul>
+
+<button class="module-btn"
+onclick="openModule('subtractors.html')">
+Open Subtractors Module
+</button>
+
+</div>
+
+<div class="card">
+<h2>Multiplexers</h2>
+
+<p>Select one input from multiple inputs.</p>
+
+<ul>
+<li>2 : 1 MUX</li>
+<li>4 : 1 MUX</li>
+<li>8 : 1 MUX</li>
+<li>16 : 1 MUX</li>
+</ul>
+
+<button class="module-btn"
+onclick="openModule('mux.html')">
+Open Multiplexer Module
+</button>
+
+</div>
+
+<div class="card">
+<h2>Demultiplexers</h2>
+
+<p>Route one input to multiple outputs.</p>
+
+<ul>
+<li>1 : 2 DEMUX</li>
+<li>1 : 4 DEMUX</li>
+<li>1 : 8 DEMUX</li>
+</ul>
+
+<button class="module-btn"
+onclick="openModule('demux.html')">
+Open Demultiplexer Module
+</button>
+
+</div>
+
+<div class="card">
+<h2>Encoders</h2>
+
+<p>Convert active inputs into binary codes.</p>
+
+<ul>
+<li>Encoder</li>
+<li>Priority Encoder</li>
+</ul>
+
+<button class="module-btn"
+onclick="openModule('encoder.html')">
+Open Encoder Module
+</button>
+
+</div>
+
+<div class="card">
+<h2>Decoders</h2>
+
+<p>Convert binary codes into output lines.</p>
+
+<ul>
+<li>2 : 4 Decoder</li>
+<li>3 : 8 Decoder</li>
+<li>BCD to 7-Segment</li>
+</ul>
+
+<button class="module-btn"
+onclick="openModule('decoder.html')">
+Open Decoder Module
+</button>
+
+</div>
+
+<div class="card">
+<h2>Comparators</h2>
+
+<p>Compare binary numbers.</p>
+
+<ul>
+<li>A > B</li>
+<li>A < B</li>
+<li>A = B</li>
+</ul>
+
+<button class="module-btn"
+onclick="openModule('comparator.html')">
+Open Comparator Module
+</button>
+
+</div>
+
+<div class="card">
+<h2>Code Converters</h2>
+
+<p>Convert between different digital codes.</p>
+
+<ul>
+<li>Binary ↔ Gray</li>
+<li>Gray ↔ Binary</li>
+<li>BCD ↔ Excess-3</li>
+</ul>
+
+<button class="module-btn"
+onclick="openModule('converter.html')">
+Open Converter Module
+</button>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<h2>Combinational Circuit Comparison</h2>
+
+<table>
+
+<tr>
+<th>Circuit</th>
+<th>Main Function</th>
+<th>Inputs</th>
+<th>Outputs</th>
+</tr>
+
+<tr>
+<td>Adder</td>
+<td>Addition</td>
+<td>Binary Numbers</td>
+<td>Sum & Carry</td>
+</tr>
+
+<tr>
+<td>Subtractor</td>
+<td>Subtraction</td>
+<td>Binary Numbers</td>
+<td>Difference & Borrow</td>
+</tr>
+
+<tr>
+<td>MUX</td>
+<td>Data Selection</td>
+<td>Many Inputs</td>
+<td>One Output</td>
+</tr>
+
+<tr>
+<td>DEMUX</td>
+<td>Data Distribution</td>
+<td>One Input</td>
+<td>Many Outputs</td>
+</tr>
+
+<tr>
+<td>Encoder</td>
+<td>Code Generation</td>
+<td>Input Lines</td>
+<td>Binary Code</td>
+</tr>
+
+<tr>
+<td>Decoder</td>
+<td>Code Interpretation</td>
+<td>Binary Code</td>
+<td>Output Lines</td>
+</tr>
+
+<tr>
+<td>Comparator</td>
+<td>Comparison</td>
+<td>Two Numbers</td>
+<td>Greater / Equal / Less</td>
+</tr>
+
+</table>
+
+</div>
+
+<div class="footer-note">
+
+<b>Key Characteristics:</b>
+
+<ul>
+<li>No memory elements</li>
+<li>No feedback path</li>
+<li>Output depends only on present inputs</li>
+<li>Built using logic gates</li>
+<li>Used extensively in arithmetic and decision-making circuits</li>
+</ul>
+
+</div>
+
+</div>
+
+<script>
+
+function openModule(page){
+
+    /*
+    Replace with actual navigation later
+    */
+
+    alert("Open: " + page);
+
+    // window.location.href = page;
+}
+
+const themeBtn =
+document.getElementById("themeBtn");
+
+/* Default = Dark Mode */
+
+let darkMode = true;
+
+themeBtn.addEventListener(
+    "click",
+    () => {
+
+        document.body.classList.toggle(
+            "light"
+        );
+
+        darkMode = !darkMode;
+
+        themeBtn.innerHTML =
+            darkMode
+            ? "☀ Light Mode"
+            : "🌙 Dark Mode";
+    }
+);
+
+
+</script>
+
+</body>
+</html>
